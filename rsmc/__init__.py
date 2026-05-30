@@ -24,7 +24,8 @@ from .control import (
     tune_ridge_lambda,
     variance_reduction,
 )
-from .features import PathFeatures, asian_features
+from .features import PathFeatures, asian_features, heston_features
+from .heston import HestonModel, HestonPaths, make_heston_datasets
 from .payoffs import (
     arithmetic_asian_call,
     black_scholes_call_price,
@@ -49,6 +50,10 @@ __all__ = [
     "geometric_asian_call_price",
     "PathFeatures",
     "asian_features",
+    "heston_features",
+    "HestonModel",
+    "HestonPaths",
+    "make_heston_datasets",
     "RandomizedSignatureReservoir",
     "readout_features",
     "control_features",

@@ -120,25 +120,33 @@ def assemble_signature_control_features(
 
         Phi_i = sum_{k=0}^{N-1} phi_{i,k} * dM_{i,k+1},   phi_k = [1, t_k, s_k].
 
-    Returns an array of shape ``(n, q)`` with ``q = 2 + signature_dim(d, level)``.
+    Scalar increments give ``q = 2 + signature_dim(d, level)``; vector increments
+    with ``m`` directions give ``q = m * (2 + signature_dim(d, level))`` with one
+    block per direction (same direction-major layout as
+    :func:`rsmc.control.control_features`).
     """
     increments = features.increments                      # (n, N, d)
     n_paths, _, n_channels = increments.shape
-    q = 2 + signature_dim(n_channels, level)
+    m = 1 if martingale_increments.ndim == 2 else martingale_increments.shape[2]
+    q_phi = 2 + signature_dim(n_channels, level)
+    q = q_phi * m
     phi_matrix = np.empty((n_paths, q))
 
     for start in range(0, n_paths, batch_size):
         stop = min(start + batch_size, n_paths)
         batch = stop - start
-        shocks = martingale_increments[start:stop]        # (batch, N)
+        shocks = martingale_increments[start:stop]        # (batch, N) or (batch, N, m)
         row = np.zeros((batch, q))
         for step, signature_state in enumerate(
             _iterate_running_signature(increments[start:stop], level)
         ):
             ones = np.ones((batch, 1))
             time_column = np.full((batch, 1), times[step])
-            phi = np.concatenate([ones, time_column, signature_state], axis=1)
-            row += phi * shocks[:, step][:, None]
+            phi = np.concatenate([ones, time_column, signature_state], axis=1)  # (batch, q_phi)
+            if shocks.ndim == 2:                          # scalar increments
+                row += phi * shocks[:, step][:, None]
+            else:                                         # vector: one block per direction
+                row += (phi[:, None, :] * shocks[:, step, :][:, :, None]).reshape(batch, -1)
         phi_matrix[start:stop] = row
 
     return phi_matrix

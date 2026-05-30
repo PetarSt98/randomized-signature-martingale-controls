@@ -29,10 +29,10 @@ class ExperimentConfig:
 
     model: BlackScholesModel = field(default_factory=BlackScholesModel)
     strike: float = 100.0          # at-the-money call (K = S_0 by default)
-    n_steps: int = 252             # N
-    n_train: int = 20_000
+    n_steps: int = 52             # N
+    n_train: int = 10_000
     n_val: int = 5_000
-    n_test: int = 100_000
+    n_test: int = 50_000
     seed: int = 0                  # master seed; sub-samples derive from it
 
 

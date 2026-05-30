@@ -35,7 +35,22 @@ from .reservoir import RandomizedSignatureReservoir, readout_features
 
 
 def control_features(readout_phi: np.ndarray, martingale_increments: np.ndarray) -> np.ndarray:
-    """Collapse each path into Phi_i = sum_k phi_{i,k} * dM_{i,k+1}.
+    """Collapse each path into the regression row Phi_i.
+
+    Scalar increments dM_{k+1} (shape ``(n, N)``, e.g. Black-Scholes):
+
+        Phi_i = sum_k phi_{i,k} * dM_{i,k+1}              in R^q.
+
+    Vector increments dM_{k+1} in R^m (shape ``(n, N, m)``, e.g. Heston's two
+    Brownian shocks): the control is C = sum_k Z_k . dM_{k+1} with one
+    predictable readout direction per martingale component, Z_k^{(j)} =
+    beta_j . phi_k. Collecting the blocks gives
+
+        Phi_i = [ sum_k phi_{i,k} dM^{(1)}, ..., sum_k phi_{i,k} dM^{(m)} ]  in R^{m q},
+
+    i.e. one q-block per martingale direction (m = 1 reduces to the scalar
+    case). Only the predictable prefix phi_0..phi_{N-1} is ever used, so the
+    integrand never looks ahead.
 
     Parameters
     ----------
@@ -43,15 +58,21 @@ def control_features(readout_phi: np.ndarray, martingale_increments: np.ndarray)
         Readout features phi_k, shape ``(n, N + 1, q)``. Only the predictable
         prefix phi_0..phi_{N-1} is used.
     martingale_increments:
-        Brownian shocks dM_{k+1}, shape ``(n, N)``.
+        Brownian shocks dM_{k+1}, shape ``(n, N)`` (scalar) or ``(n, N, m)``
+        (vector).
 
     Returns
     -------
     np.ndarray
-        Per-path regression rows Phi, shape ``(n, q)``.
+        Per-path regression rows Phi, shape ``(n, q)`` (scalar) or
+        ``(n, m * q)`` (vector, direction-major blocks).
     """
-    predictable = readout_phi[:, :-1, :]                     # phi_0 .. phi_{N-1}
-    return np.einsum("nkq,nk->nq", predictable, martingale_increments)
+    predictable = readout_phi[:, :-1, :]                     # phi_0 .. phi_{N-1}, (n, N, q)
+    if martingale_increments.ndim == 2:                      # scalar increments (n, N)
+        return np.einsum("nkq,nk->nq", predictable, martingale_increments)
+    # vector increments (n, N, m): one q-block per direction, then concatenate.
+    blocks = np.einsum("nkq,nkm->nmq", predictable, martingale_increments)   # (n, m, q)
+    return blocks.reshape(blocks.shape[0], -1)               # (n, m * q)
 
 
 def assemble_control_features(
@@ -65,10 +86,12 @@ def assemble_control_features(
 
     Batching keeps memory bounded: the full reservoir-state tensor for a large
     test set would be huge, but we only ever keep one batch of states at a time
-    and immediately collapse it into Phi (shape ``(n, q)``).
+    and immediately collapse it into Phi. Scalar increments give ``q = D + 2``;
+    vector increments with m directions give ``q = m * (D + 2)`` (one block each).
     """
     n_paths = features.values.shape[0]
-    q = reservoir.dim + 2
+    m = 1 if martingale_increments.ndim == 2 else martingale_increments.shape[2]
+    q = (reservoir.dim + 2) * m
     phi_matrix = np.empty((n_paths, q))
     for start in range(0, n_paths, batch_size):
         stop = min(start + batch_size, n_paths)

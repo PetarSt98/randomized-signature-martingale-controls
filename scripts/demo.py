@@ -56,6 +56,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from rsmc import (
     ExperimentConfig,
+    HestonModel,
     RandomizedSignatureReservoir,
     RidgeMartingaleControl,
     arithmetic_asian_call,
@@ -66,7 +67,9 @@ from rsmc import (
     european_call,
     evaluate_control,
     geometric_asian_call_price,
+    heston_features,
     make_datasets,
+    make_heston_datasets,
     signature_dim,
     tune_ridge_lambda,
     variance_reduction,
@@ -85,7 +88,7 @@ config = ExperimentConfig()                  # DATA knobs: model, strike, N, sam
 RESERVOIR_DIM = 64                           # Part A: reservoir size D
 RIDGE_LAMBDAS = (0.0, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1)
 SWEEP_DIMS = (16, 32, 64, 128, 256)                   # Part B: reservoir sizes D to compare
-SWEEP_LEVELS = (2, 3, 4, 5)                     # Part B: signature truncation levels L
+SWEEP_LEVELS = (2, 3, 4)                     # Part B: signature truncation levels L
 N_BENCH = 30_000                             # Part B: shared test paths for the d=3 and d=5 sweeps
 print(config)
 
@@ -321,30 +324,37 @@ def signature_assembler(level):
     )
 
 
-def make_bundles(feature_map, cap=None):
-    """Build train/val/test bundles from a per-dataset feature dict, optional cap."""
+def make_bundles(feature_map, path_sets, payoff_sets, cap=None):
+    """Build train/val/test bundles from a feature dict + matching paths/payoffs.
+
+    ``path_sets`` and ``payoff_sets`` are dicts keyed by split; this keeps the
+    helper model-agnostic, so the same code drives Black-Scholes (scalar shocks
+    ``(n, N)``) and Heston (vector shocks ``(n, N, 2)``) unchanged.
+    """
     bundles = {}
     for name in ("train", "val", "test"):
-        paths = datasets[name]
+        paths = path_sets[name]
         feats = feature_map[name]
         m = feats.values.shape[0] if cap is None else min(cap, feats.values.shape[0])
         bundles[name] = (
             PathFeatures(feats.values[:m], feats.names),
             paths.times,
-            paths.brownian_increments[:m],
-            payoff[name][:m],
+            paths.brownian_increments[:m],          # (m, N) or (m, N, 2)
+            payoff_sets[name][:m],
         )
     return bundles
 
 
-def run_sweep(feature_map, reservoir_dims, signature_levels, cap=None, seed=200):
+def run_sweep(feature_map, path_sets, payoff_sets, reservoir_dims, signature_levels,
+              cap=None, seed=200):
     """Run reservoir(D) and signature(L) controls on one feature map; return rows.
 
     The channel count d is read from the feature map, so it can never disagree
-    with the actual features (no hardcoded 3 / 5).
+    with the actual features (no hardcoded 3 / 5). The martingale dimension m
+    (1 for Black-Scholes, 2 for Heston) is inferred downstream from the shocks.
     """
     n_channels = feature_map["train"].values.shape[2]
-    bundles = make_bundles(feature_map, cap=cap)
+    bundles = make_bundles(feature_map, path_sets, payoff_sets, cap=cap)
     rows = []
     for dim in reservoir_dims:
         label = f"reservoir D={dim}"
@@ -399,7 +409,8 @@ def print_table(rows, n_eval):
 # times are comparable across d.
 print(f"d = 3 sweep on {N_BENCH:,} test paths:")
 rows_d3 = run_sweep(
-    features, reservoir_dims=SWEEP_DIMS, signature_levels=SWEEP_LEVELS, cap=N_BENCH,
+    features, datasets, payoff,
+    reservoir_dims=SWEEP_DIMS, signature_levels=SWEEP_LEVELS, cap=N_BENCH,
 )
 print_table(rows_d3, N_BENCH)
 
@@ -447,7 +458,8 @@ features_d5 = {
 print("d = 5 channels:", features_d5["train"].names)
 print(f"d = 5 sweep on {N_BENCH:,} test paths (same ground as d = 3):")
 rows_d5 = run_sweep(
-    features_d5, reservoir_dims=SWEEP_DIMS, signature_levels=SWEEP_LEVELS,
+    features_d5, datasets, payoff,
+    reservoir_dims=SWEEP_DIMS, signature_levels=SWEEP_LEVELS,
     cap=N_BENCH, seed=400,
 )
 print_table(rows_d5, N_BENCH)
@@ -492,7 +504,7 @@ dim_factor = top_sig_d5["feature_dim"] / best_res_d5["feature_dim"]
 resid_excess = best_res_d5["var_cv"] / top_sig_d5["var_cv"] - 1.0   # extra residual variance
 
 print("=" * 70)
-print("RESULT - randomized-signature reservoir vs finite truncated signature")
+print("RESULT (Black-Scholes) - reservoir vs finite truncated signature")
 print("=" * 70)
 print(f"  Part A (reservoir D=64, d=3, {config.n_test:,} test paths):")
 print(f"     VR = {report.variance_reduction:.1f}x, SE reduction = {report.se_reduction:.1f}x, "
@@ -505,11 +517,136 @@ print(f"    * d=5: {top_sig_d5['label']} is the richest at {top_sig_d5['feature_
       f"VR {top_sig_d5['vr']:.1f}x @ {top_sig_d5['assemble_test_s']:.1f}s (heaviest).")
 print(f"      {best_res_d5['label']} ({best_res_d5['feature_dim']}-dim) reaches "
       f"VR {best_res_d5['vr']:.1f}x @ {best_res_d5['assemble_test_s']:.1f}s:")
-print(f"      ~{time_speedup:.1f}x faster, ~{dim_factor:.0f}x fewer features, only "
-      f"~{resid_excess * 100:.0f}% more residual variance -> compression starts to show.")
+resid_phrase = (f"only ~{resid_excess * 100:.0f}% more residual variance" if resid_excess >= 0
+                else f"even ~{-resid_excess * 100:.0f}% less residual variance")
+print(f"      ~{time_speedup:.1f}x faster, ~{dim_factor:.0f}x fewer features, {resid_phrase} "
+      f"-> compression starts to show.")
 print("    * Signature dim grows as d^L (cell 9); the reservoir stays fixed at D.")
 print(f"  Both sweeps share the same {N_BENCH:,}-path test set and train set, so the")
 print("  feat / fit times above are directly comparable across d = 3 and d = 5.")
 print("  Caveat: single random seed - a pilot that confirms the pipeline, not a")
 print("  final benchmark.")
+print("=" * 70)
+
+# %% [markdown]
+# # Part C - Heston: a vector martingale control (two Brownian shocks)
+#
+# Black-Scholes has a single Brownian driver, so the control integrates against a
+# **scalar** increment. Heston adds a stochastic-variance factor with its *own*
+# Brownian motion (correlated, `rho < 0` = leverage), so the martingale increment
+# is a **vector** `dM = (dW^S, dW^v)` in R^2. The control becomes
+#
+# `C = sum_k Z_k . dM_{k+1}`,  one predictable readout direction per component,
+#
+# and the collapsed regression row concatenates one `[1, t_k, h_k]`-block per
+# direction (so the reservoir row is `q = 2 * (D + 2)`). Everything else is
+# identical: frozen reservoir, linear ridge readout, sample-split, and the same
+# reservoir-vs-signature benchmark. The simulator uses full-truncation Euler, so
+# this prices the **discretised** Heston target, not the exact continuous price.
+
+# %%
+heston_model = HestonModel()              # s0=100, v0=theta=0.04, kappa=1.5, xi=0.3, rho=-0.7
+HESTON_SIZES = {"train": 20_000, "val": 5_000, "test": 40_000}
+heston_datasets = make_heston_datasets(heston_model, HESTON_SIZES, config.n_steps, seed=0)
+heston_payoff = {
+    name: arithmetic_asian_call(paths, strike=config.strike, rate=heston_model.r)
+    for name, paths in heston_datasets.items()
+}
+print("Heston model:", heston_model)
+for name, paths in heston_datasets.items():
+    print(f"{name:>5}: spot {paths.spot.shape}, variance {paths.variance.shape}, "
+          f"dW {paths.brownian_increments.shape}")
+
+# %% [markdown]
+# ## C1 - Sanity-check the Heston simulator
+# * discounted spot is a martingale: `E[e^{-r t_k} S_k] = S_0`;
+# * variance stays non-negative (full truncation) and mean-reverts towards `theta`;
+# * the realised correlation of the two Brownian increments matches `rho`.
+
+# %%
+htest = heston_datasets["test"]
+discount = np.exp(-heston_model.r * htest.times)
+martingale_dev = np.max(np.abs((discount * htest.spot).mean(axis=0) - heston_model.s0))
+dW = htest.brownian_increments
+realised_rho = np.corrcoef(dW[:, :, 0].ravel(), dW[:, :, 1].ravel())[0, 1]
+print(f"(a) max_k |E[e^(-r t_k) S_k] - S_0| = {martingale_dev:.4f}   (should be ~0)")
+print(f"(b) min variance = {htest.variance.min():.4f} (>= 0);  "
+      f"mean v_T = {htest.variance[:, -1].mean():.4f}  (theta = {heston_model.theta})")
+print(f"(c) realised corr(dW^S, dW^v) = {realised_rho:+.3f}  (target rho = {heston_model.rho})")
+hci = 1.96 * heston_payoff["test"].std(ddof=1) / np.sqrt(heston_payoff["test"].size)
+print(f"plain MC Heston Asian price = {heston_payoff['test'].mean():.4f} +/- {hci:.4f}  (95% CI)")
+
+# %%
+fig, (ax_s, ax_v) = plt.subplots(1, 2, figsize=(12, 4.2))
+for i in range(20):
+    ax_s.plot(htest.times, htest.spot[i], lw=0.8, alpha=0.8)
+    ax_v.plot(htest.times, htest.variance[i], lw=0.8, alpha=0.8)
+ax_s.set_title("Heston spot paths"); ax_s.set_xlabel("t"); ax_s.set_ylabel("S_t")
+ax_v.axhline(heston_model.theta, color="k", ls="--", lw=1, label="theta")
+ax_v.set_title("Heston variance paths"); ax_v.set_xlabel("t"); ax_v.set_ylabel("v_t"); ax_v.legend()
+fig.tight_layout()
+fig.savefig(FIGURES_DIR / f"demo_heston_paths_{config.n_steps}.png", dpi=130)
+plt.show()
+
+# %% [markdown]
+# ## C2 - Heston features (d = 4) and the vector control headline
+# Adapted channels: time, log-price, **variance** (the second state factor),
+# running average. A single frozen reservoir (D = 64) + ridge readout, with the
+# 2-D Brownian increments as the martingale control. The regression row has
+# `q = 2 * (D + 2) = 132` columns: one `[1, t, h]`-block per Brownian direction.
+
+# %%
+heston_feats = {name: heston_features(paths) for name, paths in heston_datasets.items()}
+print("Heston channels:", heston_feats["train"].names)
+
+h_reservoir = RandomizedSignatureReservoir.draw(
+    n_channels=heston_feats["train"].values.shape[2], dim=RESERVOIR_DIM,
+    rng=np.random.default_rng(config.seed + 700),
+)
+h_phi = {
+    name: assemble_control_features(
+        h_reservoir, heston_feats[name], heston_datasets[name].times,
+        heston_datasets[name].brownian_increments,                 # (n, N, 2) -> vector control
+    )
+    for name in ("train", "val", "test")
+}
+print("Heston Phi shape:", h_phi["train"].shape, " (q = 2 * (D + 2) =", h_phi["train"].shape[1], ")")
+
+h_lambda, _ = tune_ridge_lambda(
+    h_phi["train"], heston_payoff["train"], h_phi["val"], heston_payoff["val"], RIDGE_LAMBDAS
+)
+h_control = RidgeMartingaleControl.fit(h_phi["train"], heston_payoff["train"], h_lambda)
+h_report = evaluate_control(h_control, h_phi["test"], heston_payoff["test"])
+print(h_report.summary())
+
+# %% [markdown]
+# ## C3 - Heston benchmark: reservoir vs finite truncated signature
+# Same vector control, only the path representation changes (`h_k` vs `s_k`). The
+# signature dimensions for d = 4 are `L=2 -> 20`, `L=3 -> 84`, `L=4 -> 340` per
+# Brownian block (doubled by the m = 2 directions in the regression row).
+
+# %%
+N_HESTON = 20_000
+print(f"Heston (d = 4) sweep on {N_HESTON:,} test paths:")
+rows_heston = run_sweep(
+    heston_feats, heston_datasets, heston_payoff,
+    reservoir_dims=SWEEP_DIMS, signature_levels=SWEEP_LEVELS, cap=N_HESTON, seed=700,
+)
+print_table(rows_heston, N_HESTON)
+
+# %%
+h_top_sig = max((r for r in rows_heston if r["kind"] == "signature"), key=lambda r: r["feature_dim"])
+h_best_res = max((r for r in rows_heston if r["kind"] == "reservoir"), key=lambda r: r["vr"])
+print("=" * 70)
+print("RESULT (Heston) - vector martingale control, reservoir vs signature")
+print("=" * 70)
+print(f"  Headline (reservoir D={RESERVOIR_DIM}, d=4, vector m=2, {HESTON_SIZES['test']:,} test):")
+print(f"     VR = {h_report.variance_reduction:.1f}x, SE reduction = {h_report.se_reduction:.1f}x, "
+      f"unbiased: mean(C) = {h_report.control_mean:+.4f}")
+print("  Benchmark: the vector control works for both representations -")
+print(f"     {h_best_res['label']} ({h_best_res['feature_dim']}-dim) - best reservoir VR "
+      f"{h_best_res['vr']:.1f}x @ {h_best_res['assemble_test_s']:.1f}s;")
+print(f"     {h_top_sig['label']} ({h_top_sig['feature_dim']}-dim) - richest signature, VR "
+      f"{h_top_sig['vr']:.1f}x @ {h_top_sig['assemble_test_s']:.1f}s.")
+print("  Note: discretised full-truncation Euler target, single seed - a pilot.")
 print("=" * 70)

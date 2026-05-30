@@ -90,6 +90,25 @@ def test_assemble_shape() -> None:
     assert phi.shape == (500, 2 + signature_dim(3, 3))      # 2 + 39 = 41
 
 
+def test_assemble_vector_increments_concatenate_per_direction_blocks() -> None:
+    """Vector shocks (n, N, 2) give one (2 + q_L)-block per direction, concatenated."""
+    paths = MODEL.simulate(300, 40, np.random.default_rng(8))
+    features = asian_features(paths)
+    shock_a = paths.brownian_increments
+    shock_b = np.roll(paths.brownian_increments, 1, axis=1)     # a different scalar shock
+    increments = np.stack([shock_a, shock_b], axis=2)           # (n, N, 2)
+
+    level = 2
+    q_phi = 2 + signature_dim(3, level)
+    phi_vec = assemble_signature_control_features(features, paths.times, increments, level)
+    assert phi_vec.shape == (300, 2 * q_phi)
+
+    phi_a = assemble_signature_control_features(features, paths.times, shock_a, level)
+    phi_b = assemble_signature_control_features(features, paths.times, shock_b, level)
+    assert np.allclose(phi_vec[:, :q_phi], phi_a)
+    assert np.allclose(phi_vec[:, q_phi:], phi_b)
+
+
 @lru_cache(maxsize=None)
 def _build(level=3, n_train=6_000, n_test=20_000, n_steps=50, seed=0):
     train_seed, test_seed = np.random.SeedSequence(seed).spawn(2)

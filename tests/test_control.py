@@ -137,6 +137,47 @@ def test_geometric_price_is_lower_bound() -> None:
     assert arithmetic - geometric < 0.5      # they are close for these parameters
 
 
+def test_vector_control_features_match_manual_blocks() -> None:
+    """Vector increments give (n, m*q) = one manually-summed block per direction."""
+    rng = np.random.default_rng(3)
+    n, n_steps, q, m = 40, 12, 5, 2
+    readout_phi = rng.standard_normal((n, n_steps + 1, q))
+    increments = rng.standard_normal((n, n_steps, m))
+    phi = control_features(readout_phi, increments)
+    assert phi.shape == (n, m * q)
+    predictable = readout_phi[:, :-1, :]
+    for j in range(m):                       # block j = sum_k phi_k * dM^{(j)}_{k+1}
+        block = np.einsum("nkq,nk->nq", predictable, increments[:, :, j])
+        assert np.allclose(phi[:, j * q:(j + 1) * q], block)
+
+
+def test_single_direction_vector_reduces_to_scalar() -> None:
+    """A vector increment with m = 1 reproduces the scalar control row exactly."""
+    rng = np.random.default_rng(4)
+    readout_phi = rng.standard_normal((30, 11, 4))
+    scalar_increments = rng.standard_normal((30, 10))
+    scalar = control_features(readout_phi, scalar_increments)
+    vector = control_features(readout_phi, scalar_increments[:, :, None])
+    assert vector.shape == scalar.shape
+    assert np.allclose(scalar, vector)
+
+
+def test_assemble_control_features_handles_vector_increments() -> None:
+    """The reservoir assembler accepts (n, N, m) shocks: shape and value agree."""
+    paths = MODEL.simulate(200, 40, np.random.default_rng(5))
+    features = asian_features(paths)
+    reservoir = RandomizedSignatureReservoir.draw(3, 32, np.random.default_rng(6))
+    # Fabricate a 2-direction increment from the scalar Brownian shock (algebra test).
+    increments = np.stack(
+        [paths.brownian_increments, np.roll(paths.brownian_increments, 1, axis=1)], axis=2
+    )                                                       # (n, N, 2)
+    phi = assemble_control_features(reservoir, features, paths.times, increments)
+    assert phi.shape == (200, 2 * (32 + 2))
+    states = reservoir.run(features)
+    manual = control_features(readout_features(states, paths.times), increments)
+    assert np.allclose(phi, manual)
+
+
 def _run_all() -> None:
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     failures = 0

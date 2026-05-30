@@ -8,14 +8,27 @@ acts directly on G_N.
 
 from __future__ import annotations
 
+from typing import Protocol
+
 import numpy as np
 from scipy.stats import norm
 
 from .black_scholes import SimulatedPaths
 
 
+class PricePaths(Protocol):
+    """Anything carrying spot prices and a time grid (Black-Scholes or Heston).
+
+    The path-dependent payoffs only need the prices and the time grid, so they
+    work unchanged on any simulator output that exposes these two arrays.
+    """
+
+    spot: np.ndarray
+    times: np.ndarray
+
+
 def arithmetic_asian_call(
-    paths: SimulatedPaths,
+    paths: PricePaths,
     strike: float,
     rate: float,
     include_initial: bool = False,

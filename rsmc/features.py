@@ -37,6 +37,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from .black_scholes import SimulatedPaths
+from .heston import HestonPaths
 
 
 @dataclass(frozen=True)
@@ -116,6 +117,83 @@ def asian_features(
         names.append("running_max")
 
     if include_running_min:                            # running minimum of log-price
+        channels.append(np.minimum.accumulate(log_price, axis=1))
+        names.append("running_min")
+
+    if not channels:
+        raise ValueError("At least one feature channel must be enabled.")
+
+    values = np.stack(channels, axis=-1)               # (n, N + 1, d)
+    return PathFeatures(values=values, names=tuple(names))
+
+
+def heston_features(
+    paths: HestonPaths,
+    include_time: bool = True,
+    include_log_price: bool = True,
+    include_variance: bool = True,
+    include_running_average: bool = True,
+    include_running_max: bool = False,
+    include_running_min: bool = False,
+) -> PathFeatures:
+    """Adapted feature channels for Heston paths (the stochastic-variance state).
+
+    Mirrors :func:`asian_features` but adds the **variance** as a genuine state
+    channel (Heston's second factor). All channels are F_{t_k}-measurable - no
+    future information - and start at 0 at k = 0 (matching the reservoir's
+    h_0 = 0). The default four channels are
+
+        1. time            tau_k = t_k / T
+        2. log-price       log(S_k / S_0)
+        3. variance        v_k - v_0           (centred to start at 0)
+        4. running average log(A_k / S_0), A_k = mean(S_0..S_k)
+
+    with optional running max / min of log-price for lookback / barrier state.
+    The variance is centred at v_0 only for a clean starting value; the
+    reservoir and signature are driven by *increments*, which are unaffected by
+    this constant shift.
+
+    Returns
+    -------
+    PathFeatures
+        Feature paths of shape ``(n_paths, N + 1, d)`` and the channel names.
+    """
+    spot = paths.spot                      # (n, N + 1)
+    variance = paths.variance              # (n, N + 1)
+    s0 = spot[:, 0:1]                       # (n, 1)
+    v0 = variance[:, 0:1]                   # (n, 1)
+    n_paths, n_points = spot.shape
+    log_price = np.log(spot / s0)          # 0 at k = 0
+
+    channels: list[np.ndarray] = []
+    names: list[str] = []
+
+    if include_time:
+        maturity = paths.times[-1]
+        tau = np.broadcast_to(paths.times / maturity, (n_paths, n_points))
+        channels.append(tau)
+        names.append("time")
+
+    if include_log_price:
+        channels.append(log_price)
+        names.append("log_price")
+
+    if include_variance:
+        channels.append(variance - v0)                 # v_k - v_0, starts at 0
+        names.append("variance")
+
+    if include_running_average:
+        running_sum = np.cumsum(spot, axis=1)
+        counts = np.arange(1, n_points + 1)
+        running_average = running_sum / counts          # A_k = mean(S_0..S_k)
+        channels.append(np.log(running_average / s0))
+        names.append("running_average")
+
+    if include_running_max:
+        channels.append(np.maximum.accumulate(log_price, axis=1))
+        names.append("running_max")
+
+    if include_running_min:
         channels.append(np.minimum.accumulate(log_price, axis=1))
         names.append("running_min")
 
