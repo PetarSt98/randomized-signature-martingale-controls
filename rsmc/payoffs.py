@@ -17,10 +17,10 @@ from .black_scholes import SimulatedPaths
 
 
 class PricePaths(Protocol):
-    """Anything carrying spot prices and a time grid (Black-Scholes or Heston).
+    """Anything carrying scalar spot prices and a time grid.
 
-    The path-dependent payoffs only need the prices and the time grid, so they
-    work unchanged on any simulator output that exposes these two arrays.
+    The scalar path-dependent payoffs only need the prices and the time grid, so
+    they work unchanged on any simulator output that exposes these two arrays.
     """
 
     spot: np.ndarray
@@ -62,6 +62,76 @@ def arithmetic_asian_call(
     maturity = paths.times[-1]
     discount = np.exp(-rate * maturity)
     return discount * np.maximum(average - strike, 0.0)
+
+
+def basket_arithmetic_asian_call(
+    paths,
+    strike: float,
+    rate: float,
+    weights: np.ndarray | tuple[float, ...] | None = None,
+    include_initial: bool = False,
+) -> np.ndarray:
+    """Discounted arithmetic Asian call on a weighted multi-asset basket.
+
+    ``paths.spot`` must have shape ``(n_paths, N + 1, n_assets)``. Equal basket
+    weights are used by default.
+    """
+    spot = paths.spot
+    if spot.ndim != 3:
+        raise ValueError(f"spot must have shape (n_paths, N + 1, n_assets), got {spot.shape}.")
+
+    n_assets = spot.shape[2]
+    if weights is None:
+        weight_array = np.full(n_assets, 1.0 / n_assets)
+    else:
+        weight_array = np.asarray(weights, dtype=float)
+        if weight_array.shape != (n_assets,):
+            raise ValueError(f"weights must have shape ({n_assets},), got {weight_array.shape}.")
+        if not np.all(np.isfinite(weight_array)):
+            raise ValueError("weights must contain only finite values.")
+
+    basket = np.tensordot(spot, weight_array, axes=([2], [0]))
+    monitored = basket if include_initial else basket[:, 1:]
+    average = monitored.mean(axis=1)
+    maturity = paths.times[-1]
+    discount = np.exp(-rate * maturity)
+    return discount * np.maximum(average - strike, 0.0)
+
+
+def commodity_crack_spread_asian_call(
+    paths,
+    strike: float,
+    rate: float,
+    average_node: int = 0,
+    include_initial: bool = False,
+) -> np.ndarray:
+    """Discounted monthly-average Asian crack-spread call.
+
+    The commodity order is crude, gasoline, distillate and the payoff is
+
+        exp(-rT) * max(2/3 * G_bar + 1/3 * D_bar - C_bar - K, 0).
+
+    The averaging node defaults to the front/delivery-month curve node.
+    """
+    curves = paths.forward_curves
+    if curves.ndim != 4 or curves.shape[2:] != (3, 3):
+        raise ValueError(
+            "forward_curves must have shape (n_paths, N + 1, 3, 3), "
+            f"got {curves.shape}."
+        )
+    if not 0 <= average_node < curves.shape[3]:
+        raise ValueError(f"average_node must be in [0, {curves.shape[3] - 1}].")
+
+    selected = curves[:, :, :, average_node]
+    monitored = selected if include_initial else selected[:, 1:, :]
+    average = monitored.mean(axis=1)
+    crude = average[:, 0]
+    gasoline = average[:, 1]
+    distillate = average[:, 2]
+    spread = (2.0 / 3.0) * gasoline + (1.0 / 3.0) * distillate - crude
+    maturity = paths.times[-1]
+    discount = np.exp(-rate * maturity)
+    return discount * np.maximum(spread - strike, 0.0)
 
 
 def european_call(

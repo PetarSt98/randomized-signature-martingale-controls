@@ -139,11 +139,25 @@ class RidgeMartingaleControl:
         payoff_centred = payoff - payoff.mean()
         n_features = standardised.shape[1]
 
-        # Ridge as augmented least squares: stack sqrt(lam) * I below the design
-        # matrix and zeros below the target. Robust for lam = 0 too (SVD-based).
-        design = np.vstack([standardised, np.sqrt(lam) * np.eye(n_features)])
-        target = np.concatenate([payoff_centred, np.zeros(n_features)])
-        theta, *_ = np.linalg.lstsq(design, target, rcond=None)
+        if n_features <= standardised.shape[0]:
+            # Ridge as augmented least squares: stack sqrt(lam) * I below the
+            # design matrix and zeros below the target. Robust for lam = 0 too.
+            design = np.vstack([standardised, np.sqrt(lam) * np.eye(n_features)])
+            target = np.concatenate([payoff_centred, np.zeros(n_features)])
+            theta, *_ = np.linalg.lstsq(design, target, rcond=None)
+        else:
+            # Dual ridge avoids materialising a huge p-by-p identity for exact
+            # signatures at high d and L. It solves the same centred ridge
+            # problem because theta = X^T (X X^T + lam I)^-1 y.
+            gram = standardised @ standardised.T
+            if lam == 0:
+                alpha, *_ = np.linalg.lstsq(gram, payoff_centred, rcond=None)
+            else:
+                alpha = np.linalg.solve(
+                    gram + lam * np.eye(gram.shape[0]),
+                    payoff_centred,
+                )
+            theta = standardised.T @ alpha
 
         beta = theta / std                                # back to original Phi-space
         intercept = float(payoff.mean() - beta @ mean)

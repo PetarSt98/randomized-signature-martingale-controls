@@ -5,13 +5,11 @@ Variance reduction for Monte Carlo pricing of path-dependent options using
 from a *frozen randomized-signature reservoir* (only a linear readout is
 trained). Finite truncated signatures serve as a benchmark control class.
 
-This repository is being built step by step. So far: the **Black-Scholes
-simulator**, the **Asian-aware feature channels**, the **frozen
-randomized-signature reservoir** (D = 64), the **ridge-trained martingale
-control variate**, and the **finite truncated-signature benchmark**. On the
-arithmetic Asian call the reservoir delivers a **~50x variance reduction**
-(7x smaller price standard error) while staying unbiased, and it reproduces
-**~100%** of the real signature's variance reduction (see the benchmark below).
+This repository is being built step by step. So far: the **Black-Scholes and
+Heston simulators**, the **multi-asset Heston** and **commodity forward-curve**
+benchmark cases, the **frozen randomized-signature reservoir** (D = 64), the
+**ridge-trained martingale control variate**, and the finite truncated-signature
+benchmark machinery.
 
 ## The idea in one paragraph
 
@@ -66,8 +64,10 @@ starting at 0 at `k = 0`):
 
 These three are the *sufficient* state for the arithmetic Asian call. Two more
 genuine path-state channels - running **max** and **min** of log-price
-(lookback / barrier state) - are available via `asian_features(..., include_running_max=True, include_running_min=True)`
-for `d = 5`, used in the Step 4 benchmark to study dimension scaling.
+(lookback / barrier state) - remain available via
+`asian_features(..., include_running_max=True, include_running_min=True)`, but
+they are not part of the main benchmark because the selected payoff is not a
+barrier or lookback payoff.
 
 **The frozen reservoir.** For each channel `r` we draw, once, random
 `W_r in R^{D x D}` and `xi_r in R^D` (scaled by `1/sqrt(D)`), freeze them, and
@@ -117,13 +117,30 @@ evaluate on the variance of the controlled samples and the price standard
 error. Typical result on the Asian call: `VR ~ 50x`, with `mean(C) ~ 0`
 (bias check) and the controlled price matching plain MC.
 
-## Step 4: benchmark against the *real* truncated signature
+## Step 4: final benchmark ladder
 
-The reservoir is meant to be a *cheap random surrogate* for the **finite
-truncated signature**. To test that claim, `rsmc/signature.py` computes the real
-thing and runs it through the **same** readout, ridge fit and evaluation - only
-the feature map changes (reservoir state `h_k` -> signature `s_k`). It is the
-same control-variate architecture, a different adapted path representation:
+The main demo now reports four financially defensible benchmark cases:
+
+| Case | Product | Feature dimension | Martingale dimension |
+| --- | --- | ---: | ---: |
+| Black-Scholes | arithmetic Asian call | `d = 3` | `m = 1` |
+| Heston | arithmetic Asian call | `d = 4` | `m = 2` |
+| three-asset Heston | basket Asian call | `d = 8` | `m = 6` |
+| commodity forward curve | Asian crack-spread option | `d = 12` | `m = 9` |
+
+Every case uses the same sample-split ridge martingale-control pipeline. The
+demo sweeps reservoirs `D = 16, 32, 64, 128, 256` and exact signatures
+`L = 2, 3, 4`, then reports prices, standard errors, variance reduction,
+standard-error improvement, control mean, selected lambda, row dimension and
+feature-build / fit timing. It reads `d` from the actual `PathFeatures` object
+and infers `m` from the Brownian increment array, so reported dimensions cannot
+drift from the data.
+
+The reservoir is meant to be a cheap random surrogate for the **finite truncated
+signature**. `rsmc/signature.py` still computes the real thing and runs it
+through the same readout, ridge fit and evaluation - only the feature map changes
+(reservoir state `h_k` -> signature `s_k`). It is the same control-variate
+architecture, a different adapted path representation:
 
 ```
 reservoir : h_k             -> linear readout -> Z_k = beta . [1, t_k, h_k]
@@ -143,75 +160,41 @@ channels `d` and the level `L`:
 
 ```
 q_L = d + d^2 + ... + d^L      # d = 3:  L=2->12, L=3->39, L=4->120
-                               # d = 5:  L=2->30, L=3->155, L=4->780
+                               # d = 4:  L=2->20, L=3->84, L=4->340
+                               # d = 8:  L=2->72, L=3->584, L=4->4,680
+                               # d = 12: L=2->156, L=3->1,884, L=4->22,620
 ```
 
-This benchmark lives in **`scripts/demo.py` (Part B, cells 8-11)** - no separate
-script. `resid/best` is the residual variance `Var(G - C)` relative to the best
-method in the table (`1.00` = best, higher = more leftover variance; unlike a
-"retention" ratio it stays discriminating when every VR is high). Time is split
-into feature build (`feat`) and readout fit (`fit`); evaluation is one dot
-product. **Both sweeps use the same 30k test paths and the same 20k train set**,
-so the times are directly comparable across `d`. Single-seed run, times indicative.
+The commodity case is the main high-dimensional compression benchmark: level 4
+already has 22,620 exact-signature coordinates before the martingale blocks,
+while the randomized reservoir keeps a fixed dimension `D`.
 
-`d = 3` Asian features (time, log-price, running average):
-
-| method          | dim | VR     | resid/best | feat   | fit  |
-| --------------- | --: | -----: | ---------: | -----: | ---: |
-| reservoir D=32  |  32 | 44.1x  |     1.35x  |  3.5s  | 0.1s |
-| reservoir D=64  |  64 | 53.2x  |     1.12x  |  6.5s  | 0.4s |
-| reservoir D=128 | 128 | 59.5x  |     1.00x  | 13.5s  | 0.8s |
-| signature L=2   |  12 | 30.6x  |     1.94x  |  0.8s  | 0.1s |
-| signature L=3   |  39 | 46.7x  |     1.27x  |  2.6s  | 0.2s |
-| signature L=4   | 120 | 49.7x  |     1.20x  |  8.0s  | 0.8s |
-
-`d = 5` (add running max / min of log-price - lookback / barrier state):
-
-| method          | dim | VR     | resid/best | feat   | fit   |
-| --------------- | --: | -----: | ---------: | -----: | ----: |
-| reservoir D=32  |  32 | 46.9x  |     1.59x  |  5.1s  |  0.2s |
-| reservoir D=64  |  64 | 62.6x  |     1.19x  | 13.4s  |  0.4s |
-| reservoir D=128 | 128 | 69.7x  |     1.07x  | 26.1s  |  1.0s |
-| signature L=2   |  30 | 43.3x  |     1.73x  |  1.6s  |  0.2s |
-| signature L=3   | 155 | 67.4x  |     1.11x  |  9.8s  |  1.2s |
-| signature L=4   | 780 | 74.7x  |     1.00x  | 55.9s  | 10.6s |
-
-**Takeaways (honest pilot conclusion).**
-
-- **Faithfulness.** At matched dimension the reservoir and the real signature sit
-  on the *same* variance-reduction curve - their residual variances are within a
-  few percent. The cheap random projection loses little.
-- **No compression win at small `d`/`L`.** With `d = 3` the exact signature is
-  tiny, so low-order signatures (`L = 2, 3`) are cheap *and* competitive - the
-  reservoir matches their VR but does **not** beat them on time.
-- **Compression starts to show at `d = 5`.** The richest signature `L = 4` is
-  780-dim and by far the heaviest (best VR, 74.7x at ~56s). Reservoir `D = 128`
-  reaches 69.7x with **~6x fewer features**, **~2.1x less feature-build time**,
-  and only **~7% more residual variance**. (Mid-level `L = 3` is still cheaper
-  than `D = 128` and nearly as good - the reservoir's clean win is against the
-  *high-order* signature.) Signature dimension grows like `d^L` while the
-  reservoir stays fixed at `D`, so this gap widens as `d` and `L` increase.
-- **Caveat.** Single random seed - a pilot that confirms the pipeline, not a
-  final benchmark.
-
-![Signature dimension explodes as d^L while D is fixed](figures/demo_dimension_growth.png)
-![Reservoir vs finite truncated signature](figures/demo_benchmark.png)
+For the widest exact-signature rows, the default demo uses explicitly printed
+row caps so the script completes on a laptop. Remove or edit `SIGNATURE_CAPS` in
+`scripts/demo.py` if you want all signature levels to use the full sample size.
 
 ## Layout
 
 ```
 rsmc/
   black_scholes.py   # BlackScholesModel + SimulatedPaths (the simulator)
-  payoffs.py         # Asian / European payoffs, closed-form BS + geometric Asian prices
-  features.py        # asian_features: time / log-price / running-avg (+ optional max/min)
+  heston.py          # single-asset Heston simulator
+  multi_asset_heston.py # three-asset Heston basket simulator
+  commodity.py       # commodity forward-curve simulator
+  payoffs.py         # Asian, basket Asian, crack-spread, and validation payoffs
+  features.py        # adapted PathFeatures builders for d = 3, 4, 8, 12
   reservoir.py       # RandomizedSignatureReservoir (D = 64) + readout_features
   signature.py       # finite truncated signature (Chen's identity) - the benchmark
   control.py         # Phi assembly, RidgeMartingaleControl, evaluation + VR metrics
   config.py          # ExperimentConfig + make_datasets (train/val/test splits)
 scripts/
-  demo.py            # ONE file: Part A method (cells 1-7) + Part B benchmark (cells 8-11)
+  demo.py            # one-command reservoir-vs-signature benchmark sweep
 tests/
   test_black_scholes.py   # simulator sanity checks (martingale, European vs analytic)
+  test_heston.py          # Heston simulator, features, vector control
+  test_multi_asset_heston.py # d=8 basket benchmark components
+  test_commodity.py       # d=12 crack-spread benchmark components
+  test_demo.py            # four-row demo smoke test
   test_reservoir.py       # feature + reservoir checks (h_0 = 0, non-anticipative, ...)
   test_control.py         # control-variate checks (unbiased, VR > 1, lambda tuning)
   test_signature.py       # signature correctness (Chen, exp, dim) + unbiased + VR > 1
@@ -226,30 +209,36 @@ pip install -r requirements.txt
 ## Run
 
 ```bash
-python scripts/demo.py                 # Part A method + Part B signature benchmark
+python scripts/demo.py                 # four final benchmark rows: d=3,4,8,12
 python tests/test_black_scholes.py     # simulator tests (also works with: pytest tests)
+python tests/test_heston.py            # Heston tests
+python tests/test_multi_asset_heston.py
+python tests/test_commodity.py
+python tests/test_demo.py
 python tests/test_reservoir.py         # feature + reservoir tests
 python tests/test_control.py           # control-variate tests
 python tests/test_signature.py         # signature tests
 ```
 
 `scripts/demo.py` is written with `# %%` cell markers, so you can open it in
-Cursor / VS Code (or Jupyter) and run it cell by cell like a notebook. **Part A**
-(cells 1-7) is the method - simulate, train, evaluate, ~50x VR - and runs in
-under a minute. **Part B** (cells 8-11) is the signature benchmark and is the
-heavy part (a few minutes); the cell markers let you run Part A on its own. The
-`N_COMPARE` / `N_HIGHD` knobs control the benchmark sample sizes.
+Cursor / VS Code (or Jupyter) and run it cell by cell like a notebook. The
+default path counts are modest, and `DEFAULT_SIZES`, `DEFAULT_N_STEPS`,
+`RESERVOIR_DIMS`, `SIGNATURE_LEVELS`, `SIGNATURE_CAPS`, and `RIDGE_LAMBDAS` are
+the demo knobs.
 
-`demo.py` first sanity-checks the simulator (the discounted price is a
-martingale, and the Monte Carlo European call matches the closed-form
-Black-Scholes price), then trains the control and reports the variance
-reduction. The deeper correctness properties are enforced by the test suite:
+`demo.py` trains every reservoir and signature control for each case and reports
+model, product, feature names, actual `d`, martingale dimension `m`, path
+shapes, plain MC, controlled prices/SEs, variance reduction, control mean,
+selected lambda and timing. The deeper correctness properties are enforced by
+the test suite:
 
 - **Discounted price is a martingale** (`test_black_scholes.py`).
 - **Reservoir is non-anticipative** - `h_k` is unchanged when the path is
   perturbed after step `k` - and a **fixed-`beta` reservoir control has mean
   zero**, the unbiasedness backbone (`test_reservoir.py`).
 - **Controlled estimator is unbiased and reduces variance** (`test_control.py`).
+- **The d=8 and d=12 benchmark components have the requested shapes and
+  martingale dimensions** (`test_multi_asset_heston.py`, `test_commodity.py`).
 
 ## Quick start in code
 
@@ -289,14 +278,8 @@ phi = assemble_signature_control_features(asian_features(paths), paths.times,
 
 ## Roadmap
 
-- **Done:** Black-Scholes simulator, arithmetic Asian payoff, Asian-aware
-  features (`d = 3`, with optional max/min for `d = 5`), frozen
-  randomized-signature reservoir, the ridge-trained sample-split martingale
-  control variate (~50x VR), and the **finite truncated-signature benchmark**
-  (the reservoir tracks the signature's variance reduction at matched dimension;
-  at `d = 5` it nears the 780-dim `L = 4` signature with ~6x fewer features and
-  ~2.1x less feature-build time, on the same 30k test paths).
-- **Next:** repeat over 5-10 random seeds for error bars; push to the regime
-  where the reservoir's fixed-dimension advantage is decisive (higher `d`/`L`, or
-  a lookback / barrier payoff needing more path state); then ablations in `D`,
-  `N`, `lambda` and the Heston model.
+- **Done:** the final benchmark ladder `d=3 -> d=4 -> d=8 -> d=12`, with
+  reservoir martingale controls and finite-signature benchmark machinery.
+- **Next:** repeat over 5-10 random seeds for error bars; add explicit optional
+  signature-control sweeps for selected levels/sample sizes; then ablations in
+  `D`, `N`, `lambda` and model parameters.
