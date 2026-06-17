@@ -136,6 +136,11 @@ feature-build / fit timing. It reads `d` from the actual `PathFeatures` object
 and infers `m` from the Brownian increment array, so reported dimensions cannot
 drift from the data.
 
+Very wide exact-signature rows are controlled by explicit flags in
+`scripts/demo.py`: `RUN_SIGNATURE_D8_L4`, `RUN_SIGNATURE_D12_L3`, and
+`RUN_SIGNATURE_D12_L4`. The default is to skip `d=8,L=4` and `d=12,L=4`, while
+running `d=12,L=3`; skipped rows are printed with their theoretical dimensions.
+
 The reservoir is meant to be a cheap random surrogate for the **finite truncated
 signature**. `rsmc/signature.py` still computes the real thing and runs it
 through the same readout, ridge fit and evaluation - only the feature map changes
@@ -169,9 +174,13 @@ The commodity case is the main high-dimensional compression benchmark: level 4
 already has 22,620 exact-signature coordinates before the martingale blocks,
 while the randomized reservoir keeps a fixed dimension `D`.
 
-For the widest exact-signature rows, the default demo uses explicitly printed
-row caps so the script completes on a laptop. Remove or edit `SIGNATURE_CAPS` in
-`scripts/demo.py` if you want all signature levels to use the full sample size.
+All rows use the same train / validation / test counts. The default demo is a
+proper empirical run (`train=10,000`, `val=3,000`, `test=10,000`) and may take a
+while, especially with `N=252`. Use `SMOKE_SIZES` in `scripts/demo.py` only for
+quick integration checks. The ridge grid extends to `1e6`, so high-dimensional
+rows are not forced to choose an under-regularised edge value. High-q rows with
+`q > n` should still be read as proposal evidence rather than final production
+estimates.
 
 ## Layout
 
@@ -221,10 +230,10 @@ python tests/test_signature.py         # signature tests
 ```
 
 `scripts/demo.py` is written with `# %%` cell markers, so you can open it in
-Cursor / VS Code (or Jupyter) and run it cell by cell like a notebook. The
-default path counts are modest, and `DEFAULT_SIZES`, `DEFAULT_N_STEPS`,
-`RESERVOIR_DIMS`, `SIGNATURE_LEVELS`, `SIGNATURE_CAPS`, and `RIDGE_LAMBDAS` are
-the demo knobs.
+Cursor / VS Code (or Jupyter) and run it cell by cell like a notebook.
+`DEFAULT_SIZES`, `SMOKE_SIZES`, `DEFAULT_N_STEPS`, `RESERVOIR_DIMS`,
+`SIGNATURE_LEVELS`, the `RUN_SIGNATURE_*` flags, and `RIDGE_LAMBDAS` are the
+demo knobs.
 
 `demo.py` trains every reservoir and signature control for each case and reports
 model, product, feature names, actual `d`, martingale dimension `m`, path

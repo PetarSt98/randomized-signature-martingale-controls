@@ -39,7 +39,7 @@ def default_multi_asset_heston_correlation() -> np.ndarray:
     for i in range(3):
         for j in range(3):
             corr[i, j + 3] = corr[j + 3, i] = -0.65 if i == j else -0.25
-    return corr
+    return validate_correlation_matrix(corr, 6, name="default multi-asset Heston correlation")
 
 
 @dataclass(frozen=True)
@@ -72,8 +72,10 @@ class MultiAssetHestonModel:
             raise ValueError(f"T must be positive, got {self.T}.")
         if len(self.asset_names) != 3:
             raise ValueError("asset_names must contain exactly three names.")
-        if self.correlation is not None:
-            validate_correlation_matrix(self.correlation, 6)
+        validate_correlation_matrix(
+            default_multi_asset_heston_correlation() if self.correlation is None else self.correlation,
+            6,
+        )
 
     def simulate(
         self,

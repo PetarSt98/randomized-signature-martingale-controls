@@ -16,6 +16,7 @@ from rsmc import (  # noqa: E402
     assemble_control_features,
     multi_asset_heston_features,
 )
+from rsmc.multi_asset_heston import default_multi_asset_heston_correlation  # noqa: E402
 
 MODEL = MultiAssetHestonModel()
 
@@ -48,6 +49,14 @@ def test_multi_asset_correlation_validation_rejects_invalid_matrix() -> None:
         pass
     else:
         raise AssertionError("expected ValueError for non-PSD correlation")
+
+
+def test_default_multi_asset_correlation_is_valid() -> None:
+    corr = default_multi_asset_heston_correlation()
+    assert corr.shape == (6, 6)
+    assert np.allclose(corr, corr.T)
+    assert np.allclose(np.diag(corr), 1.0)
+    assert np.linalg.eigvalsh(corr)[0] >= -1e-10
 
 
 def test_basket_payoff_and_features() -> None:

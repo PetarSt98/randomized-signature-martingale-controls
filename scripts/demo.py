@@ -11,7 +11,9 @@
 #
 # For each case we sweep reservoirs D = 16, 32, 64, 128, 256 and exact
 # signatures L = 2, 3, 4 through the same train / validation / test split, ridge
-# fit, martingale-control assembly and reporting.
+# fit, martingale-control assembly and reporting. Very wide exact-signature rows
+# can be disabled with the flags below; skipped rows are printed with their
+# theoretical dimensions.
 
 # %%
 from __future__ import annotations
@@ -67,21 +69,35 @@ from rsmc import (  # noqa: E402
 )
 
 
-RIDGE_LAMBDAS = (0.0, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1.0)
-RESERVOIR_DIMS = (16, 32, 64, 128, 256)
+RIDGE_LAMBDAS = (
+    0.0,
+    1e-6,
+    1e-5,
+    1e-4,
+    1e-3,
+    1e-2,
+    1e-1,
+    1.0,
+    10.0,
+    100.0,
+    300.0,
+    500.0,
+    1_000.0,
+    5_000.0,
+    10_000.0,
+    50_000.0,
+    100_000.0,
+    500_000.0,
+    1_000_000.0,
+)
+RESERVOIR_DIMS = (16, 32, 64, 128, 256) 
 SIGNATURE_LEVELS = (2, 3, 4)
+RUN_SIGNATURE_D8_L4 = False
+RUN_SIGNATURE_D12_L3 = False
+RUN_SIGNATURE_D12_L4 = False
 DEFAULT_N_STEPS = 252
-DEFAULT_SIZES = {"train": 1_500, "val": 750, "test": 3_000}
-
-# Exact signatures at d=8/12, L=3/4 get very wide. They are still run by default,
-# but on smaller row counts so the demo completes on a laptop and prints n_eval
-# honestly in the table. Set SIGNATURE_CAPS = {} in this file to force every
-# signature row onto DEFAULT_SIZES.
-SIGNATURE_CAPS = {
-    (8, 4): {"train": 200, "val": 100, "test": 300},
-    (12, 3): {"train": 120, "val": 80, "test": 200},
-    (12, 4): {"train": 24, "val": 16, "test": 32},
-}
+DEFAULT_SIZES = {"train": 10_000, "val": 3_000, "test": 10_000}
+SMOKE_SIZES = {"train": 200, "val": 100, "test": 300}
 
 
 def martingale_dim(increments: np.ndarray) -> int:
@@ -190,13 +206,6 @@ def prepare_case(case: dict[str, object]) -> dict[str, object]:
     }
 
 
-def cap_sizes(full_sizes: dict[str, int], cap: dict[str, int] | None) -> dict[str, int]:
-    """Apply an optional train / val / test cap without exceeding available rows."""
-    if cap is None:
-        return dict(full_sizes)
-    return {name: min(full_sizes[name], cap[name]) for name in ("train", "val", "test")}
-
-
 def make_bundles(
     prepared: dict[str, object],
     sizes: dict[str, int],
@@ -293,13 +302,23 @@ def signature_assembler(level: int) -> Callable:
     )
 
 
+def should_run_signature_level(d: int, level: int) -> bool:
+    """Whether the demo should run this exact-signature row."""
+    if d == 8 and level == 4:
+        return RUN_SIGNATURE_D8_L4
+    if d == 12 and level == 3:
+        return RUN_SIGNATURE_D12_L3
+    if d == 12 and level == 4:
+        return RUN_SIGNATURE_D12_L4
+    return True
+
+
 def run_case_sweep(
     prepared: dict[str, object],
     sizes: dict[str, int],
     reservoir_dims: tuple[int, ...],
     signature_levels: tuple[int, ...],
     lambdas: tuple[float, ...],
-    signature_caps: dict[tuple[int, int], dict[str, int]],
     print_output: bool = True,
 ) -> list[dict[str, object]]:
     """Run all reservoir and signature rows for one benchmark case."""
@@ -308,13 +327,15 @@ def run_case_sweep(
     rows: list[dict[str, object]] = []
 
     if print_output:
+        case_payoff = prepared["payoff"]["test"][:sizes["test"]]
         print(f"\n{prepared['model']} - {prepared['product']}")
         print(f"  feature channels ({d}): {', '.join(prepared['features']['train'].names)}")
         print(f"  martingale dimension m = {m}")
+        print(f"  train / val / test for this case: {sizes}")
         print(f"  test path shapes: {path_shape_summary(prepared['datasets']['test'])}")
         print(
-            f"  plain MC on full test: price {prepared['plain_price']:.4f}, "
-            f"SE {prepared['plain_se']:.4f}"
+            f"  plain MC on case test: price {case_payoff.mean():.4f}, "
+            f"SE {case_payoff.std(ddof=1) / np.sqrt(case_payoff.size):.4f}"
         )
 
     for dim in reservoir_dims:
@@ -333,10 +354,18 @@ def run_case_sweep(
         )
 
     for level in signature_levels:
-        row_sizes = cap_sizes(sizes, signature_caps.get((d, level)))
+        if not should_run_signature_level(d, level):
+            if print_output:
+                sig_dim = signature_dim(d, level)
+                q = m * (2 + sig_dim)
+                print(
+                    f"  signature L={level} skipped "
+                    f"(dim={sig_dim:,}, q={q:,}; enable RUN_SIGNATURE_D{d}_L{level} to run)",
+                    flush=True,
+                )
+            continue
         if print_output:
-            cap_note = "" if row_sizes == sizes else f" capped n={row_sizes}"
-            print(f"  signature L={level}{cap_note} ...", flush=True)
+            print(f"  signature L={level} ...", flush=True)
         rows.append(
             run_control_row(
                 prepared=prepared,
@@ -344,7 +373,7 @@ def run_case_sweep(
                 label=f"signature L={level}",
                 feature_dim=signature_dim(d, level),
                 assemble=signature_assembler(level),
-                sizes=row_sizes,
+                sizes=sizes,
                 lambdas=lambdas,
             )
         )
@@ -413,18 +442,25 @@ def print_final_summary(rows: list[dict[str, object]]) -> None:
         reservoirs = [row for row in case_rows if row["method"] == "reservoir"]
         signatures = [row for row in case_rows if row["method"] == "signature"]
         best_reservoir = max(reservoirs, key=lambda row: float(row["variance_reduction"]))
-        best_signature = max(signatures, key=lambda row: float(row["variance_reduction"]))
+        best_signature = (
+            max(signatures, key=lambda row: float(row["variance_reduction"]))
+            if signatures else None
+        )
+        signature_label = "not run" if best_signature is None else str(best_signature["label"])
+        signature_vr = np.nan if best_signature is None else float(best_signature["variance_reduction"])
+        signature_feat = np.nan if best_signature is None else float(best_signature["feature_test_s"])
         print(
             f"{model:<25}{product:<22}"
             f"{int(best_reservoir['d']):>4}{int(best_reservoir['m']):>4}"
             f"{str(best_reservoir['label']):>20}"
             f"{float(best_reservoir['variance_reduction']):>8.2f}x"
             f"{float(best_reservoir['feature_test_s']):>8.2f}"
-            f"{str(best_signature['label']):>20}"
-            f"{float(best_signature['variance_reduction']):>8.2f}x"
-            f"{float(best_signature['feature_test_s']):>8.2f}"
+            f"{signature_label:>20}"
+            f"{signature_vr:>8.2f}x"
+            f"{signature_feat:>8.2f}"
         )
     print("-" * len(header))
+    print("All rows use the same train/val/test size, so reservoir and signature comparisons are matched.")
 
 
 def run_demo(
@@ -433,18 +469,20 @@ def run_demo(
     reservoir_dims: tuple[int, ...] = RESERVOIR_DIMS,
     signature_levels: tuple[int, ...] = SIGNATURE_LEVELS,
     lambdas: tuple[float, ...] = RIDGE_LAMBDAS,
-    signature_caps: dict[tuple[int, int], dict[str, int]] | None = None,
     print_output: bool = True,
 ) -> list[dict[str, object]]:
     """Run the full reservoir-vs-signature sweep for all four cases."""
     sizes = DEFAULT_SIZES if sizes is None else sizes
-    signature_caps = SIGNATURE_CAPS if signature_caps is None else signature_caps
     if print_output:
         print(f"train / val / test sizes: {sizes}; time steps N = {n_steps}")
         print(f"reservoir D sweep: {reservoir_dims}")
         print(f"signature L sweep: {signature_levels}")
-        if signature_caps:
-            print(f"signature row caps for very wide signatures: {signature_caps}")
+        print(
+            "signature row flags: "
+            f"RUN_SIGNATURE_D8_L4={RUN_SIGNATURE_D8_L4}, "
+            f"RUN_SIGNATURE_D12_L3={RUN_SIGNATURE_D12_L3}, "
+            f"RUN_SIGNATURE_D12_L4={RUN_SIGNATURE_D12_L4}"
+        )
 
     all_rows: list[dict[str, object]] = []
     prepared_cases = [prepare_case(case) for case in build_benchmarks(sizes, n_steps)]
@@ -456,7 +494,6 @@ def run_demo(
                 reservoir_dims=reservoir_dims,
                 signature_levels=signature_levels,
                 lambdas=lambdas,
-                signature_caps=signature_caps,
                 print_output=print_output,
             )
         )
