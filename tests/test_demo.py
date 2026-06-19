@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT))
 
 
 def _load_demo_module():
-    path = ROOT / "scripts" / "demo.py"
+    path = ROOT / "scripts" / "control_variates_demo.py"
     spec = importlib.util.spec_from_file_location("demo", path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None

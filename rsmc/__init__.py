@@ -31,6 +31,16 @@ from .features import (
     heston_features,
     multi_asset_heston_features,
 )
+from .hedging import (
+    HedgeReport,
+    assemble_linear_hedge_features,
+    discounted_traded_increments,
+    evaluate_hedge,
+    fit_hedge,
+    hedging_features,
+    multi_asset_hedging_features,
+    observe_variance,
+)
 from .heston import HestonModel, HestonPaths, make_heston_datasets
 from .multi_asset_heston import (
     MultiAssetHestonModel,
@@ -89,4 +99,12 @@ __all__ = [
     "assemble_signature_control_features",
     "basket_arithmetic_asian_call",
     "commodity_crack_spread_asian_call",
+    "observe_variance",
+    "discounted_traded_increments",
+    "hedging_features",
+    "multi_asset_hedging_features",
+    "assemble_linear_hedge_features",
+    "HedgeReport",
+    "evaluate_hedge",
+    "fit_hedge",
 ]
