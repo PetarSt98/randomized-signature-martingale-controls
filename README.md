@@ -182,6 +182,26 @@ rows are not forced to choose an under-regularised edge value. High-q rows with
 `q > n` should still be read as proposal evidence rather than final production
 estimates.
 
+The hedging demo in `scripts/hedging_demo.py` is the observed-filtration
+extension. It trades discounted stock increments and hides the Heston variance,
+replacing it by a noisy observation `Y = V + eta eps`. The reservoir and
+signature hedge readouts use the common current-state block
+`[1, t_k, x_k, h_k]` or `[1, t_k, x_k, s_k]` (with the time channel not
+duplicated inside `x_k`), matching the direct current-state input used by the
+small causal Transformer hedge. Linear hedges also remove the original time
+channel before prepending `t_k`, so ridge regularization is not distorted by
+duplicated time columns. The default noise sweep is
+`eta = 0, 0.01, 0.02, 0.04, 0.08, 0.16`; larger values are better treated as
+stress tests rather than core benchmark points. The one-asset Heston case also
+includes a model-aware particle filter benchmark that estimates
+`E[V_k | S_0:k, Y_0:k]` and `Var(V_k | S_0:k, Y_0:k)` and uses only those
+filtered quantities plus the current raw signal as hedge features; it still
+trades only the stock. The particle-filter benchmark reports both affine and
+quadratic ridge readouts, with the headline PF row selected by validation MSE.
+The demo prints paired bootstrap intervals for selected test-path MSE
+differences, including the eta sweep, so method comparisons use the same
+resampled test paths.
+
 ## Layout
 
 ```

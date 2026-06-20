@@ -21,7 +21,7 @@ Why this reuses the pricing code
 gives ``E[dS~_{k+1} | G_k] = 0`` as well, so ``dS~`` is a G-martingale increment.
 Collapsing each path into one regression row,
 
-    Psi_i = sum_{k=0}^{N-1} phi_{i,k} * dS~_{i,k+1},   phi_k = [1, t_k, h_k],
+    Psi_i = sum_{k=0}^{N-1} phi_{i,k} * dS~_{i,k+1},
 
 the best linear hedge is exactly the ridge problem
 
@@ -29,9 +29,13 @@ the best linear hedge is exactly the ridge problem
 
 i.e. the pricing control-variate regression with the simulator increment ``dM``
 replaced by the traded increment ``dS~`` and the intercept *kept* as the initial
-capital ``c``. We therefore reuse :class:`RidgeMartingaleControl`,
-:func:`assemble_control_features` and :func:`assemble_signature_control_features`
-unchanged; only the increment, the target and the reporting differ.
+capital ``c``. For reservoir and signature hedges the readout is augmented with
+the current observed state,
+
+    phi_k = [1, t_k, x_k, h_k],
+
+so it has the same direct current-state information as the Transformer hedge
+head. Only the increment, target and reporting differ from the pricing pipeline.
 """
 
 from __future__ import annotations
@@ -42,7 +46,8 @@ import numpy as np
 
 from .control import RidgeMartingaleControl, control_features
 from .features import PathFeatures
-from .reservoir import readout_features
+from .reservoir import RandomizedSignatureReservoir, readout_features
+from .signature import _iterate_running_signature, signature_dim
 
 
 def observe_variance(variance: np.ndarray, eta: float, rng: np.random.Generator) -> np.ndarray:
@@ -204,14 +209,234 @@ def assemble_linear_hedge_features(
 ) -> np.ndarray:
     """Collapse each path into the hedge row ``Psi`` for a *linear* readout.
 
-    Here the state is the feature vector itself, ``theta_k = beta . [1, t_k, x_k]``
-    (an "identity reservoir"). This is the baseline used by the explicit-feature
-    hedges (oracle / raw signal). It reuses :func:`readout_features` to
-    prepend ``[1, t_k]`` and :func:`control_features` to form
-    ``Psi_i = sum_k phi_{i,k} dS~_{i,k+1}``, so ``q = d + 2``.
+    Here the state is the current feature vector itself. Since feature builders
+    already include a time channel, that channel is removed before
+    :func:`readout_features` prepends ``[1, t_k]``. Thus a feature set with
+    first channel ``time`` has per-step width ``d + 1`` rather than ``d + 2``.
     """
-    phi = readout_features(features.values, times)     # (n, N + 1, d + 2)
+    current = _current_state_block(features)
+    phi = readout_features(current, times)
     return control_features(phi, increments)
+
+
+def _current_state_block(features: PathFeatures) -> np.ndarray:
+    """Current feature channels used directly in nonlinear hedge readouts.
+
+    The readout already prepends time as a separate column, so feature sets whose
+    first channel is named ``time`` contribute only the remaining state channels.
+    """
+    if features.names and features.names[0] == "time":
+        return features.values[:, :, 1:]
+    return features.values
+
+
+def _quadratic_state_block(features: PathFeatures) -> np.ndarray:
+    """Current non-time state plus all degree-two monomials."""
+    current = _current_state_block(features)
+    blocks = [current]
+    n_channels = current.shape[-1]
+    for left in range(n_channels):
+        for right in range(left, n_channels):
+            blocks.append((current[:, :, left] * current[:, :, right])[:, :, None])
+    return np.concatenate(blocks, axis=-1)
+
+
+def assemble_quadratic_hedge_features(
+    features: PathFeatures,
+    times: np.ndarray,
+    increments: np.ndarray,
+) -> np.ndarray:
+    """Collapse paths for a quadratic hedge readout on the current state."""
+    phi = readout_features(_quadratic_state_block(features), times)
+    return control_features(phi, increments)
+
+
+def assemble_reservoir_hedge_features(
+    reservoir: RandomizedSignatureReservoir,
+    features: PathFeatures,
+    times: np.ndarray,
+    increments: np.ndarray,
+    batch_size: int = 10_000,
+) -> np.ndarray:
+    """Collapse paths for a reservoir hedge readout ``[1, t_k, x_k, h_k]``."""
+    n_paths = features.values.shape[0]
+    current_dim = _current_state_block(features).shape[-1]
+    m = 1 if increments.ndim == 2 else increments.shape[2]
+    q = (reservoir.dim + current_dim + 2) * m
+    psi = np.empty((n_paths, q))
+    for start in range(0, n_paths, batch_size):
+        stop = min(start + batch_size, n_paths)
+        batch = PathFeatures(features.values[start:stop], features.names)
+        states = reservoir.run(batch)
+        current = _current_state_block(batch)
+        phi = readout_features(np.concatenate([current, states], axis=-1), times)
+        psi[start:stop] = control_features(phi, increments[start:stop])
+    return psi
+
+
+def assemble_signature_hedge_features(
+    features: PathFeatures,
+    times: np.ndarray,
+    increments: np.ndarray,
+    level: int,
+    batch_size: int = 10_000,
+) -> np.ndarray:
+    """Collapse paths for a signature hedge readout ``[1, t_k, x_k, s_k]``."""
+    feature_increments = features.increments
+    n_paths, _, n_channels = feature_increments.shape
+    current = _current_state_block(features)
+    current_dim = current.shape[-1]
+    m = 1 if increments.ndim == 2 else increments.shape[2]
+    q_phi = 2 + current_dim + signature_dim(n_channels, level)
+    q = q_phi * m
+    psi = np.empty((n_paths, q))
+
+    for start in range(0, n_paths, batch_size):
+        stop = min(start + batch_size, n_paths)
+        batch = stop - start
+        row = np.zeros((batch, q))
+        shocks = increments[start:stop]
+        for step, signature_state in enumerate(
+            _iterate_running_signature(feature_increments[start:stop], level)
+        ):
+            ones = np.ones((batch, 1))
+            time_column = np.full((batch, 1), times[step])
+            phi = np.concatenate(
+                [ones, time_column, current[start:stop, step, :], signature_state],
+                axis=1,
+            )
+            if shocks.ndim == 2:
+                row += phi * shocks[:, step][:, None]
+            else:
+                row += (phi[:, None, :] * shocks[:, step, :][:, :, None]).reshape(batch, -1)
+        psi[start:stop] = row
+    return psi
+
+
+def heston_variance_particle_filter(
+    model,
+    spot: np.ndarray,
+    signal: np.ndarray,
+    times: np.ndarray,
+    eta: float,
+    n_particles: int,
+    rng: np.random.Generator,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Causal particle filter for ``E[V_k | S_0:k, Y_0:k]`` in one-asset Heston.
+
+    The filter is model-aware and uses the known Heston parameters. It returns
+    only filtered variance mean and variance; the hedge still trades only
+    discounted stock increments.
+    """
+    spot = np.asarray(spot, dtype=float)
+    signal = np.asarray(signal, dtype=float)
+    if spot.ndim != 2:
+        raise ValueError(f"spot must have shape (n, N + 1), got {spot.shape}.")
+    if signal.shape != spot.shape:
+        raise ValueError(f"signal must match spot shape {spot.shape}, got {signal.shape}.")
+    if times.shape[0] != spot.shape[1]:
+        raise ValueError(f"times must have length {spot.shape[1]}, got {times.shape[0]}.")
+    if eta < 0.0:
+        raise ValueError(f"eta must be non-negative, got {eta}.")
+    if n_particles <= 0:
+        raise ValueError(f"n_particles must be positive, got {n_particles}.")
+    if eta == 0.0:
+        return signal.copy(), np.zeros_like(signal)
+
+    n_paths, n_points = spot.shape
+    n_steps = n_points - 1
+    particles = np.full((n_paths, n_particles), float(model.v0))
+    filtered_mean = np.empty_like(signal)
+    filtered_var = np.empty_like(signal)
+    filtered_mean[:, 0] = model.v0
+    filtered_var[:, 0] = 0.0
+
+    log_spot = np.log(spot)
+    obs_var = eta * eta
+    log_obs_norm = np.log(2.0 * np.pi * obs_var)
+    rho_perp = np.sqrt(max(1.0 - model.rho**2, 0.0))
+    eps = 1e-12
+
+    for step in range(n_steps):
+        dt = float(times[step + 1] - times[step])
+        log_return = log_spot[:, step + 1] - log_spot[:, step]
+        v_prev = np.maximum(particles, 0.0)
+
+        stock_var = np.maximum(v_prev * dt, eps)
+        stock_mean = (model.r - 0.5 * v_prev) * dt
+        stock_residual = log_return[:, None] - stock_mean
+        logw = -0.5 * (stock_residual**2 / stock_var + np.log(2.0 * np.pi * stock_var))
+
+        sqrt_v = np.sqrt(v_prev)
+        implied_dw_spot = np.zeros_like(v_prev)
+        active = sqrt_v > 1e-10
+        implied_dw_spot[active] = stock_residual[active] / sqrt_v[active]
+        dw_perp = np.sqrt(dt) * rng.standard_normal((n_paths, n_particles))
+        dw_var = model.rho * implied_dw_spot + rho_perp * dw_perp
+        proposal = (
+            v_prev
+            + model.kappa * (model.theta - v_prev) * dt
+            + model.xi * sqrt_v * dw_var
+        )
+        particles_next = np.maximum(proposal, 0.0)
+
+        obs_residual = signal[:, step + 1, None] - particles_next
+        logw += -0.5 * (obs_residual**2 / obs_var + log_obs_norm)
+        logw -= np.max(logw, axis=1, keepdims=True)
+        weights = np.exp(logw)
+        weights /= np.sum(weights, axis=1, keepdims=True)
+
+        mean = np.sum(weights * particles_next, axis=1)
+        second = np.sum(weights * particles_next**2, axis=1)
+        filtered_mean[:, step + 1] = mean
+        filtered_var[:, step + 1] = np.maximum(second - mean**2, 0.0)
+
+        positions = (rng.random((n_paths, 1)) + np.arange(n_particles)[None, :]) / n_particles
+        cumulative = np.cumsum(weights, axis=1)
+        indices = np.empty((n_paths, n_particles), dtype=int)
+        for path_index in range(n_paths):
+            indices[path_index] = np.searchsorted(
+                cumulative[path_index],
+                positions[path_index],
+                side="right",
+            )
+        indices = np.minimum(indices, n_particles - 1)
+        particles = np.take_along_axis(particles_next, indices, axis=1)
+
+    return filtered_mean, filtered_var
+
+
+def particle_filter_hedging_features(
+    spot: np.ndarray,
+    times: np.ndarray,
+    signal: np.ndarray,
+    variance_mean: np.ndarray,
+    variance_var: np.ndarray,
+    variance_center: float,
+) -> PathFeatures:
+    """Build hedge features from raw signal plus filtered variance diagnostics."""
+    signal = np.asarray(signal, dtype=float)
+    if signal.shape != spot.shape:
+        raise ValueError("signal must match spot shape.")
+    base = hedging_features(spot, times, signal - variance_center, "signal")
+    if variance_mean.shape != spot.shape or variance_var.shape != spot.shape:
+        raise ValueError("filtered variance mean/variance must match spot shape.")
+    values = np.concatenate(
+        [
+            base.values,
+            (variance_mean - variance_center)[..., None],
+            variance_var[..., None],
+        ],
+        axis=-1,
+    )
+    return PathFeatures(
+        values=values,
+        names=base.names
+        + (
+            "pf_variance_mean",
+            "pf_variance_var",
+        ),
+    )
 
 
 @dataclass(frozen=True)
@@ -236,6 +461,7 @@ class HedgeReport:
     variance_reduction: float    # Var(H) / Var(e)
     mean_error: float            # mean(e); should be ~ 0
     mean_error_se: float
+    errors: np.ndarray | None = None
 
     def summary(self) -> str:
         """Human-readable multi-line report."""
@@ -285,6 +511,7 @@ def evaluate_hedge(
         variance_reduction=payoff_var / error_var if error_var > 0 else np.inf,
         mean_error=float(error.mean()),
         mean_error_se=float(error.std(ddof=1) / np.sqrt(n)),
+        errors=error,
     )
 
 

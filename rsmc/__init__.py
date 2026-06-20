@@ -34,12 +34,17 @@ from .features import (
 from .hedging import (
     HedgeReport,
     assemble_linear_hedge_features,
+    assemble_quadratic_hedge_features,
+    assemble_reservoir_hedge_features,
+    assemble_signature_hedge_features,
     discounted_traded_increments,
     evaluate_hedge,
     fit_hedge,
     hedging_features,
+    heston_variance_particle_filter,
     multi_asset_hedging_features,
     observe_variance,
+    particle_filter_hedging_features,
 )
 from .heston import HestonModel, HestonPaths, make_heston_datasets
 from .multi_asset_heston import (
@@ -60,6 +65,12 @@ from .signature import (
     assemble_signature_control_features,
     running_signature,
     signature_dim,
+)
+from .transformer_hedging import (
+    TransformerHedgeConfig,
+    evaluate_transformer_hedge,
+    fit_transformer_hedge,
+    transformer_available,
 )
 
 __all__ = [
@@ -103,8 +114,17 @@ __all__ = [
     "discounted_traded_increments",
     "hedging_features",
     "multi_asset_hedging_features",
+    "heston_variance_particle_filter",
+    "particle_filter_hedging_features",
     "assemble_linear_hedge_features",
+    "assemble_quadratic_hedge_features",
+    "assemble_reservoir_hedge_features",
+    "assemble_signature_hedge_features",
     "HedgeReport",
     "evaluate_hedge",
     "fit_hedge",
+    "TransformerHedgeConfig",
+    "transformer_available",
+    "fit_transformer_hedge",
+    "evaluate_transformer_hedge",
 ]

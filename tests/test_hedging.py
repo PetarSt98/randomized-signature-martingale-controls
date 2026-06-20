@@ -17,16 +17,25 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from rsmc import (  # noqa: E402
     HestonModel,
     MultiAssetHestonModel,
+    PathFeatures,
     RandomizedSignatureReservoir,
+    TransformerHedgeConfig,
     arithmetic_asian_call,
-    assemble_control_features,
+    assemble_reservoir_hedge_features,
+    assemble_signature_hedge_features,
     discounted_traded_increments,
     evaluate_hedge,
+    evaluate_transformer_hedge,
     fit_hedge,
+    fit_transformer_hedge,
     hedging_features,
+    heston_variance_particle_filter,
     make_heston_datasets,
     multi_asset_hedging_features,
     observe_variance,
+    particle_filter_hedging_features,
+    signature_dim,
+    transformer_available,
 )
 from rsmc.hedging import assemble_linear_hedge_features  # noqa: E402
 
@@ -67,6 +76,16 @@ def _hedge(splits, feature_fn, assemble):
     return evaluate_hedge(control, psi["test"], payoff["test"])
 
 
+def _configure_tiny_transformer(module) -> None:
+    """Keep demo smoke tests tiny when PyTorch is installed locally."""
+    module.TRANSFORMER_D_MODEL = 8
+    module.TRANSFORMER_HEADS = 2
+    module.TRANSFORMER_LAYERS = 1
+    module.TRANSFORMER_WINDOW = 2
+    module.TRANSFORMER_EPOCHS = 1
+    module.TRANSFORMER_BATCH_SIZE = 8
+
+
 def test_discounted_traded_increments_are_martingale() -> None:
     """dS~ has the right shape and conditional mean zero (E[dS~_{k+1}] = 0 per step)."""
     paths = MODEL.simulate(50_000, 50, np.random.default_rng(0))
@@ -98,13 +117,13 @@ def test_hedging_features_shapes_and_start_at_zero() -> None:
     assert np.allclose(with_vol.values[:, 0, :], 0.0)
 
 
-def test_linear_assembler_width_is_d_plus_2() -> None:
-    """A linear readout collapses to q = d + 2 (the [1, t_k, x_k] block)."""
+def test_linear_assembler_width_does_not_duplicate_time() -> None:
+    """A linear readout uses [1, t_k, x_k] without duplicating the time channel."""
     paths = MODEL.simulate(200, 40, np.random.default_rng(0))
     feats = hedging_features(paths.spot, paths.times, paths.variance - MODEL.v0, "variance")
     increments = discounted_traded_increments(paths.spot, paths.times, MODEL.r)
     psi = assemble_linear_hedge_features(feats, paths.times, increments)
-    assert psi.shape == (200, feats.n_channels + 2)
+    assert psi.shape == (200, feats.n_channels + 1)
 
 
 def test_multi_asset_features_and_traded_increments() -> None:
@@ -135,7 +154,93 @@ def test_multi_asset_features_and_traded_increments() -> None:
         "running_basket_average",
     )
     psi = assemble_linear_hedge_features(observed_features, paths.times, increments)
-    assert psi.shape == (120, 3 * (8 + 2))
+    assert psi.shape == (120, 3 * (8 + 1))
+
+
+def test_augmented_nonlinear_hedge_widths() -> None:
+    """Reservoir/signature hedge readouts include current non-time state channels."""
+    paths = MODEL.simulate(20, 5, np.random.default_rng(12))
+    features = hedging_features(paths.spot, paths.times, paths.variance - MODEL.v0, "variance")
+    increments = discounted_traded_increments(paths.spot, paths.times, MODEL.r)
+    reservoir = RandomizedSignatureReservoir.draw(features.n_channels, 7, np.random.default_rng(13))
+    reservoir_psi = assemble_reservoir_hedge_features(reservoir, features, paths.times, increments)
+    signature_psi = assemble_signature_hedge_features(features, paths.times, increments, level=2)
+    current_dim = features.n_channels - 1
+    assert reservoir_psi.shape == (20, 7 + 2 + current_dim)
+    assert signature_psi.shape == (20, 2 + current_dim + signature_dim(features.n_channels, 2))
+
+    multi_paths = MULTI_MODEL.simulate(20, 5, np.random.default_rng(14))
+    multi_features = multi_asset_hedging_features(
+        multi_paths.spot,
+        multi_paths.times,
+        multi_paths.variance - np.asarray(MULTI_MODEL.v0)[None, None, :],
+        "variance",
+    )
+    multi_increments = discounted_traded_increments(
+        multi_paths.spot, multi_paths.times, MULTI_MODEL.r
+    )
+    multi_reservoir = RandomizedSignatureReservoir.draw(
+        multi_features.n_channels, 7, np.random.default_rng(15)
+    )
+    multi_psi = assemble_reservoir_hedge_features(
+        multi_reservoir,
+        multi_features,
+        multi_paths.times,
+        multi_increments,
+    )
+    multi_current_dim = multi_features.n_channels - 1
+    assert multi_psi.shape == (20, 3 * (7 + 2 + multi_current_dim))
+
+
+def test_particle_filter_features_shapes_and_exact_signal() -> None:
+    """The one-asset particle filter returns causal variance mean/uncertainty features."""
+    paths = MODEL.simulate(24, 6, np.random.default_rng(16))
+    mean, var = heston_variance_particle_filter(
+        MODEL,
+        paths.spot,
+        paths.variance,
+        paths.times,
+        eta=0.0,
+        n_particles=8,
+        rng=np.random.default_rng(17),
+    )
+    assert mean.shape == paths.variance.shape
+    assert var.shape == paths.variance.shape
+    assert np.allclose(mean, paths.variance)
+    assert np.allclose(var, 0.0)
+
+    noisy_signal = observe_variance(paths.variance, 0.02, np.random.default_rng(18))
+    mean, var = heston_variance_particle_filter(
+        MODEL,
+        paths.spot,
+        noisy_signal,
+        paths.times,
+        eta=0.02,
+        n_particles=16,
+        rng=np.random.default_rng(19),
+    )
+    assert mean.shape == paths.variance.shape
+    assert var.shape == paths.variance.shape
+    assert np.all(mean >= 0.0)
+    assert np.all(var >= 0.0)
+
+    features = particle_filter_hedging_features(
+        paths.spot,
+        paths.times,
+        noisy_signal,
+        mean,
+        var,
+        MODEL.v0,
+    )
+    assert features.values.shape == (24, 7, 6)
+    assert features.names == (
+        "time",
+        "log_price",
+        "running_average",
+        "signal",
+        "pf_variance_mean",
+        "pf_variance_var",
+    )
 
 
 def test_oracle_hedge_reduces_variance_and_breaks_even() -> None:
@@ -167,10 +272,90 @@ def test_reservoir_hedge_runs_and_reduces_variance() -> None:
     splits = _splits(eta=0.02)
     n_channels = _raw_features(*splits["train"]).n_channels
     reservoir = RandomizedSignatureReservoir.draw(n_channels, 64, np.random.default_rng(7))
-    assemble = lambda feats, times, inc: assemble_control_features(reservoir, feats, times, inc)
+    assemble = lambda feats, times, inc: assemble_reservoir_hedge_features(
+        reservoir, feats, times, inc
+    )
     report = _hedge(splits, _raw_features, assemble)
     assert np.isfinite(report.variance_reduction)
     assert report.variance_reduction > 2.0
+
+
+def test_transformer_hedge_tiny_optional() -> None:
+    """The optional Transformer trains from scratch on the same hedging objective."""
+    if not transformer_available():
+        return
+
+    datasets = make_heston_datasets(
+        MODEL,
+        {"train": 16, "val": 8, "test": 8},
+        n_steps=3,
+        seed=11,
+    )
+
+    def bundle(name: str):
+        paths = datasets[name]
+        signal = observe_variance(paths.variance, 0.02, np.random.default_rng(20 + len(name)))
+        features = hedging_features(paths.spot, paths.times, signal - MODEL.v0, "signal")
+        increments = discounted_traded_increments(paths.spot, paths.times, MODEL.r)
+        payoff = arithmetic_asian_call(paths, 100.0, MODEL.r)
+        return features, increments, payoff
+
+    train = bundle("train")
+    val = bundle("val")
+    test = bundle("test")
+    fitted = fit_transformer_hedge(
+        train[0],
+        train[1],
+        train[2],
+        val[0],
+        val[1],
+        val[2],
+        TransformerHedgeConfig(
+            d_model=8,
+            n_heads=2,
+            n_layers=1,
+            window=2,
+            epochs=1,
+            batch_size=4,
+            seed=5,
+        ),
+    )
+    report = evaluate_transformer_hedge(fitted, test[0], test[1], test[2])
+    assert fitted.n_parameters > 0
+    assert np.isfinite(fitted.validation_mse)
+    assert np.isfinite(report.rmse)
+    assert report.n_eval == 8
+
+
+def test_transformer_capital_handles_constant_payoff_optional() -> None:
+    """With zero traded increments, the fixed training-mean capital is the hedge."""
+    if not transformer_available():
+        return
+
+    features = PathFeatures(np.zeros((12, 4, 2), dtype=float), ("time", "state"))
+    increments = np.zeros((12, 3), dtype=float)
+    payoff = np.full(12, 5.0, dtype=float)
+    fitted = fit_transformer_hedge(
+        features,
+        increments,
+        payoff,
+        features,
+        increments,
+        payoff,
+        TransformerHedgeConfig(
+            d_model=8,
+            n_heads=2,
+            n_layers=1,
+            window=2,
+            epochs=1,
+            batch_size=4,
+            seed=6,
+        ),
+    )
+    report = evaluate_transformer_hedge(fitted, features, increments, payoff)
+    assert abs(report.capital - 5.0) < 1e-6
+    assert report.rmse < 1e-6
+    assert abs(report.mean_error) < 1e-6
 
 
 def test_hedging_demo_smoke_run() -> None:
@@ -180,6 +365,9 @@ def test_hedging_demo_smoke_run() -> None:
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
+    _configure_tiny_transformer(module)
+    module.PARTICLE_FILTER_PARTICLES = 8
+    module.PAIRED_BOOTSTRAP_REPLICATIONS = 20
 
     rows = module.run_demo(
         sizes={"train": 40, "val": 20, "test": 30},
@@ -189,20 +377,36 @@ def test_hedging_demo_smoke_run() -> None:
         lambdas=(1.0,),
         print_output=False,
     )
-    assert len(rows) == 12
-    assert {row["label"] for row in rows} == {
+    base_labels = {
         "price-only linear",
         "observed signal linear",
         "oracle true V linear",
+        "oracle true V quadratic",
         "oracle reservoir D=4",
         "reservoir D=4",
         "signature L=2",
     }
-    assert sorted({row["d"] for row in rows}) == [3, 4, 5, 8]
+    expected_labels = set(base_labels)
+    if module.RUN_PARTICLE_FILTER:
+        expected_labels.add("particle filter affine P=8")
+        expected_labels.add("particle filter quadratic P=8")
+    if module.TRANSFORMER_AVAILABLE and module.RUN_TRANSFORMER_HEDGE:
+        expected_labels.add("transformer w=2")
+        if module.RUN_ORACLE_TRANSFORMER:
+            expected_labels.add("oracle transformer w=2")
+    transformer_rows = int(module.TRANSFORMER_AVAILABLE and module.RUN_TRANSFORMER_HEDGE)
+    transformer_rows *= 1 + int(module.RUN_ORACLE_TRANSFORMER)
+    expected_len = 2 * (6 + transformer_rows)
+    expected_len += 1  # one-asset oracle true V quadratic
+    expected_len += 2 * int(module.RUN_PARTICLE_FILTER)
+    assert len(rows) == expected_len
+    assert {row["label"] for row in rows} == expected_labels
+    assert sorted({row["d"] for row in rows}) == [3, 4, 5, 6, 8]
     assert {row["m"] for row in rows} == {1, 3}
     assert {row["n_train"] for row in rows} == {40}
     assert {row["n_val"] for row in rows} == {20}
     assert {row["n_eval"] for row in rows} == {30}
+    assert all(np.asarray(row["errors"]).shape == (30,) for row in rows)
 
 
 def test_hedging_demo_eta_sweep_smoke_run() -> None:
@@ -212,6 +416,9 @@ def test_hedging_demo_eta_sweep_smoke_run() -> None:
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
+    _configure_tiny_transformer(module)
+    module.PARTICLE_FILTER_PARTICLES = 8
+    module.PAIRED_BOOTSTRAP_REPLICATIONS = 20
 
     rows = module.run_eta_sweep(
         etas=(0.0, 0.02),
@@ -222,7 +429,11 @@ def test_hedging_demo_eta_sweep_smoke_run() -> None:
         lambdas=(1.0,),
         print_output=False,
     )
-    assert len(rows) == 24
+    transformer_rows = int(module.TRANSFORMER_AVAILABLE and module.RUN_TRANSFORMER_HEDGE)
+    transformer_rows *= 1 + int(module.RUN_ORACLE_TRANSFORMER)
+    particle_rows = 2 * int(module.RUN_PARTICLE_FILTER)
+    one_asset_extra = 1 + particle_rows
+    assert len(rows) == 2 * (2 * (6 + transformer_rows) + one_asset_extra)
     assert sorted({row["eta"] for row in rows}) == [0.0, 0.02]
     assert {row["m"] for row in rows} == {1, 3}
     assert all("validation_mse" in row for row in rows)
