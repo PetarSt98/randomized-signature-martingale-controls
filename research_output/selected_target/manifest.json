@@ -1,0 +1,107 @@
+{
+  "architecture": "shallow_biased_tanh",
+  "artifacts": {
+    "basis_labels.json": {
+      "path": "research_output/selected_target/basis_labels.json",
+      "sha256": "47633436488e49e0abf65d1ae7563cfa2ba9d6d8702a0f96950ecee75c5e5dce"
+    },
+    "candidate_minor.json": {
+      "path": "research_output/selected_target/candidate_minor.json",
+      "sha256": "fcc4c9fda39dcfe3d1adcac5396ac97ace298afdb02bc82aea023613643543b8"
+    },
+    "candidate_minor.npz": {
+      "path": "research_output/selected_target/candidate_minor.npz",
+      "sha256": "9d0e7dc1897c6b702a702393557937f558aa46367eef8d5275c20371190e46c9"
+    },
+    "evaluation_matrix.npy": {
+      "path": "research_output/selected_target/evaluation_matrix.npy",
+      "sha256": "242331a0dcc69c8d093419bf06914403fd5a6218298a55448f65ea6cc46abd67"
+    },
+    "evaluation_points.npy": {
+      "path": "research_output/selected_target/evaluation_points.npy",
+      "sha256": "ab1d7f10c2804049d185760f305f8fed97fe84293cf2d29813f5d85f8eee51fc"
+    },
+    "parameters.npz": {
+      "path": "research_output/selected_target/parameters.npz",
+      "sha256": "9cb24612ac0124b5d9295921ae332c5c7193167d993617664ec237d50567820f"
+    },
+    "singular_values.npy": {
+      "path": "research_output/selected_target/singular_values.npy",
+      "sha256": "946a8bc5f0b5295c527cd92e1008360caf81b80ccb2f6916e4c2973fc783f8f3"
+    }
+  },
+  "basis": "complete standard Lyndon basis of degree 4",
+  "bracket_convention": "[V,W](x) = DW(x)V(x) - DV(x)W(x)",
+  "branch": "A",
+  "classification": "reproducible numerical evidence",
+  "dtype": "float64",
+  "extension_point_seed": 1000002719,
+  "input_dim": 2,
+  "matrix_shape": [
+    42,
+    3
+  ],
+  "minor": {
+    "basis_labels": [
+      "[X1,[X1,[X1,X2]]]",
+      "[X1,[[X1,X2],X2]]",
+      "[[[X1,X2],X2],X2]"
+    ],
+    "classification": "reproducible numerical evidence",
+    "condition_number": 1.9857803041316449,
+    "determinant_sign": -1.0,
+    "log_absolute_determinant": 1.6177639541253304,
+    "point_indices": [
+      18,
+      32,
+      22
+    ],
+    "selected_scalar_rows": [
+      18,
+      32,
+      22
+    ],
+    "selection_method": "pivoted QR of evaluation_matrix.T",
+    "shape": [
+      3,
+      3
+    ],
+    "singular_values": [
+      2.3822113318667415,
+      1.7642356139242612,
+      1.1996348875604599
+    ],
+    "state_coordinates": [
+      0,
+      0,
+      0
+    ],
+    "warning": "This floating-point minor is a numerical certificate target, not an exact certificate."
+  },
+  "parameter_scales": {
+    "bias_scale": 1.0,
+    "weight_scale": 1.0
+  },
+  "point_count": 42,
+  "point_seed": 2719,
+  "rank_tuple": [
+    3,
+    3,
+    3,
+    3
+  ],
+  "relative_tolerances": [
+    1e-08,
+    1e-10,
+    1e-12
+  ],
+  "row_oversampling": 39,
+  "sigma_min_over_sigma_max": 0.44928654055308465,
+  "standard_tolerance": 5.4816981369318726e-14,
+  "state_dim": 1,
+  "target_degree": 4,
+  "through_degree": 4,
+  "warning": "Branch A selects an exact-certificate target; it does not claim generic faithfulness.",
+  "weight_seed": 1729,
+  "witt_dimension": 3
+}

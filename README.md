@@ -250,6 +250,17 @@ python tests/test_control.py           # control-variate tests
 python tests/test_signature.py         # signature tests
 ```
 
+The standalone homogeneous free-Lie rank reconnaissance has three explicit
+commands. It uses generic Euclidean states and does not enter the finance
+pipeline. Its outputs are numerical evidence only; the per-case matrix budget
+is checked before basis generation, parameter sampling, or autodiff:
+
+```bash
+python scripts/lie_rank_atlas.py smoke
+python scripts/lie_rank_atlas.py single --architecture shallow_biased_tanh --input-dim 2 --state-dim 2 --degree 3
+python scripts/lie_rank_atlas.py full
+```
+
 `scripts/control_variates_demo.py` is written with `# %%` cell markers, so you can open it in
 Cursor / VS Code (or Jupyter) and run it cell by cell like a notebook.
 `DEFAULT_SIZES`, `SMOKE_SIZES`, `DEFAULT_N_STEPS`, `RESERVOIR_DIMS`,
