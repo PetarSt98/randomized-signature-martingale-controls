@@ -1,0 +1,1007 @@
+# From homogeneous Lie injectivity to graded log-signature reconstruction
+
+This note proves the degree-by-degree reconstruction bridge for two inputs and
+degrees at most four.  The path-level argument is first made for continuous
+bounded-variation paths (hence for piecewise-\(C^1\) paths).  No rough-path
+extension is used in any proof below.
+
+The three observation objects used in the note are different:
+
+1. **A. Ideal normalized scale jets** \(J_m(y;X)\), which are exact derivatives
+   at input scale \(r=0\).
+2. **B. The degree-four truncated finite-scale response**
+   \(F_y^{(4)}(r;z)\), a polynomial obtained by retaining tensor degrees at most
+   four.
+3. **C. The actual full CDE response** \(Y_T^y(rX)\), whose Chen--Fliess
+   expansion also has levels at least five.
+
+Only A is used in the recursive reconstruction theorem.  B is used in the
+joint state--scale theorem.  Neither theorem identifies B with C at nonzero
+scale.
+
+## 1. Setting and conventions
+
+### 1.1 Scaled CDE and regularity
+
+Fix \(T>0\), an open interval \(U\subseteq\mathbb R\), and a continuous path
+\(X=(X^1,X^2):[0,T]\to\mathbb R^2\) of bounded variation.  Let
+\(V_1,V_2\in C^4(U;\mathbb R)\).  For every initial state used below, assume
+that there is a neighborhood of \(r=0\) on which the Riemann--Stieltjes CDE
+
+\[
+ dY_t^{y,r}
+   =\sum_{i=1}^2 V_i(Y_t^{y,r})\,d(rX_t^i)
+   =r\sum_{i=1}^2 V_i(Y_t^{y,r})\,dX_t^i,
+ \qquad Y_0^{y,r}=y,
+\]
+
+has a unique solution that remains in a compact subset of \(U\) on which the
+derivatives of the \(V_i\) through order four are bounded.  These local
+assumptions are enough for the repeated-substitution calculation through
+degree four.  They hold globally for the certified tanh fields.
+
+The notation is, by definition,
+
+\[
+Y^{y,r}(X):=Y^y(rX).
+\]
+
+No state-rescaling identity is asserted or used.  Define
+
+\[
+J_m(y;X)
+  :=\frac1{m!}\left.\frac{\partial^m}{\partial r^m}
+      Y_T^{y,r}(X)\right|_{r=0},\qquad 1\le m\le4.
+\]
+
+### 1.2 Associative words, tensors, and signature
+
+Use the ordered alphabet \(1<2\), corresponding to the repository's internal
+zero-based letters \(0<1\) and displayed generators \(X_1,X_2\).  A word is
+\(w=i_1\cdots i_m\), its length is \(|w|=m\), and the empty word is denoted by
+\(\varnothing\).
+
+Let \(E=\operatorname{span}\{X_1,X_2\}\).  In the tensor algebra
+
+\[
+T((E))=\prod_{m\ge0}E^{\otimes m},
+\]
+
+the monomial associated with \(w=i_1\cdots i_m\) is
+\(X_w=X_{i_1}\cdots X_{i_m}\).  Tensor multiplication is ordered
+concatenation:
+
+\[
+X_u\otimes X_v=X_{uv}.
+\]
+
+Products below are this noncommutative product; the tensor symbol is often
+suppressed.  Truncation after degree \(L\) uses the same multiplication followed
+by deletion of terms of degree greater than \(L\).
+
+The chronological signature-word convention is
+
+\[
+S^{i_1\cdots i_m}(X)
+ :=\int_{0<t_1<\cdots<t_m<T}
+      dX_{t_1}^{i_1}\cdots dX_{t_m}^{i_m},
+\]
+
+so the earliest differential is the leftmost letter.  There is no extra
+factorial in this definition.  For example, a straight segment with increment
+\(a\in E\) has \(S_m=a^{\otimes m}/m!\).  Set
+
+\[
+S(X)=1+\sum_{m\ge1}S_m(X),\qquad
+S_m(X)=\sum_{|w|=m}S^w(X)X_w.
+\]
+
+With this convention, Chen concatenation places the earlier path on the left.
+Input dilation acts homogeneously:
+
+\[
+S_m(rX)=r^mS_m(X).
+\]
+
+### 1.3 Tensor logarithm and deterministic Lyndon basis
+
+The tensor logarithm convention is
+
+\[
+\log_{\otimes}S
+ =\sum_{k\ge1}\frac{(-1)^{k+1}}{k}(S-1)^{\otimes k},
+\qquad
+S=\exp_{\otimes}(\ell)
+ =\sum_{k\ge0}\frac{\ell^{\otimes k}}{k!}.
+\]
+
+For a bounded-variation signature, Chen's group-like theorem implies that
+\(\ell=\log_{\otimes}S\) is a Lie series.  Write
+
+\[
+\ell=\ell_1+\ell_2+\ell_3+\ell_4+\text{terms of degree at least five},
+\qquad \ell_m\in\mathcal L_{2,m}.
+\]
+
+The repository ordering is deterministic.  Words are lexicographically
+ordered.  A Lyndon word is strictly smaller than each nontrivial proper suffix.
+For a nontrivial Lyndon word \(w=uv\), \(v\) is its longest proper Lyndon
+suffix, and the standard bracketing is \(H(w)=[H(u),H(v)]\).  Brackets expand
+associatively by
+
+\[
+[u,v]=uv-vu.
+\]
+
+In degree order, followed by lexicographic Lyndon-word order within a degree,
+the basis through degree four is
+
+\[
+\begin{array}{c|l}
+1&X_1,\ X_2,\\
+2&[X_1,X_2],\\
+3&[X_1,[X_1,X_2]],\ [[X_1,X_2],X_2],\\
+4&[X_1,[X_1,[X_1,X_2]]],\
+  [X_1,[[X_1,X_2],X_2]],\
+  [[[X_1,X_2],X_2],X_2].
+\end{array}
+\]
+
+These are the Hall coordinates meant below; no second basis convention is
+introduced.
+
+### 1.4 Differential operators, composition order, and bracket sign
+
+For a scalar vector field \(V\), let its pullback derivation be
+
+\[
+\mathcal D_V f(x):=Df(x)V(x).
+\]
+
+Operator multiplication means composition in the usual order,
+\((AB)f=A(Bf)\).  Define the unital associative representation
+
+\[
+\Gamma(X_i)=\mathcal D_{V_i},\qquad
+\Gamma(X_{i_1}\cdots X_{i_m})
+ =\mathcal D_{V_{i_1}}\circ\cdots\circ\mathcal D_{V_{i_m}}.
+\]
+
+Consequently,
+
+\[
+\Gamma(uv)=\Gamma(u)\Gamma(v),
+\]
+
+so \(\Gamma\) is a homomorphism, not an anti-homomorphism, for the repository
+word order.
+
+The sign can be checked without convention-dependent shorthand.  Hessian terms
+cancel to give
+
+\[
+\begin{aligned}
+[\mathcal D_V,\mathcal D_W]_{\mathrm{op}}f
+ &=\mathcal D_V(\mathcal D_Wf)-\mathcal D_W(\mathcal D_Vf)\\
+ &=Df\bigl(DW\,V-DV\,W\bigr).
+\end{aligned}
+\]
+
+Thus the induced vector-field bracket is exactly
+
+\[
+[V,W]_{\mathrm{repo}}=DW\,V-DV\,W,
+\]
+
+and
+
+\[
+\Gamma(X_1X_2-X_2X_1)\operatorname{Id}
+ =DV_2\,V_1-DV_1\,V_2
+ =[V_1,V_2]_{\mathrm{repo}}.
+\]
+
+For the exact witness \(V_1(x)=\tanh x\), \(V_2(x)=1/2\), this is
+
+\[
+\Gamma(X_1X_2-X_2X_1)\operatorname{Id}(x)
+ =-\tfrac12\operatorname{sech}^2x,
+\]
+
+which equals \(-1/2\) at \(x=0\), exactly the certified degree-two entry.
+Reversing the word-to-operator order would give the opposite sign and would
+conflict with the verified certificate.  Therefore no reversal or sign
+correction is required.
+
+Define the represented Lie field
+
+\[
+\rho(h):=\Gamma(h)\operatorname{Id},\qquad
+\rho_m:=\rho|_{\mathcal L_{2,m}}.
+\]
+
+## 2. Chen--Fliess coefficient and the normalization factorial
+
+For any sufficiently smooth scalar test function \(f\), the
+Riemann--Stieltjes chain rule gives
+
+\[
+f(Y_t^{y,r})
+ =f(y)+r\sum_{i=1}^2\int_0^t
+   (\mathcal D_{V_i}f)(Y_s^{y,r})\,dX_s^i.
+\]
+
+Substituting the same identity into the integrand fixes both orders.  At degree
+two, for example, the earlier differential is \(dX_u^j\), the later one is
+\(dX_s^i\), and the associated operator is
+\(\mathcal D_{V_j}\mathcal D_{V_i}\):
+
+\[
+r^2\sum_{j,i=1}^2
+ \int_{0<u<s<T}dX_u^j\,dX_s^i\,
+ (\mathcal D_{V_j}\mathcal D_{V_i}f)(y).
+\]
+
+Induction by repeated substitution therefore yields, through degree four,
+
+\[
+f(Y_T^{y,r})
+ =f(y)+\sum_{m=1}^4 r^m
+   \sum_{i_1,\ldots,i_m=1}^2
+   S^{i_1\cdots i_m}(X)
+   (\mathcal D_{V_{i_1}}\cdots\mathcal D_{V_{i_m}}f)(y)
+   +R_5(r).
+\]
+
+The fivefold iterated-integral remainder is \(O(r^5)\) under the local
+regularity and boundedness assumptions in Section 1.1.  This local statement is
+used only to identify derivatives at \(r=0\); it is not a finite-scale error
+theorem for the full CDE.
+
+Taking \(f=\operatorname{Id}\) gives
+
+\[
+Y_T^{y,r}
+ =y+\sum_{m=1}^4 r^m\Gamma(S_m(X))\operatorname{Id}(y)+O(r^5).
+\]
+
+In particular, degree by degree,
+
+\[
+\begin{aligned}
+[r]Y_T^{y,r}
+ &=\sum_{i_1}S^{i_1}\mathcal D_{V_{i_1}}\operatorname{Id}(y),\\
+[r^2]Y_T^{y,r}
+ &=\sum_{i_1,i_2}S^{i_1i_2}
+   \mathcal D_{V_{i_1}}\mathcal D_{V_{i_2}}\operatorname{Id}(y),\\
+[r^3]Y_T^{y,r}
+ &=\sum_{i_1,i_2,i_3}S^{i_1i_2i_3}
+   \mathcal D_{V_{i_1}}\mathcal D_{V_{i_2}}
+   \mathcal D_{V_{i_3}}\operatorname{Id}(y),\\
+[r^4]Y_T^{y,r}
+ &=\sum_{i_1,i_2,i_3,i_4}S^{i_1i_2i_3i_4}
+   \mathcal D_{V_{i_1}}\mathcal D_{V_{i_2}}
+   \mathcal D_{V_{i_3}}\mathcal D_{V_{i_4}}
+   \operatorname{Id}(y).
+\end{aligned}
+\]
+
+If \(a_m=[r^m]Y_T^{y,r}\), then
+\(\partial_r^mY_T^{y,r}|_{r=0}=m!a_m\).  The normalization in \(J_m\)
+removes exactly this Taylor factorial.  Hence, with no remaining factorial,
+
+\[
+\boxed{J_m(y;X)=\Gamma(S_m(X))\operatorname{Id}(y),\qquad 1\le m\le4.}
+\]
+
+The simplex factorial already present for straight-line signatures is part of
+\(S_m\); it is unrelated to, and not duplicated by, the Taylor normalization.
+
+## 3. Homogeneous tensor-exponential formulas
+
+For this section write simply
+
+\[
+\ell=\ell_1+\ell_2+\ell_3+\ell_4
+\]
+
+inside the degree-four truncated tensor algebra.  From the tensor exponential,
+
+\[
+S_m
+ =\sum_{k=1}^m\frac1{k!}
+   \sum_{\substack{j_1+\cdots+j_k=m\\j_a\ge1}}
+   \ell_{j_1}\ell_{j_2}\cdots\ell_{j_k}.
+\]
+
+The inner sum is over ordered compositions of \(m\), so none of its products
+may be commuted.  Enumerating those compositions independently in each degree
+gives
+
+\[
+\boxed{S_1=\ell_1,}
+\]
+
+\[
+\boxed{S_2=\ell_2+\frac12\ell_1\ell_1,}
+\]
+
+\[
+\boxed{
+S_3=\ell_3
+ +\frac12\bigl(\ell_1\ell_2+\ell_2\ell_1\bigr)
+ +\frac16\ell_1\ell_1\ell_1,}
+\]
+
+and
+
+\[
+\boxed{\begin{aligned}
+S_4={}&\ell_4
+ +\frac12\bigl(\ell_1\ell_3+\ell_2\ell_2+\ell_3\ell_1\bigr)\\
+&+\frac16\bigl(
+  \ell_1\ell_1\ell_2
+ +\ell_1\ell_2\ell_1
+ +\ell_2\ell_1\ell_1\bigr)
+ +\frac1{24}\ell_1\ell_1\ell_1\ell_1.
+\end{aligned}}
+\]
+
+No commutative multinomial coefficients have been inserted: each displayed
+ordered product arises once from an ordered composition.
+
+## 4. Triangular graded identities
+
+Combining the scale-jet identity with the four tensor-exponential formulas
+gives
+
+\[
+J_m(y;X)
+ =\rho(\ell_m(X))(y)
+  +\Psi_m\bigl(y;\ell_1(X),\ldots,\ell_{m-1}(X)\bigr).
+\]
+
+Every lower-degree correction is explicit:
+
+\[
+\boxed{\Psi_1(y)=0,}
+\]
+
+\[
+\boxed{
+\Psi_2(y;\ell_1)
+ =\frac12\Gamma(\ell_1\ell_1)\operatorname{Id}(y),}
+\]
+
+\[
+\boxed{\begin{aligned}
+\Psi_3(y;\ell_1,\ell_2)
+={}&\frac12\Gamma(\ell_1\ell_2+\ell_2\ell_1)
+       \operatorname{Id}(y)\\
+&+\frac16\Gamma(\ell_1\ell_1\ell_1)
+       \operatorname{Id}(y),
+\end{aligned}}
+\]
+
+and
+
+\[
+\boxed{\begin{aligned}
+\Psi_4(y;\ell_1,\ell_2,\ell_3)
+={}&\frac12\Gamma(
+   \ell_1\ell_3+\ell_2\ell_2+\ell_3\ell_1)
+   \operatorname{Id}(y)\\
+&+\frac16\Gamma(
+   \ell_1\ell_1\ell_2
+  +\ell_1\ell_2\ell_1
+  +\ell_2\ell_1\ell_1)
+   \operatorname{Id}(y)\\
+&+\frac1{24}\Gamma(\ell_1\ell_1\ell_1\ell_1)
+   \operatorname{Id}(y).
+\end{aligned}}
+\]
+
+Thus the unknown degree-\(m\) Lie component enters \(J_m\) linearly through
+\(\rho_m\), while every nonlinear term depends only on already lower degrees.
+This is a graded triangular statement; it is not injectivity of \(\rho\) on an
+ungraded direct sum.
+
+## 5. Precise definition of the truncated finite-scale object
+
+Let
+
+\[
+\mathfrak g^{(4)}
+ =\mathcal L_{2,1}\oplus\mathcal L_{2,2}
+  \oplus\mathcal L_{2,3}\oplus\mathcal L_{2,4},
+\qquad z=z_1+z_2+z_3+z_4,
+\]
+
+and let the homogeneous dilation be
+
+\[
+\delta_rz=r z_1+r^2z_2+r^3z_3+r^4z_4.
+\]
+
+Define object B by
+
+\[
+\begin{aligned}
+F_y^{(4)}(r;z)
+ &:=\Gamma\!\left(
+   \pi_{\le4}\exp_{\otimes}(\delta_rz)\right)
+   \operatorname{Id}(y)\\
+ &=y+\sum_{m=1}^4r^m
+   \Gamma\!\left(\pi_m\exp_{\otimes}(z)\right)
+   \operatorname{Id}(y).
+\end{aligned}
+\]
+
+If \(z_m=\ell_m(X)\), then the coefficient of \(r^m\) in this polynomial is
+the ideal jet \(J_m(y;X)\).  At a nonzero finite scale, however,
+\(F_y^{(4)}(r;z)\) is only object B.  The actual response C is
+\(Y_T^y(rX)\), and its expansion contains degrees at least five.  No equality
+between B and C, no finite-scale remainder bound, and no full-CDE inversion is
+claimed here.
+
+## 6. Finite-evaluation lemma
+
+**Lemma.** Let \(\Omega\) be a nonempty set and let
+\(f_1,\ldots,f_N:\Omega\to\mathbb R^d\) be linearly independent as functions.
+Then there are \(N\) point-coordinate pairs
+
+\[
+(x_a,k_a)\in\Omega\times\{1,\ldots,d\},\qquad 1\le a\le N,
+\]
+
+such that the scalar evaluation matrix
+
+\[
+A_{aj}=(f_j(x_a))_{k_a}
+\]
+
+is nonsingular.  In particular, finitely many scalar point-coordinate
+evaluations have full column rank.
+
+**Proof.** Let \(E=\operatorname{span}\{f_1,\ldots,f_N\}\), so
+\(\dim E=N\).  For each \((x,k)\), restrict the scalar functional
+
+\[
+\varepsilon_{x,k}:f\mapsto(f(x))_k
+\]
+
+to \(E\).  The common kernel of all these restricted evaluations is zero:
+a function whose every coordinate vanishes at every point is the zero
+function.  If their linear span were a proper subspace of \(E^*\), its
+annihilator in the finite-dimensional space \(E\) would contain a nonzero
+element, contradicting that common-kernel statement.  Hence the evaluations
+span \(E^*\).  Select \(N\) of them forming a basis of \(E^*\).  Their matrix in
+the basis \(f_1,\ldots,f_N\) is nonsingular.  No continuity assumption is
+needed. \(\square\)
+
+The converse implication used in the existing certificate is immediate as
+well: a full-column-rank finite evaluation matrix rules out a nonzero
+functional linear relation.
+
+## 7. Reconstruction sufficiency
+
+**Theorem (finite ideal-jet reconstruction).** Fix \(1\le L\le4\).  Assume:
+
+1. \(X\) and \(V_1,V_2\) satisfy the bounded-variation and local \(C^4\)
+   hypotheses of Section 1.1 at every observation state;
+2. the vector fields, their derivatives, and the representation \(\Gamma\) are
+   known exactly;
+3. for each \(m\le L\), the homogeneous map
+   \(\rho_m:\mathcal L_{2,m}\to\mathfrak X(U)\) is injective;
+4. the observer has exact access to the normalized derivatives \(J_m(y;X)\)
+   at the finitely many initial states selected below.
+
+Then all Hall coefficients of
+\(\ell_1(X),\ldots,\ell_L(X)\) are reconstructed uniquely and recursively from
+finitely many ideal normalized scale jets.
+
+**Proof.** Let
+\(H_{m,1},\ldots,H_{m,n_m}\) be the repository's standard-Lyndon basis of
+\(\mathcal L_{2,m}\), and write
+
+\[
+\ell_m=\sum_{j=1}^{n_m}\lambda_{m,j}H_{m,j}.
+\]
+
+Injectivity of \(\rho_m\) says that the \(n_m\) scalar functions
+\(\rho(H_{m,j})\) are linearly independent.  The finite-evaluation lemma
+therefore supplies \(n_m\) states \(y_{m,a}\in U\) for which
+
+\[
+(M_m)_{aj}:=\rho(H_{m,j})(y_{m,a})
+\]
+
+is nonsingular.  These states and matrices depend only on the known
+representation, not on the unknown path.
+
+At degree one, \(\Psi_1=0\), so
+\(M_1\lambda_1=\mathbf J_1\).  Suppose degrees below \(m\) have been recovered.
+They determine the exact vector
+
+\[
+(\boldsymbol\Psi_m)_a
+ :=\Psi_m(y_{m,a};\ell_1,\ldots,\ell_{m-1}).
+\]
+
+Evaluating the triangular identity gives
+
+\[
+\mathbf J_m-\boldsymbol\Psi_m=M_m\lambda_m,
+\]
+
+and hence
+
+\[
+\boxed{
+\lambda_m=M_m^{-1}
+ (\mathbf J_m-\boldsymbol\Psi_m),\qquad 1\le m\le L.}
+\]
+
+Induction reconstructs every homogeneous component through \(L\). \(\square\)
+
+This theorem concerns exact ideal derivatives.  It assumes neither recovery
+from one terminal state nor a finite-difference approximation to the jets.
+
+## 8. Converse: formal invisibility and actual-path realizability
+
+### 8.1 Formal free-Lie/free-nilpotent coordinate model
+
+For every Lie polynomial \(a\), \(\Gamma(a)\) is itself a first-order
+derivation and
+
+\[
+\Gamma(a)=\mathcal D_{\rho(a)}.
+\]
+
+This follows by induction from the generator definition and the commutator
+calculation in Section 1.4.  In particular,
+
+\[
+h\in\ker\rho_m\quad\Longrightarrow\quad \Gamma(h)=0
+\]
+
+as an operator on all smooth test functions, not merely after application to
+\(\operatorname{Id}\).
+
+Let \(1\le m\le L\le4\), let \(0\ne h\in\ker\rho_m\), and let
+\(z\in\mathfrak g^{(L)}\).  Introduce an independent formal grading variable
+\(u\) and work only through \(u\)-degree \(L\).  Expand the finite tensor
+polynomial
+\(\pi_{\le L}\exp_{\otimes}(\delta_u(z+t h))\).  Every term in its difference
+from \(\pi_{\le L}\exp_{\otimes}(\delta_u z)\) contains at least one factor
+\(h\).  Since \(\Gamma\) is an algebra homomorphism and \(\Gamma(h)=0\), every
+such term maps to zero.  Hence, as a polynomial in \(u\),
+
+\[
+\Gamma\!\left(
+ \pi_{\le L}\exp_{\otimes}(\delta_u(z+t h))\right)
+=\Gamma\!\left(
+ \pi_{\le L}\exp_{\otimes}(\delta_u z)\right).
+\]
+
+Equality of coefficients of every power of \(u\) shows
+
+\[
+\Gamma\!\left(\pi_k\exp_{\otimes}(z+t h)\right)
+ =\Gamma\!\left(\pi_k\exp_{\otimes}z\right)
+\qquad\text{for every }k\le L.
+\]
+
+Thus \(z\) and \(z+t h\) give identical formal graded jets at every state and
+at every observed level through \(L\); they also give the same truncated
+finite-scale response.  The degree-\(m\) Hall direction \(h\) is genuinely
+invisible in the formal model.  Consequently homogeneous injectivity is
+necessary for local injectivity on any open subset of the formal Hall-coordinate
+space.
+
+### 8.2 What is required for actual bounded-variation paths
+
+To transfer that necessity statement to actual path signatures, it is enough
+that the set of realized truncated log signatures contain a nonempty open set
+in \(\mathfrak g^{(L)}\).  The standard finite-step realization result is
+stronger:
+
+\[
+\{S^{\le L}(X):X\text{ piecewise linear}\}
+ =G^L(\mathbb R^2)
+ =\exp_{\otimes}(\mathfrak g^{(L)}).
+\]
+
+Here is the reduction to finite-dimensional controllability.  A straight
+segment of increment \(v\in E\) has truncated signature
+\(\exp_{\otimes}(v)\), and Chen concatenation makes a piecewise-linear
+signature a finite product of such exponentials.  In the connected,
+simply-connected free step-\(L\) nilpotent group, the Lie algebra generated by
+the horizontal first layer \(E\) is the entire free nilpotent Lie algebra.
+The orbit/subgroup theorem (equivalently Rashevsky--Chow accessibility) says
+that finite products of the horizontal one-parameter subgroups therefore fill
+the whole group.  Since the nilpotent exponential is a global diffeomorphism,
+every Hall-coordinate vector is realized by a piecewise-linear, hence
+bounded-variation, path.
+
+It follows that the formal kernel argument also proves actual-path necessity
+for observation object A through level \(L\), and for object B.  It does **not**
+prove that two realizing paths have identical object C: their signature levels
+above \(L\) may differ and may affect the actual full CDE response.
+
+Here “actual-path necessity” is a statement about the observation map on the
+realized truncated Hall-coordinate domain, which is all of
+\(\mathfrak g^{(L)}\).  Global realization alone does not provide a continuous
+local right inverse into path space near an arbitrarily prescribed path, so no
+stronger claim in the \(1\)-variation topology of path representatives is made.
+
+## 9. Application to the exact tanh certificate
+
+Let
+
+\[
+q=\frac{\log3}{2},\qquad V_1(x)=\tanh x,\qquad V_2(x)=\frac12.
+\]
+
+The authoritative exact matrices are generated by
+`lie_reservoir.certificates.degree_exact_certificate`; their displayed forms
+are also recorded in `research_output/certificate.json` and
+`research_output/certificate_note.md`.  Rows follow the certified point order
+and columns follow the standard-Lyndon order fixed in Section 1.3:
+
+\[
+M_1=
+\begin{pmatrix}0&1/2\\1/2&1/2\end{pmatrix}
+\quad\text{at }(0,q),
+\qquad
+M_2=\begin{pmatrix}-1/2\end{pmatrix}
+\quad\text{at }(0),
+\]
+
+\[
+M_3=
+\begin{pmatrix}15/32&3/16\\15/32&-3/16\end{pmatrix}
+\quad\text{at }(-q,q),
+\]
+
+and
+
+\[
+M_4=
+\begin{pmatrix}
+-57/128&-3/32&3/64\\
+-1/2&0&1/4\\
+-57/128&3/32&3/64
+\end{pmatrix}
+\quad\text{at }(-q,0,q).
+\]
+
+Their exact determinants are respectively
+
+\[
+-\frac14,\qquad-\frac12,\qquad-\frac{45}{256},\qquad
+\frac{135}{8192},
+\]
+
+so these are complete-basis evaluation matrices, not numerical rank evidence.
+Their product is the authoritative exact value
+\(-6075/16777216\ne0\).
+Exact Gauss--Jordan elimination applied to the matrices returned by the
+authoritative `Fraction` certificate constructor gives
+
+\[
+M_1^{-1}=
+\begin{pmatrix}-2&2\\2&0\end{pmatrix},
+\qquad
+M_2^{-1}=\begin{pmatrix}-2\end{pmatrix},
+\]
+
+\[
+M_3^{-1}=
+\begin{pmatrix}
+16/15&16/15\\
+8/3&-8/3
+\end{pmatrix},
+\]
+
+and
+
+\[
+M_4^{-1}=
+\begin{pmatrix}
+-64/45&8/15&-64/45\\
+-16/3&0&16/3\\
+-128/45&76/15&-128/45
+\end{pmatrix}.
+\]
+
+All four products \(M_mM_m^{-1}\) are the exact identity over
+\(\mathbb Q\); no floating-point determinant or inverse is used.
+
+For \(P_m\) equal to the certified ordered point set, define the residual
+
+\[
+R_m(y):=J_m(y;X)
+ -\Psi_m(y;\ell_1,\ldots,\ell_{m-1}),
+\qquad y\in P_m,
+\]
+
+with \(\Psi_1=0\), and form the residual column in the listed point order.  If
+\(\lambda_m\) is the Hall-coordinate column in the listed basis order, then
+
+\[
+\boxed{
+\lambda_m
+ =M_m^{-1}\!\left(
+   \mathbf J_m-\boldsymbol\Psi_m(
+   \lambda_1,\ldots,\lambda_{m-1})\right)
+ =M_m^{-1}\mathbf R_m.}
+\]
+
+Here \(\boldsymbol\Psi_m(\lambda_1,\ldots,\lambda_{m-1})\) means that
+\(\ell_k=\sum_j\lambda_{k,j}H_{k,j}\) has been substituted into the explicit
+formula from Section 4 and then evaluated on \(P_m\).
+
+Explicitly,
+
+\[
+\lambda_1=
+\begin{pmatrix}
+-2R_1(0)+2R_1(q)\\
+2R_1(0)
+\end{pmatrix},
+\qquad
+\lambda_2=-2R_2(0),
+\]
+
+\[
+\lambda_3=
+\begin{pmatrix}
+\frac{16}{15}\bigl(R_3(-q)+R_3(q)\bigr)\\
+\frac83\bigl(R_3(-q)-R_3(q)\bigr)
+\end{pmatrix},
+\]
+
+and
+
+\[
+\lambda_4=
+\begin{pmatrix}
+-\frac{64}{45}R_4(-q)+\frac8{15}R_4(0)-\frac{64}{45}R_4(q)\\
+-\frac{16}{3}R_4(-q)+\frac{16}{3}R_4(q)\\
+-\frac{128}{45}R_4(-q)+\frac{76}{15}R_4(0)-\frac{128}{45}R_4(q)
+\end{pmatrix}.
+\]
+
+This reconstructs \(2+1+2+3=8\) Hall coordinates from eight exact,
+degree-specific ideal scalar jets at the witness.  The existing analytic
+determinant-product argument further shows that the same fixed point sets give
+invertible, parameter-dependent \(M_m\) for Lebesgue-almost every
+\((a_1,b_1,a_2,b_2)\in\mathbb R^4\).  The rational inverses displayed above
+apply only to the exact witness.
+
+## 10. The correct dimension statement
+
+The Hall-coordinate dimensions are
+
+\[
+\dim\mathcal L_{2,1}=2,\quad
+\dim\mathcal L_{2,2}=1,\quad
+\dim\mathcal L_{2,3}=2,\quad
+\dim\mathcal L_{2,4}=3,
+\]
+
+and hence
+
+\[
+\dim\mathfrak g^{(4)}=2+1+2+3=8.
+\]
+
+**Dimension proposition.** Let \(U_0\subset\mathbb R^8\) be nonempty and
+open.  If a continuous map \(G:U_0\to\mathbb R^N\) is injective on some open
+neighborhood in \(U_0\), then \(N\ge8\).
+
+Indeed, if \(N<8\), compose the injective restriction with the coordinate
+embedding \(\mathbb R^N\hookrightarrow\mathbb R^8\).  Brouwer invariance of
+domain would make its image open in \(\mathbb R^8\), while that image lies in
+an \(N\)-dimensional coordinate plane with empty \(8\)-dimensional interior, a
+contradiction.
+
+This is only a lower bound on the scalar codomain dimension of a continuous
+locally injective observation map defined on an open subset of this
+eight-dimensional coordinate space.  It is not a claim about minimal reservoir
+runs, scale values, terminal-state observations, or universal measurement
+minimality.
+
+## 11. Joint state--scale linear independence
+
+Let \(\mathcal H\) be the eight standard-Lyndon basis elements in Section 1.3,
+and use their Hall coefficients as coordinates \(z\in\mathbb R^8\).  If
+\(h\in\mathcal H\) has degree \(m\), then
+
+\[
+\pi_{\le4}\exp_{\otimes}(\delta_r(\varepsilon h))
+ =1+\varepsilon r^m h+O(\varepsilon^2).
+\]
+
+Therefore the derivative of object B at the zero signature is
+
+\[
+\boxed{
+\partial_hF_y^{(4)}(r;0)=r^m\rho(h)(y).}
+\]
+
+**Theorem (joint state--scale independence).** Suppose every
+\(\rho_m\), \(1\le m\le4\), is injective.  On any nonempty open scale interval
+\(I\subset\mathbb R\setminus\{0\}\), the eight scalar functions
+
+\[
+(r,y)\longmapsto r^{\deg h}\rho(h)(y),
+\qquad h\in\mathcal H,
+\]
+
+are linearly independent on \(I\times U\).
+
+**Proof.** Suppose a linear combination vanishes and group its terms by
+degree.  With
+
+\[
+h_m:=\sum_{\substack{h\in\mathcal H\\\deg h=m}}c_hh,
+\]
+
+the relation becomes
+
+\[
+\sum_{m=1}^4r^m\rho(h_m)(y)=0
+\qquad\text{for every }(r,y)\in I\times U.
+\]
+
+For each fixed \(y\), the left side is a polynomial in \(r\) that vanishes on
+an interval.  Every coefficient is therefore zero:
+\(\rho(h_m)(y)=0\) for all \(m,y\).  Homogeneous injectivity gives \(h_m=0\)
+for every \(m\), and basis independence then gives every \(c_h=0\).
+\(\square\)
+
+Apply the finite-evaluation lemma on the joint domain \(I\times U\).  There
+exist eight state--scale pairs \((r_a,y_a)\) such that the observation map
+
+\[
+\mathcal O(z)
+ :=\bigl(F_{y_a}^{(4)}(r_a;z)\bigr)_{a=1}^8
+\]
+
+has a nonsingular \(8\times8\) Jacobian at \(z=0\).  The finite-dimensional
+inverse-function theorem gives a local inverse near the zero signature.
+
+There is also a precise conditional stability estimate.  Put
+\(A=D\mathcal O(0)\).  On any convex neighborhood \(B\) of zero small enough
+that
+
+\[
+\sup_{z\in B}\left\|A^{-1}
+  \bigl(D\mathcal O(z)-A\bigr)\right\|\le\frac12,
+\]
+
+the fundamental theorem of calculus gives
+
+\[
+\begin{aligned}
+A^{-1}\bigl(\mathcal O(z)-\mathcal O(z')\bigr)
+ &=(z-z')\\
+ &\quad+\int_0^1 A^{-1}
+   \bigl(D\mathcal O(z'+t(z-z'))-A\bigr)(z-z')\,dt,
+\end{aligned}
+\]
+
+and therefore
+
+\[
+\|z-z'\|\le2\|A^{-1}\|\,
+  \|\mathcal O(z)-\mathcal O(z')\|,
+\qquad z,z'\in B.
+\]
+
+The theorem proves existence of eight such scalar evaluations and qualitative
+local stability for object B.  It does not provide an explicit selected tuple,
+an exact joint determinant, a numerical conditioning constant, or a certified
+radius \(B\).  Those are separate proof obligations before claiming explicit
+local stability.
+
+For the exact tanh witness, and for almost every tanh parameter vector covered
+by the existing certificate, homogeneous injectivity supplies the hypothesis
+of this theorem.  This does not remove the distinction between truncated
+object B and full response C.
+
+## 12. Standard results requiring citation
+
+A formal paper version should cite the following standard inputs at the points
+where they are used:
+
+1. For bounded-variation signatures and controlled-ODE Taylor expansions:
+   Peter K. Friz and Nicolas B. Victoir, *Multidimensional Stochastic Processes
+   as Rough Paths*, Cambridge University Press, 2010, Section 7.1 and
+   Section 18.2, [DOI 10.1017/CBO9780511845079](https://doi.org/10.1017/CBO9780511845079).
+   The word/operator order used here was nevertheless derived directly in
+   Section 2.  This matters because other Fliess conventions reverse those
+   indices.
+2. For primitive/group-like series, tensor exponential and logarithm, and the
+   fact that a bounded-variation log signature is a free Lie series:
+   Christophe Reutenauer, *Free Lie Algebras*, Oxford University Press, 1993,
+   Theorems 3.1--3.2 and Corollary 3.5,
+   [publisher record](https://academic.oup.com/book/53911).
+3. For exact finite-step path realizability:
+   Friz--Victoir, Theorems 7.28 and 7.30.  They identify
+   \(G^L(\mathbb R^d)=\exp(\mathfrak g^L(\mathbb R^d))\) with the set of
+   truncated signatures of continuous bounded-variation paths, with
+   piecewise-linear realizations.
+4. The Lebesgue-almost-every tanh implication in Section 9 is imported
+   unchanged from the repository's verified exact certificate.  Its external
+   standard input is the theorem that the zero set of a nontrivial
+   real-analytic function on a connected open subset of Euclidean space has
+   Lebesgue measure zero; a paper version should cite a real-analytic geometry
+   reference for that theorem.
+5. For the codomain-dimension obstruction: Allen Hatcher,
+   *Algebraic Topology*, Section 2.B, Theorem 2B.2 (Brouwer invariance of
+   domain), [official text](https://pi.math.cornell.edu/~hatcher/AT/AT.pdf).
+6. For the local inverse: Walter Rudin, *Principles of Mathematical Analysis*,
+   third edition, Theorem 9.24 (the finite-dimensional inverse-function
+   theorem).
+
+The algebraic formulas, finite-evaluation lemma, recursive reconstruction,
+formal kernel argument, and polynomial-in-scale independence argument were
+proved directly above rather than inferred from those citations.
+
+## 13. Rough-path extension is separate
+
+Nothing above assumes a rough path.  A later extension would have to specify a
+geometric \(p\)-rough path, sufficient \(\operatorname{Lip}^\gamma\) regularity
+of the vector fields, continuity of the Itô--Lyons map, and a rough Taylor
+theorem that identifies the scale derivatives with the same signature
+coefficients.  The universal limit theorem alone gives continuity, not the
+required differentiability in \(r\).  No such extension is claimed in this
+note.
+
+## 14. Strongest established result and exact scope
+
+The proved result is the following.
+
+* Homogeneous injectivity of every \(\rho_m\), \(m\le4\), is sufficient for
+  recursive recovery of the degree-\(m\) Hall coefficients from finitely many
+  exact normalized graded scale jets.
+* For the exact certified tanh witness, the authoritative degree-specific point
+  sets give eight scalar ideal-jet evaluations and the exact inverse formulas
+  displayed in Section 9.  The existing analytic certificate transfers
+  invertibility of those parameter-dependent matrices to Lebesgue-almost every
+  tanh parameter vector.
+* A nonzero homogeneous kernel direction is invisible in the formal graded
+  model.  Standard free-nilpotent horizontal realizability transfers this
+  necessity statement to bounded-variation paths for ideal jets through the
+  truncation level and for the truncated response.
+* Homogeneous injectivity also implies joint state--scale linear independence,
+  hence existence of eight scalar evaluations with nonsingular zero-signature
+  Jacobian for the degree-four truncated response and a local inverse there.
+* Any continuous locally injective Euclidean observation map on an open subset
+  of the eight-dimensional Hall-coordinate space needs scalar codomain
+  dimension at least eight.
+
+The note does not prove ungraded direct-sum injectivity, recovery from one
+terminal state, a global inverse, a finite-difference jet scheme, explicit
+joint state--scale locations, an exact joint Jacobian certificate, an explicit
+stability radius, a full-CDE remainder/control theorem, equality of the
+truncated and full responses at finite scale, or a rough-path extension.
+
+## 15. Unresolved proof obligations
+
+Within the frozen research direction, the remaining obligations after this
+bridge are:
+
+1. select eight concrete state--scale pairs and certify their zero-signature
+   Jacobian exactly;
+2. derive explicit conditioning and a certified local stability neighborhood
+   for that selected truncated observation map;
+3. only if requested separately, control levels at least five to transfer a
+   finite-scale statement from object B to the actual full CDE object C.
+
+## Final status
+
+PROVED
