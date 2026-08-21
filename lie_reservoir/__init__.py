@@ -29,6 +29,11 @@ from .free_lie import (
     witt_dimension,
     word_expansion,
 )
+from .graded_reconstruction import (
+    DegreeReconstruction,
+    exact_tanh_witness_graded_jets,
+    reconstruct_tanh_witness_hall_coordinates,
+)
 from .rank_atlas import (
     RankAtlasCase,
     RankAtlasResult,
@@ -66,6 +71,7 @@ __all__ = [
     "CertificateStatus",
     "DepthTwoExponentialConfig",
     "DepthTwoExponentialParameters",
+    "DegreeReconstruction",
     "ExactMinor",
     "ExactMinorCertificate",
     "ExactThroughDegreeFourCertificate",
@@ -89,6 +95,7 @@ __all__ = [
     "compute_rank_diagnostics",
     "degree_exact_certificate",
     "evaluate_lie_node",
+    "exact_tanh_witness_graded_jets",
     "degree_four_exact_certificate",
     "format_rank_table",
     "format_lie_node",
@@ -104,6 +111,7 @@ __all__ = [
     "sample_evaluation_points",
     "report_fraction_as_float",
     "report_minor_as_float",
+    "reconstruct_tanh_witness_hall_coordinates",
     "run_rank_atlas",
     "run_rank_case",
     "smoke_atlas_cases",
