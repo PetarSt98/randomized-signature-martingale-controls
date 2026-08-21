@@ -5,6 +5,10 @@ degrees at most four.  The path-level argument is first made for continuous
 bounded-variation paths (hence for piecewise-\(C^1\) paths).  No rough-path
 extension is used in any proof below.
 
+This is the downstream reconstruction bridge left open in
+`research_output/technical_note.md`; it does not alter that note's certified
+homogeneous-injectivity theorem.
+
 The three observation objects used in the note are different:
 
 1. **A. Ideal normalized scale jets** \(J_m(y;X)\), which are exact derivatives
@@ -25,8 +29,27 @@ scale.
 
 Fix \(T>0\), an open interval \(U\subseteq\mathbb R\), and a continuous path
 \(X=(X^1,X^2):[0,T]\to\mathbb R^2\) of bounded variation.  Let
-\(V_1,V_2\in C^4(U;\mathbb R)\).  For every initial state used below, assume
-that there is a neighborhood of \(r=0\) on which the Riemann--Stieltjes CDE
+\(V_1,V_2\in C^4(U;\mathbb R)\), and put
+
+\[
+ \omega_X:=\|X^1\|_{1\text{-var};[0,T]}
+            +\|X^2\|_{1\text{-var};[0,T]}.
+\]
+
+For each \(y\in U\), choose \(d_y>0\) so that
+\(K_y=[y-d_y,y+d_y]\subset U\), and set
+
+\[
+ M_y:=\max_{i=1,2}\sup_{x\in K_y}|V_i(x)|,
+ \qquad
+ \varepsilon_y:=
+ \begin{cases}
+ d_y/(M_y\omega_X),&M_y\omega_X>0,\\
+ +\infty,&M_y\omega_X=0.
+ \end{cases}
+\]
+
+For \(|r|<\varepsilon_y\), the Riemann--Stieltjes CDE
 
 \[
  dY_t^{y,r}
@@ -36,9 +59,20 @@ that there is a neighborhood of \(r=0\) on which the Riemann--Stieltjes CDE
 \]
 
 has a unique solution that remains in a compact subset of \(U\) on which the
-derivatives of the \(V_i\) through order four are bounded.  These local
-assumptions are enough for the repeated-substitution calculation through
-degree four.  They hold globally for the certified tanh fields.
+derivatives of the \(V_i\) through order four are bounded.  Indeed, up to a
+hypothetical first exit from \(K_y\),
+
+\[
+ \sup_{t\le T}|Y_t^{y,r}-y|
+ \le |r|M_y\omega_X<d_y,
+\]
+
+which rules out that exit; standard local existence and uniqueness for BV
+controlled ODEs then gives the solution on \([0,T]\).  Thus the local
+hypotheses hold for every \(y\in U\), rather than only for states selected
+later.  For any finite selected state set one may use the minimum of its
+positive \(\varepsilon_y\)'s.  The certified tanh fields are globally defined
+and have bounded derivatives of every order.
 
 The notation is, by definition,
 
@@ -53,6 +87,9 @@ J_m(y;X)
   :=\frac1{m!}\left.\frac{\partial^m}{\partial r^m}
       Y_T^{y,r}(X)\right|_{r=0},\qquad 1\le m\le4.
 \]
+
+The existence of these classical derivatives, not merely asymptotic
+coefficients, is proved at the start of Section 2.
 
 ### 1.2 Associative words, tensors, and signature
 
@@ -147,8 +184,9 @@ the basis through degree four is
 \end{array}
 \]
 
-These are the Hall coordinates meant below; no second basis convention is
-introduced.
+The standard-bracketed Lyndon basis is a Hall basis (often called the
+Lyndon--Hall basis).  Its coefficients are the Hall coordinates meant below;
+no second basis convention is introduced.
 
 ### 1.4 Differential operators, composition order, and bracket sign
 
@@ -222,6 +260,33 @@ Define the represented Lie field
 
 ## 2. Chen--Fliess coefficient and the normalization factorial
 
+First establish the scale regularity required by the definition of \(J_m\).
+Fix \(y\in U\), use \(K_y\) from Section 1.1, and let
+\(\mathcal B=C([0,T];\mathbb R)\) with the uniform norm.  On the open subset
+\(\mathcal O_y\subset\mathcal B\) of paths with range in the interior of
+\(K_y\), define
+
+\[
+ \Phi(r,Z)_t
+ :=Z_t-y-r\sum_{i=1}^2\int_0^t V_i(Z_s)\,dX_s^i.
+\]
+
+Riemann--Stieltjes integration against a fixed BV path is a bounded linear map
+on continuous integrands, and the Nemytskii maps \(Z\mapsto V_i\circ Z\) are
+\(C^4\) there.  Hence
+\(\Phi:\mathbb R\times\mathcal O_y\to\mathcal B\) is
+\(C^4\) near \((0,Z^0)\), where \(Z^0_t=y\), and
+
+\[
+ D_Z\Phi(0,Z^0)=I_{\mathcal B}.
+\]
+
+The Banach-space implicit-function theorem gives a unique \(C^4\) map
+\(r\mapsto Z(r)\) satisfying \(\Phi(r,Z(r))=0\) for sufficiently small
+\(|r|\).  By uniqueness this is the CDE solution from Section 1.1.  Therefore
+\(r\mapsto Y_T^{y,r}\) is classically \(C^4\), and all four derivatives in
+the definition of \(J_m\) exist.
+
 For any sufficiently smooth scalar test function \(f\), the
 Riemann--Stieltjes chain rule gives
 
@@ -253,10 +318,44 @@ f(Y_T^{y,r})
    +R_5(r).
 \]
 
-The fivefold iterated-integral remainder is \(O(r^5)\) under the local
-regularity and boundedness assumptions in Section 1.1.  This local statement is
-used only to identify derivatives at \(r=0\); it is not a finite-scale error
-theorem for the full CDE.
+The remainder is not only formal.  Repeating the same substitution once more
+gives the exact integral
+
+\[
+ R_5(r)=r^5\sum_{i_1,\ldots,i_5=1}^2
+ \int_{0<t_1<\cdots<t_5<T}
+ (\mathcal D_{V_{i_1}}\cdots\mathcal D_{V_{i_5}}f)
+       (Y_{t_1}^{y,r})
+ \,dX_{t_1}^{i_1}\cdots dX_{t_5}^{i_5}.
+\]
+
+For \(|r|<\varepsilon_y\), set
+
+\[
+ C_{5,f,y}:=
+ \max_{i_1,\ldots,i_5\in\{1,2\}}
+ \sup_{x\in K_y}
+ \left|\mathcal D_{V_{i_1}}\cdots
+             \mathcal D_{V_{i_5}}f(x)\right|.
+\]
+
+The total-variation measure
+\(|dX^1|+|dX^2|\) is nonatomic because \(X\) is continuous.  Summing the
+absolute fivefold iterated integrals and partitioning the product domain among
+the \(5!\) strict time orderings gives
+
+\[
+ \boxed{
+ |R_5(r)|\le
+ \frac{C_{5,f,y}}{5!}\,|r|^5\omega_X^5.}
+\]
+
+For \(f=\operatorname{Id}\), the degree-four coefficient uses derivatives of
+the \(V_i\) only through order three, while \(C_{5,f,y}\) uses derivatives
+through order four.  Thus \(C^4\) is used precisely for the displayed
+remainder; \(C^3\) would suffice for the four coefficients alone.  This local
+bound identifies derivatives at \(r=0\); it is not a uniform finite-scale
+error theorem for object C over an unrestricted path class.
 
 Taking \(f=\operatorname{Id}\) gives
 
@@ -286,9 +385,11 @@ In particular, degree by degree,
 \end{aligned}
 \]
 
-If \(a_m=[r^m]Y_T^{y,r}\), then
-\(\partial_r^mY_T^{y,r}|_{r=0}=m!a_m\).  The normalization in \(J_m\)
-removes exactly this Taylor factorial.  Hence, with no remaining factorial,
+The terminal map is \(C^4\) in \(r\), as proved above.  Uniqueness of its
+degree-four asymptotic polynomial therefore identifies
+\(a_m=[r^m]Y_T^{y,r}\) with
+\(\partial_r^mY_T^{y,r}|_{r=0}/m!\).  The normalization in \(J_m\) removes
+exactly this Taylor factorial.  Hence, with no remaining factorial,
 
 \[
 \boxed{J_m(y;X)=\Gamma(S_m(X))\operatorname{Id}(y),\qquad 1\le m\le4.}
@@ -544,8 +645,16 @@ and hence
 
 Induction reconstructs every homogeneous component through \(L\). \(\square\)
 
-This theorem concerns exact ideal derivatives.  It assumes neither recovery
-from one terminal state nor a finite-difference approximation to the jets.
+For observation object A, this triangular decoder is global on the whole
+formal coordinate space \(\mathfrak g^{(L)}\): the matrices \(M_m\) are fixed
+and invertible, and the recursion has no local-neighborhood restriction.  This
+does not assert a global inverse for object B or object C.
+
+The theorem concerns exact ideal derivatives.  Access to them is an idealized
+identifiability assumption, not a measurement procedure derived here from a
+finite family of nonzero-scale full-CDE runs.  In particular, the theorem
+assumes neither recovery from one terminal state nor a finite-difference
+approximation to the jets.
 
 ## 8. Converse: formal invisibility and actual-path realizability
 
@@ -862,6 +971,66 @@ an interval.  Every coefficient is therefore zero:
 for every \(m\), and basis independence then gives every \(c_h=0\).
 \(\square\)
 
+At the exact tanh witness there is nevertheless an exact cross-degree
+restriction at any *single* fixed scale.  Write, in the basis order of
+Section 1.3,
+
+\[
+\begin{gathered}
+ H_2=[X_1,X_2],\qquad
+ H_{31}=[X_1,[X_1,X_2]],\qquad
+ H_{32}=[[X_1,X_2],X_2],\\
+ H_{41}=[X_1,[X_1,[X_1,X_2]]],\qquad
+ H_{42}=[X_1,[[X_1,X_2],X_2]],\qquad
+ H_{43}=[[[X_1,X_2],X_2],X_2].
+\end{gathered}
+\]
+
+With \(u=\tanh y\) and \(d/dy=(1-u^2)d/du\), direct application of the
+certified bracket convention gives the three odd fields
+
+\[
+ \rho(X_1)=u,\qquad
+ \rho(H_{32})=-\frac{u(1-u^2)}2,\qquad
+ \rho(H_{42})=u^3(1-u^2),
+\]
+
+and the five even fields
+
+\[
+\begin{aligned}
+ \rho(X_2)&=\frac12,&
+ \rho(H_2)&=-\frac{1-u^2}{2},&
+ \rho(H_{31})&=\frac{1-u^4}{2},\\
+ \rho(H_{41})&=-\frac{(1-u^2)(1+3u^4)}2,&
+ \rho(H_{43})&=\frac{(1-u^2)(1-3u^2)}4.
+\end{aligned}
+\]
+
+The odd fields are independent by their successive highest powers
+\(u,u^3,u^5\).  The first four displayed even fields are independent by their
+successive highest powers \(1,u^2,u^4,u^6\), while all five even fields obey
+the unique relation
+
+\[
+ \boxed{\rho(4H_2+3H_{31}+2H_{43})=0.}
+\]
+
+Thus the eight represented fields have exact cross-degree rank seven at the
+witness.  If all observations use one fixed \(r_0\ne0\), and \(\zeta_h\) are
+the coefficients of the boxed kernel element, then the nonzero column
+coefficient vector \(c_h=r_0^{-\deg h}\zeta_h\) satisfies
+
+\[
+ \sum_{h\in\mathcal H}c_h r_0^{\deg h}\rho(h)(y)=0
+ \qquad\text{for every }y.
+\]
+
+Consequently every all-at-one-scale eight-row Jacobian is singular at this
+witness: any nonsingular witness tuple must use at least two distinct scale
+values.  This does not contradict the theorem, whose polynomial argument uses
+an open interval of scales.
+
 Apply the finite-evaluation lemma on the joint domain \(I\times U\).  There
 exist eight state--scale pairs \((r_a,y_a)\) such that the observation map
 
@@ -872,6 +1041,11 @@ exist eight state--scale pairs \((r_a,y_a)\) such that the observation map
 
 has a nonsingular \(8\times8\) Jacobian at \(z=0\).  The finite-dimensional
 inverse-function theorem gives a local inverse near the zero signature.
+By the realization result in Section 8.2, every \(z\) in that coordinate
+neighborhood is the step-four log signature of a piecewise-linear path, so
+this local inverse has genuine truncated-signature meaning for object B.  It
+does not provide a continuous local inverse into a chosen path topology, and
+it says nothing about inversion of the full response C.
 
 There is also a precise conditional stability estimate.  Put
 \(A=D\mathcal O(0)\).  On any convex neighborhood \(B\) of zero small enough
@@ -919,31 +1093,41 @@ where they are used:
 
 1. For bounded-variation signatures and controlled-ODE Taylor expansions:
    Peter K. Friz and Nicolas B. Victoir, *Multidimensional Stochastic Processes
-   as Rough Paths*, Cambridge University Press, 2010, Section 7.1 and
-   Section 18.2, [DOI 10.1017/CBO9780511845079](https://doi.org/10.1017/CBO9780511845079).
-   The word/operator order used here was nevertheless derived directly in
-   Section 2.  This matters because other Fliess conventions reverse those
+   as Rough Paths*, Cambridge University Press, 2010, Section 7.1
+   (pp. 125--126) for BV signatures and Definition 10.1 with Proposition 10.3
+   (pp. 212--214) for the deterministic controlled-ODE Euler expansion and
+   remainder,
+   [DOI 10.1017/CBO9780511845079](https://doi.org/10.1017/CBO9780511845079).
+   The word/operator order, scale-parameter regularity, and the precise local
+   remainder used here were nevertheless derived directly in Section 2.  This
+   matters because other Fliess conventions reverse the word and operator
    indices.
-2. For primitive/group-like series, tensor exponential and logarithm, and the
+2. For the Banach-space implicit-function theorem used to establish the
+   classical scale derivatives: Klaus Deimling, *Nonlinear Functional
+   Analysis*, Springer, 1985, Section 15.1 (pp. 147--152),
+   [DOI 10.1007/978-3-662-00547-7](https://doi.org/10.1007/978-3-662-00547-7).
+3. For primitive/group-like series, tensor exponential and logarithm, and the
    fact that a bounded-variation log signature is a free Lie series:
    Christophe Reutenauer, *Free Lie Algebras*, Oxford University Press, 1993,
-   Theorems 3.1--3.2 and Corollary 3.5,
+   Theorems 3.1--3.2 and Corollary 3.5; for the standard bracketed Lyndon basis
+   as a Hall basis, Chapter 5, Theorem 5.1,
    [publisher record](https://academic.oup.com/book/53911).
-3. For exact finite-step path realizability:
-   Friz--Victoir, Theorems 7.28 and 7.30.  They identify
+4. For exact finite-step path realizability:
+   Friz--Victoir, Theorems 7.28 (pp. 140--142) and 7.30 (pp. 142--144).  They
+   identify
    \(G^L(\mathbb R^d)=\exp(\mathfrak g^L(\mathbb R^d))\) with the set of
    truncated signatures of continuous bounded-variation paths, with
    piecewise-linear realizations.
-4. The Lebesgue-almost-every tanh implication in Section 9 is imported
+5. The Lebesgue-almost-every tanh implication in Section 9 is imported
    unchanged from the repository's verified exact certificate.  Its external
    standard input is the theorem that the zero set of a nontrivial
    real-analytic function on a connected open subset of Euclidean space has
    Lebesgue measure zero; a paper version should cite a real-analytic geometry
    reference for that theorem.
-5. For the codomain-dimension obstruction: Allen Hatcher,
-   *Algebraic Topology*, Section 2.B, Theorem 2B.2 (Brouwer invariance of
+6. For the codomain-dimension obstruction: Allen Hatcher,
+   *Algebraic Topology*, Section 2.B, Theorem 2B.3 (Brouwer invariance of
    domain), [official text](https://pi.math.cornell.edu/~hatcher/AT/AT.pdf).
-6. For the local inverse: Walter Rudin, *Principles of Mathematical Analysis*,
+7. For the local inverse: Walter Rudin, *Principles of Mathematical Analysis*,
    third edition, Theorem 9.24 (the finite-dimensional inverse-function
    theorem).
 
@@ -966,8 +1150,9 @@ note.
 The proved result is the following.
 
 * Homogeneous injectivity of every \(\rho_m\), \(m\le4\), is sufficient for
-  recursive recovery of the degree-\(m\) Hall coefficients from finitely many
-  exact normalized graded scale jets.
+  global recursive recovery on \(\mathfrak g^{(L)}\) of the degree-\(m\) Hall
+  coefficients from finitely many exact normalized graded scale jets (object
+  A).
 * For the exact certified tanh witness, the authoritative degree-specific point
   sets give eight scalar ideal-jet evaluations and the exact inverse formulas
   displayed in Section 9.  The existing analytic certificate transfers
@@ -979,16 +1164,18 @@ The proved result is the following.
   truncation level and for the truncated response.
 * Homogeneous injectivity also implies joint state--scale linear independence,
   hence existence of eight scalar evaluations with nonsingular zero-signature
-  Jacobian for the degree-four truncated response and a local inverse there.
+  Jacobian for the degree-four truncated response and a local inverse there
+  (object B).  At the exact witness, such a tuple must use at least two scales.
 * Any continuous locally injective Euclidean observation map on an open subset
   of the eight-dimensional Hall-coordinate space needs scalar codomain
   dimension at least eight.
 
 The note does not prove ungraded direct-sum injectivity, recovery from one
-terminal state, a global inverse, a finite-difference jet scheme, explicit
-joint state--scale locations, an exact joint Jacobian certificate, an explicit
-stability radius, a full-CDE remainder/control theorem, equality of the
-truncated and full responses at finite scale, or a rough-path extension.
+terminal state, a global inverse for object B or C, a finite-difference jet
+scheme, explicit joint state--scale locations, an exact joint Jacobian
+certificate, an explicit stability radius, a full-CDE remainder/control
+theorem, equality of the truncated and full responses at finite scale, or a
+rough-path extension.
 
 ## 15. Unresolved proof obligations
 
@@ -996,11 +1183,16 @@ Within the frozen research direction, the remaining obligations after this
 bridge are:
 
 1. select eight concrete state--scale pairs and certify their zero-signature
-   Jacobian exactly;
+   Jacobian exactly, using at least two distinct scales at the exact witness;
 2. derive explicit conditioning and a certified local stability neighborhood
    for that selected truncated observation map;
-3. only if requested separately, control levels at least five to transfer a
-   finite-scale statement from object B to the actual full CDE object C.
+3. only if requested separately, first specify a path class with a uniform
+   \(1\)-variation bound (or an appropriate homogeneous rough-path norm bound),
+   and then control levels at least five to transfer a finite-scale statement
+   from object B to the actual full CDE object C.  Fixing only the first four
+   log-signature levels controls neither the path variation nor the higher
+   levels, so the present hypotheses do not support a uniform remainder
+   constant over all BV realizations of the same \(z\).
 
 ## Final status
 
