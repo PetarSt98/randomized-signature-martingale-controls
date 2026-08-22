@@ -5,9 +5,10 @@ degrees at most four.  The path-level argument is first made for continuous
 bounded-variation paths (hence for piecewise-\(C^1\) paths).  No rough-path
 extension is used in any proof below.
 
-This is the downstream reconstruction bridge left open in
-`research_output/technical_note.md`; it does not alter that note's certified
-homogeneous-injectivity theorem.
+This note gives the detailed proof of the graded-reconstruction component
+summarized in `research_output/technical_note.md`. It preserves the certified
+homogeneous-injectivity theorem and develops the object-A reconstruction
+result in detail.
 
 The three observation objects used in the note are different:
 

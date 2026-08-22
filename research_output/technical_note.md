@@ -393,9 +393,13 @@ bound and exact radius table are in
 ## 8. Related work and novelty boundary
 
 The randomized-signature setting predates this package. Akyildirim, Gambara,
-Teichmann, and Zhou used randomized signatures as feature extractors and gave
-a representation-theoretic justification in
+Teichmann, and Zhou used shallow randomized-signature CDEs as feature
+extractors and stated a broad representation-theoretic
+faithfulness/signature-recovery result in
 [*Applications of Signature Methods to Market Anomaly Detection* (2022)](https://arxiv.org/abs/2201.02441).
+The later 2025 reconstruction work examines the relevant
+iterated-vector-field independence issue in substantially greater detail and
+establishes more restrictive architecture-specific reconstruction conditions.
 
 The closest prior work identified in the targeted search is Mie Glückstad,
 Nicola Muça Cirone, and Josef Teichmann,
@@ -412,17 +416,9 @@ log-signature/Lie coordinates as a further direction; if the claimed truncated
 tensor signature is obtained, it can also be postprocessed by the truncated
 tensor logarithm.
 
-There is a source-level qualification. In the Euclidean proof of Theorem 4.1,
-the asserted identity \(Y^{\eta,r}=rY^{\eta/r}\), used to obtain the scaled
-response family from unscaled responses over all initial states, is not valid
-for general nonlinear vector fields in the displayed \(rV_i\)-scaled CDE.
-The subsequent Taylor and finite-evaluation argument remains the relevant
-prior strategy if that scaled family is independently available, but the
-printed state-rescaling bridge does not establish it in the stated generality.
-This package uses only responses to the scaled input path and no
-state-rescaling identity. In either reading, the
-2025 paper does not provide a finite set of scale values or the exact
-eight-output and inverse-Lipschitz certificates established here.
+The present analysis defines scaled responses directly through the scaled
+input path \(rX\), so none of its proofs requires an auxiliary state-rescaling
+identity.
 
 Accordingly, this package claims no originality for introducing path or vector
 field scaling, differentiating in scale, separating tensor levels, choosing

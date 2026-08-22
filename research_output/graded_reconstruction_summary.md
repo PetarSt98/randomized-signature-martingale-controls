@@ -268,27 +268,33 @@ or the largest possible stable radius.
 
 The closest prior work identified is Glückstad, Muça Cirone, and Teichmann,
 [*Signature Reconstruction from Randomized Signatures* (2025)](https://arxiv.org/html/2502.03163v1).
-It states ordinary tensor-signature reconstruction results, and its proof uses
-scale differentiation, homogeneous tensor-level separation, and finite
-initial-state selection. Its Euclidean proof also uses the asserted identity
-\(Y^{\eta,r}=rY^{\eta/r}\), which is not valid for general nonlinear vector
-fields in the displayed \(rV_i\)-scaled CDE; conditional on independently
-available scaled responses, the subsequent Taylor separation remains the
-relevant prior strategy. Section 5 identifies direct recovery in compressed
-log-signature/Lie coordinates as a further direction. Bailleul and Diehl's
-[*The Inverse Problem for Rough Controlled Differential Equations* (2015)](https://doi.org/10.1137/140995982)
-already establishes the inverse-CDE perspective, while free-Lie,
-Hall--Lyndon, signature/log-signature, tensor-exponential, and Chen--Fliess
-algebra are classical.
+It reconstructs finite tensor-signature levels from CDE/randomized-signature
+observations under a word/tree-level linear-independence condition. Its proof
+uses a scale parameter, differentiation at zero, homogeneous-level separation,
+and finite initial-state selection, and its explicit positive construction
+uses depth-two exponential vector fields.
 
-Accordingly, no originality is claimed for scaling/Taylor arguments, inverse
-CDEs, or ordinary tensor-signature reconstruction. Relative to the closest
-work identified, the package-specific proved results are homogeneous
-free-Lie injectivity for the scalar shallow biased-tanh architecture through
-degree four, its exact witness and certificates, the fixed eight-output
-truncated design and genericity statement, and its exact local
-inverse-Lipschitz certificate. This comparison delimits the contribution; it
-is not a literature-priority claim.
+Section 5 identifies direct recovery in compressed log-signature/Lie
+coordinates as a further direction. Where its tensor-signature reconstruction
+theorem applies, the corresponding truncated log-signature can also be
+obtained indirectly through the classical tensor logarithm.
+
+Bailleul and Diehl's
+[*The Inverse Problem for Rough Controlled Differential Equations* (2015)](https://doi.org/10.1137/140995982)
+establishes important prior art for inverse controlled/rough differential
+equations. Free-Lie and Hall--Lyndon algebra, signature/log-signature algebra,
+tensor exponential and logarithm, and Chen--Fliess expansions are classical.
+
+Accordingly, no originality is claimed here for scale/Taylor arguments,
+homogeneous-level separation, finite initial-state selection, inverse-CDE
+problems, or ordinary tensor-signature reconstruction.
+
+Relative to the closest prior work identified, this package works directly
+with homogeneous free-Lie coordinates for the scalar shallow biased-tanh
+architecture and establishes the exact witness, the fixed dimension-matched
+eight-output truncated design, fixed-design genericity, and an exact
+quantitative local inverse-Lipschitz certificate. This comparison delimits the
+proved contribution and is not a literature-priority claim.
 
 ## Scope and limitations
 
