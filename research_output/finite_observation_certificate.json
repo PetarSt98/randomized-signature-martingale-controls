@@ -1,0 +1,542 @@
+{
+  "artifact_kind": "exact_finite_observation_certificate",
+  "authoritative_sources": {
+    "graded_reconstruction_certificate": {
+      "path": "research_output/graded_reconstruction_certificate.json",
+      "semantic_sha256": "1ee183de33b20ade0f283d066992d4ce9e079963f22b3e0724921ce590659a64"
+    },
+    "homogeneous_certificate": {
+      "path": "research_output/certificate.json",
+      "semantic_sha256": "b211938a201150d3140a7a085e2c97a11bced7e8aa305af373819ab8dd0b5959"
+    },
+    "matrix_constructor": "lie_reservoir.finite_observation.exact_zero_jacobian"
+  },
+  "candidate_search": {
+    "candidate_order": "state-major, then listed scale order",
+    "eight_subset_count": 495,
+    "exact_nonsingular_subset_count": 486,
+    "fallback_candidate_count": 18,
+    "fallback_scales": [
+      "-3",
+      "-2",
+      "-1",
+      "1",
+      "2",
+      "3"
+    ],
+    "fallback_used": false,
+    "primary_candidate_count": 12,
+    "primary_candidate_pairs": [
+      {
+        "scale": "1",
+        "state": "-log(3)/2"
+      },
+      {
+        "scale": "2",
+        "state": "-log(3)/2"
+      },
+      {
+        "scale": "3",
+        "state": "-log(3)/2"
+      },
+      {
+        "scale": "4",
+        "state": "-log(3)/2"
+      },
+      {
+        "scale": "1",
+        "state": "0"
+      },
+      {
+        "scale": "2",
+        "state": "0"
+      },
+      {
+        "scale": "3",
+        "state": "0"
+      },
+      {
+        "scale": "4",
+        "state": "0"
+      },
+      {
+        "scale": "1",
+        "state": "log(3)/2"
+      },
+      {
+        "scale": "2",
+        "state": "log(3)/2"
+      },
+      {
+        "scale": "3",
+        "state": "log(3)/2"
+      },
+      {
+        "scale": "4",
+        "state": "log(3)/2"
+      }
+    ],
+    "primary_scales": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "primary_states": [
+      "-log(3)/2",
+      "0",
+      "log(3)/2"
+    ],
+    "selected_domain": "primary",
+    "selection_rule": [
+      "exact determinant must be nonzero",
+      "fewer distinct absolute scale values",
+      "lexicographically smaller distinct absolute scale set",
+      "lower non-certifying binary64 2-norm condition number",
+      "lexicographic ordered-pair list"
+    ]
+  },
+  "common_scale_corollary": {
+    "degree_multiplicities": {
+      "1": 2,
+      "2": 1,
+      "3": 2,
+      "4": 3
+    },
+    "degree_sum": 22,
+    "exact_checks": [
+      {
+        "exact_determinant": "-2069864280",
+        "h_power_22_identity_verified": true,
+        "multiplier": "-2"
+      },
+      {
+        "exact_determinant": "-258733035/2199023255552",
+        "h_power_22_identity_verified": true,
+        "multiplier": "1/2"
+      },
+      {
+        "exact_determinant": "-8119316794152483315/524288",
+        "h_power_22_identity_verified": true,
+        "multiplier": "3"
+      }
+    ],
+    "law": "det B(h)=h^22 det B(1)"
+  },
+  "conventions": {
+    "associative_word_order": "chronological",
+    "bracket": "[V,W]=DW V-DV W",
+    "factorial_normalization": "homogeneous coefficient equals normalized scale jet",
+    "literal_response_representation": "(q_multiplier,rational_increment) denotes q_multiplier*log(3)/2+rational_increment",
+    "operator_action": "D_V f=f' V",
+    "operator_order": "Gamma(i1...im)=D_Vi1...D_Vim",
+    "scaled_response": "Y^{y,r}(X)=Y^y(rX)",
+    "tensor_exponential": "truncated concatenation exponential"
+  },
+  "cross_degree_scope_guard": {
+    "common_nonzero_scale_rank": 7,
+    "conclusion": "a full-rank design at the witness needs at least two scales",
+    "exact_polynomial_relation_residual": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "exact_represented_function_rank": 7,
+    "exact_taylor_relation_residual": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "first_seven_column_minor_determinant": "-3/32",
+    "relation": "rho(4[X1,X2]+3[X1,[X1,X2]]+2[[[X1,X2],X2],X2])=0",
+    "relation_hall_coefficients": [
+      "0",
+      "0",
+      "4",
+      "3",
+      "0",
+      "0",
+      "0",
+      "2"
+    ],
+    "represented_u_polynomials": {
+      "[[[X1,X2],X2],X2]": [
+        "1/4",
+        "0",
+        "-1",
+        "0",
+        "3/4"
+      ],
+      "[X1,[X1,X2]]": [
+        "1/2",
+        "0",
+        "0",
+        "0",
+        "-1/2"
+      ],
+      "[X1,X2]": [
+        "-1/2",
+        "0",
+        "1/2",
+        "0",
+        "0"
+      ],
+      "coefficient_order": "ascending powers u^0,...,u^4",
+      "variable": "u=tanh(y)"
+    },
+    "represented_normalized_taylor_orders": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "exclusions": [
+    "actual full CDE observations (object C)",
+    "levels at least five",
+    "full-CDE remainder estimates",
+    "finite-difference reconstruction",
+    "global invertibility",
+    "universal measurement minimality"
+  ],
+  "hall_basis": [
+    {
+      "degree": 1,
+      "label": "X1"
+    },
+    {
+      "degree": 1,
+      "label": "X2"
+    },
+    {
+      "degree": 2,
+      "label": "[X1,X2]"
+    },
+    {
+      "degree": 3,
+      "label": "[X1,[X1,X2]]"
+    },
+    {
+      "degree": 3,
+      "label": "[[X1,X2],X2]"
+    },
+    {
+      "degree": 4,
+      "label": "[X1,[X1,[X1,X2]]]"
+    },
+    {
+      "degree": 4,
+      "label": "[X1,[[X1,X2],X2]]"
+    },
+    {
+      "degree": 4,
+      "label": "[[[X1,X2],X2],X2]"
+    }
+  ],
+  "noncertifying_diagnostics": {
+    "arithmetic": "binary64",
+    "condition_number_2": "468.626825569",
+    "purpose": "selection diagnostic only, not rank certification",
+    "reported_significant_digits": 12,
+    "singular_values": [
+      "72.8678806904",
+      "13.4576527068",
+      "12.4585453832",
+      "2.9110008089",
+      "1.23631176424",
+      "0.365987026873",
+      "0.197225996535",
+      "0.155492337857"
+    ]
+  },
+  "reproduction": {
+    "command": "python research_output/reproduce_finite_observation.py",
+    "exact_arithmetic": "fractions.Fraction",
+    "search": "deterministic exhaustive combinations",
+    "writes_files_by_default": false
+  },
+  "schema_version": 1,
+  "scope": {
+    "architecture": "certified scalar tanh witness",
+    "hall_coordinate_dimension": 8,
+    "input_dimension": 2,
+    "maximum_degree": 4,
+    "observation_object": "B: degree-four truncated finite-scale response",
+    "scalar_observation_count": 8,
+    "state_dimension": 1
+  },
+  "selected_design": [
+    {
+      "scale": "1",
+      "state": "-log(3)/2"
+    },
+    {
+      "scale": "2",
+      "state": "-log(3)/2"
+    },
+    {
+      "scale": "3",
+      "state": "-log(3)/2"
+    },
+    {
+      "scale": "2",
+      "state": "0"
+    },
+    {
+      "scale": "3",
+      "state": "0"
+    },
+    {
+      "scale": "1",
+      "state": "log(3)/2"
+    },
+    {
+      "scale": "2",
+      "state": "log(3)/2"
+    },
+    {
+      "scale": "3",
+      "state": "log(3)/2"
+    }
+  ],
+  "status": "PROVED",
+  "theorems": {
+    "dimension_lower_bound": "no continuous locally injective U subset R^8 to R^M exists for M<8",
+    "fixed_design_genericity": "the fixed determinant is nontrivial real analytic in (a1,b1,a2,b2), hence nonzero almost everywhere",
+    "local_inverse": "the truncated polynomial has a local analytic inverse at zero"
+  },
+  "zero_jacobian": {
+    "exact_determinant": "-258733035/524288",
+    "exact_determinant_nonzero": true,
+    "exact_inverse": [
+      [
+        "-18/11",
+        "9/22",
+        "-2/33",
+        "0",
+        "0",
+        "18/11",
+        "-9/22",
+        "2/33"
+      ],
+      [
+        "360/239",
+        "126/239",
+        "-88/717",
+        "-405/239",
+        "80/239",
+        "360/239",
+        "126/239",
+        "-88/717"
+      ],
+      [
+        "-76/239",
+        "547/239",
+        "-964/2151",
+        "-990/239",
+        "1760/2151",
+        "-76/239",
+        "547/239",
+        "-964/2151"
+      ],
+      [
+        "-760/717",
+        "1168/717",
+        "-664/2151",
+        "-432/239",
+        "256/717",
+        "-760/717",
+        "1168/717",
+        "-664/2151"
+      ],
+      [
+        "-76/33",
+        "52/33",
+        "-28/99",
+        "0",
+        "0",
+        "76/33",
+        "-52/33",
+        "28/99"
+      ],
+      [
+        "-3056/10755",
+        "476/1195",
+        "-2992/32265",
+        "-1244/3585",
+        "808/10755",
+        "-3056/10755",
+        "476/1195",
+        "-2992/32265"
+      ],
+      [
+        "-40/33",
+        "32/33",
+        "-8/33",
+        "0",
+        "0",
+        "40/33",
+        "-32/33",
+        "8/33"
+      ],
+      [
+        "-472/10755",
+        "646/3585",
+        "-2264/32265",
+        "-1018/3585",
+        "1276/10755",
+        "-472/10755",
+        "646/3585",
+        "-2264/32265"
+      ]
+    ],
+    "exact_matrix": [
+      [
+        "-1/2",
+        "1/2",
+        "-3/8",
+        "15/32",
+        "3/16",
+        "-57/128",
+        "-3/32",
+        "3/64"
+      ],
+      [
+        "-1",
+        "1",
+        "-3/2",
+        "15/4",
+        "3/2",
+        "-57/8",
+        "-3/2",
+        "3/4"
+      ],
+      [
+        "-3/2",
+        "3/2",
+        "-27/8",
+        "405/32",
+        "81/16",
+        "-4617/128",
+        "-243/32",
+        "243/64"
+      ],
+      [
+        "0",
+        "1",
+        "-2",
+        "4",
+        "0",
+        "-8",
+        "0",
+        "4"
+      ],
+      [
+        "0",
+        "3/2",
+        "-9/2",
+        "27/2",
+        "0",
+        "-81/2",
+        "0",
+        "81/4"
+      ],
+      [
+        "1/2",
+        "1/2",
+        "-3/8",
+        "15/32",
+        "-3/16",
+        "-57/128",
+        "3/32",
+        "3/64"
+      ],
+      [
+        "1",
+        "1",
+        "-3/2",
+        "15/4",
+        "-3/2",
+        "-57/8",
+        "3/2",
+        "3/4"
+      ],
+      [
+        "3/2",
+        "3/2",
+        "-27/8",
+        "405/32",
+        "-81/16",
+        "-4617/128",
+        "243/32",
+        "243/64"
+      ]
+    ],
+    "hall_column_order": [
+      "X1",
+      "X2",
+      "[X1,X2]",
+      "[X1,[X1,X2]]",
+      "[[X1,X2],X2]",
+      "[X1,[X1,[X1,X2]]]",
+      "[X1,[[X1,X2],X2]]",
+      "[[[X1,X2],X2],X2]"
+    ],
+    "left_inverse_verified": true,
+    "right_inverse_verified": true,
+    "single_row_removal_exact_ranks": [
+      7,
+      7,
+      7,
+      7,
+      7,
+      7,
+      7,
+      7
+    ],
+    "tensor_and_lie_constructions_equal": true
+  },
+  "zero_observation": [
+    {
+      "q_multiplier": -1,
+      "rational_increment": "0"
+    },
+    {
+      "q_multiplier": -1,
+      "rational_increment": "0"
+    },
+    {
+      "q_multiplier": -1,
+      "rational_increment": "0"
+    },
+    {
+      "q_multiplier": 0,
+      "rational_increment": "0"
+    },
+    {
+      "q_multiplier": 0,
+      "rational_increment": "0"
+    },
+    {
+      "q_multiplier": 1,
+      "rational_increment": "0"
+    },
+    {
+      "q_multiplier": 1,
+      "rational_increment": "0"
+    },
+    {
+      "q_multiplier": 1,
+      "rational_increment": "0"
+    }
+  ]
+}

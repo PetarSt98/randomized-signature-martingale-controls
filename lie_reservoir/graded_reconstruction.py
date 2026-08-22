@@ -345,9 +345,7 @@ def exact_tanh_witness_graded_jets(
     coordinates: ExactBlocks,
 ) -> ExactBlocks:
     """Encode Hall log-signature coordinates as exact normalized scale jets."""
-    exact_coordinates = _validate_blocks(coordinates, name="coordinates")
-    lie_element = _hall_lie_element_from_validated(exact_coordinates)
-    signature = tensor_exp(lie_element)
+    signature = _signature_from_hall_coordinates(coordinates)
     return tuple(
         _evaluate_signature_level(
             degree,
@@ -357,18 +355,27 @@ def exact_tanh_witness_graded_jets(
     )
 
 
+def _signature_from_hall_coordinates(
+    coordinates: ExactBlocks,
+) -> SparseTensor:
+    """Reuse the exact Hall-to-signature core at other certified observations."""
+    exact_coordinates = _validate_blocks(coordinates, name="coordinates")
+    lie_element = _hall_lie_element_from_validated(exact_coordinates)
+    return tensor_exp(lie_element)
+
+
 def exact_reconstruction_matrices() -> tuple[ExactMinor, ...]:
     """Recompute the four matrices with the authoritative certificate path."""
     return tuple(_degree_context(degree)[5] for degree in _DEGREES)
 
 
 def invert_exact_matrix(matrix: ExactMinor) -> ExactMinor:
-    """Invert one nonempty square matrix of Fractions by Gauss--Jordan."""
+    """Invert one square Fraction matrix of size at most eight."""
     if not isinstance(matrix, tuple) or not matrix:
         raise ValueError("matrix must be a nonempty tuple of rows.")
     size = len(matrix)
-    if size > 3:
-        raise ValueError("only the certified matrix sizes one through three apply.")
+    if size > 8:
+        raise ValueError("exact inversion is limited to matrix size eight.")
     if any(not isinstance(row, tuple) or len(row) != size for row in matrix):
         raise ValueError("matrix must be square with tuple rows.")
     for row in matrix:
