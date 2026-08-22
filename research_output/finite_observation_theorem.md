@@ -58,6 +58,11 @@ let
  =(F_{y_j}^{(4)}(r_j;z))_{j=1}^8.
 \]
 
+The eight scalar components are eight state-scale experiments applied to the
+same unknown truncated Hall-coordinate vector \(z\), equivalently to the same
+underlying path in this formal observation model.  They are not observations
+of eight independent path samples.
+
 The literal constant terms \(y_j=\pm q\) are not rational. Exact code
 therefore also uses the explicitly centered map
 \[
@@ -110,6 +115,14 @@ chronological word representation. The independent Lie route recursively
 applies the certified vector-field bracket. Equality of the two
 \(\operatorname{Fraction}\)-valued matrices is a required certificate check,
 not a floating-point comparison.
+
+An additional exact regression links these linearized constructions to the
+implemented nonlinear map itself.  For every Hall direction \(e_h\), it
+evaluates \(\widehat\Phi_{\mathcal D_*}(t e_h)\) at
+\(t\in\{0,1,-1,2,-2\}\), extracts the coefficient of \(t\) by exact quartic
+interpolation, and obtains the corresponding certified Jacobian column with
+zero tolerance.  No Jacobian routine is used to generate those forward-map
+samples.
 
 ## 3. General joint state-scale theorem
 
@@ -196,6 +209,20 @@ This rule selects
 \mathcal D_*=((-q,1),(-q,2),(-q,3),(0,2),(0,3),
                (q,1),(q,2),(q,3)).}
 \]
+Within the scalar-observation model restricted to the three states
+\(\{-q,0,q\}\), a full-rank eight-row design requires at least three distinct
+scales.  Indeed, a nonsingular design cannot repeat a state-scale pair, because
+repeated pairs give identical rows.  With \(s\) distinct scales, the three
+states provide at most \(3s\) distinct pairs.  Hence \(8\leq3s\), so \(s\geq3\).
+The selected design uses exactly the scales \(\{1,2,3\}\).  This is a
+scale-count statement only for this restricted three-state scalar-observation
+model, not an unrestricted or universal scale-minimality claim.
+
+The scale set \(\{1,2,3\}\) was selected for exact algebraic certification and
+conditioning of the degree-four truncated observation map.  It was not
+selected to approximate the actual full CDE response: degree-five and higher
+terms of that response can be large at these scales.
+
 In the Hall order of Section 1, its exact zero Jacobian is
 \[
 B_*=
@@ -271,9 +298,12 @@ Therefore \(\Delta_{\mathcal D_*}\) is real analytic. At
 its exact value is \(-258733035/524288\ne0\), so it is not identically zero.
 The zero set of a nontrivial real-analytic function on connected
 \(\mathbb R^4\) has Lebesgue measure zero. Hence the same fixed design has an
-invertible zero Jacobian for Lebesgue-almost every parameter vector, and
-almost surely under every parameter law absolutely continuous with respect
-to four-dimensional Lebesgue measure.
+invertible zero-signature Jacobian for Lebesgue-almost every shallow-tanh
+parameter vector, and almost surely under every parameter law absolutely
+continuous with respect to four-dimensional Lebesgue measure.
+
+The local inverse neighborhood and its stability constants may depend on the
+parameter vector and can degenerate near the analytic determinant-zero set.
 
 This conclusion uses the fixed determinant \(\Delta_{\mathcal D_*}\)
 directly. Generic homogeneous injectivity alone would not prove that one
@@ -326,8 +356,10 @@ contradiction. \(\square\)
 Thus eight scalar observations match the topological dimension in this
 specific model: continuous local injectivity on an open eight-dimensional
 Hall-coordinate domain. This is not universal measurement minimality,
-reservoir-run minimality, scale minimality, or a statement about terminal
-observations of the full CDE.
+reservoir-run minimality, unrestricted or universal scale minimality, or a
+statement about terminal observations of the full CDE.  The only scale-count
+optimality claimed is for the restricted three-state scalar model in Section
+4.
 
 ## 8. Common scale rescaling
 
@@ -353,7 +385,14 @@ Put \(u=\tanh y\). Direct use of
 \[
 u,\qquad -\frac{u(1-u^2)}2,\qquad u^3(1-u^2),
 \]
-and the five even fields
+and, writing
+\[
+H_2=[X_1,X_2],\quad
+H_{31}=[X_1,[X_1,X_2]],\quad
+H_{41}=[X_1,[X_1,[X_1,X_2]]],\quad
+H_{43}=[[[X_1,X_2],X_2],X_2],
+\]
+the five even fields
 \[
 \frac12,\quad -\frac{1-u^2}{2},\quad
 \frac{1-u^4}{2},\quad
@@ -362,7 +401,8 @@ and the five even fields
 \]
 The odd fields have successive highest powers \(u,u^3,u^5\), hence rank
 three. The first four even fields have successive highest even powers through
-\(u^6\), hence rank four. All five even fields satisfy the unique relation
+\(u^6\), hence rank four. The family of five even fields has a one-dimensional
+relation space, spanned by \(4H_2+3H_{31}+2H_{43}\), equivalently
 \[
 \boxed{
 \rho\left(
@@ -370,6 +410,7 @@ three. The first four even fields have successive highest even powers through
 +2[[[X_1,X_2],X_2],X_2]
 \right)=0.}
 \]
+The coefficients of \(X_2\) and \(H_{41}\) in this spanning relation are zero.
 Indeed, the three fields appearing in this relation are, coefficientwise as
 polynomials in \(u\),
 \[
@@ -399,9 +440,11 @@ r_0^4,r_0^4,r_0^4).
 Their rank remains seven. Equivalently, the relation coefficients at scale
 \(r_0\) are \(4r_0^{-2},3r_0^{-3},2r_0^{-4}\) in the three displayed
 directions. Hence every all-at-one-scale eight-observation Jacobian is
-singular at the witness, and every full-rank design must use at least two
-distinct scale values. This is precisely why homogeneous injectivity must not
-be promoted to ungraded injectivity.
+singular at the witness, so an unrestricted-state full-rank design must use at
+least two distinct scale values.  Under the three-state restriction of Section
+4, the counting argument sharpens this to at least three, attained by
+\(\mathcal D_*\).  This is precisely why homogeneous injectivity must not be
+promoted to ungraded injectivity.
 
 ## 10. Standard results used
 

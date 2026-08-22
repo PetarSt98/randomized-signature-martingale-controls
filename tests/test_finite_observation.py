@@ -34,7 +34,14 @@ from lie_reservoir.finite_observation import (
     select_exact_design,
     single_scale_field_jet_matrix,
 )
-from lie_reservoir.free_lie import lyndon_basis, word_expansion
+from lie_reservoir.free_lie import (
+    Bracket,
+    Generator,
+    LieNode,
+    format_lie_node,
+    lyndon_basis,
+    word_expansion,
+)
 
 
 F = Fraction
@@ -400,6 +407,72 @@ def _identity():
     )
 
 
+def _trim_polynomial(
+    coefficients: tuple[Fraction, ...],
+) -> tuple[Fraction, ...]:
+    last = len(coefficients)
+    while last > 1 and coefficients[last - 1] == 0:
+        last -= 1
+    return coefficients[:last]
+
+
+def _polynomial_derivative(
+    coefficients: tuple[Fraction, ...],
+) -> tuple[Fraction, ...]:
+    if len(coefficients) == 1:
+        return (F(0),)
+    return _trim_polynomial(
+        tuple(
+            F(power) * coefficients[power]
+            for power in range(1, len(coefficients))
+        )
+    )
+
+
+def _polynomial_product(
+    left: tuple[Fraction, ...],
+    right: tuple[Fraction, ...],
+) -> tuple[Fraction, ...]:
+    coefficients = [F(0)] * (len(left) + len(right) - 1)
+    for left_power, left_coefficient in enumerate(left):
+        for right_power, right_coefficient in enumerate(right):
+            coefficients[left_power + right_power] += (
+                left_coefficient * right_coefficient
+            )
+    return _trim_polynomial(tuple(coefficients))
+
+
+def _polynomial_difference(
+    left: tuple[Fraction, ...],
+    right: tuple[Fraction, ...],
+) -> tuple[Fraction, ...]:
+    width = max(len(left), len(right))
+    return _trim_polynomial(
+        tuple(
+            (left[power] if power < len(left) else F(0))
+            - (right[power] if power < len(right) else F(0))
+            for power in range(width)
+        )
+    )
+
+
+def _independent_represented_polynomial(
+    node: LieNode,
+) -> tuple[Fraction, ...]:
+    if isinstance(node, Generator):
+        return ((F(0), F(1)), (F(1, 2),))[node.index]
+    if not isinstance(node, Bracket):
+        raise TypeError("node must be a free-Lie generator or bracket.")
+
+    left = _independent_represented_polynomial(node.left)
+    right = _independent_represented_polynomial(node.right)
+    bracket_core = _polynomial_difference(
+        _polynomial_product(_polynomial_derivative(right), left),
+        _polynomial_product(_polynomial_derivative(left), right),
+    )
+    return _polynomial_product((F(1), F(0), F(-1)), bracket_core)
+
+
 def test_exact_observation_map_at_zero_retains_the_state_baseline() -> None:
     assert exact_centered_truncated_observation_map(
         ZERO_COORDINATES,
@@ -425,6 +498,50 @@ def test_zero_jacobian_matches_independent_represented_fields() -> None:
     field_matrix = exact_joint_state_scale_matrix(EXPECTED_DESIGN)
     assert tensor_jacobian == field_matrix
     assert exact_zero_jacobian(EXPECTED_DESIGN) == field_matrix
+
+
+def test_nonlinear_forward_map_has_certified_zero_jacobian_exactly() -> None:
+    nodes = (F(0), F(1), F(-1), F(2), F(-2))
+    derivative_columns: list[tuple[Fraction, ...]] = []
+
+    for hall_column in range(8):
+        forward_values = {}
+        for node in nodes:
+            direction = tuple(
+                node if index == hall_column else F(0)
+                for index in range(8)
+            )
+            forward_values[node] = exact_centered_truncated_observation_map(
+                _blocks(direction),
+                EXPECTED_DESIGN,
+            )
+        assert forward_values[F(0)] == (F(0),) * 8
+
+        # Exact five-node interpolation for the t coefficient of a quartic:
+        # [t]p = (8(p(1)-p(-1))-(p(2)-p(-2)))/12.
+        derivative_columns.append(
+            tuple(
+                (
+                    F(8)
+                    * (
+                        forward_values[F(1)][row]
+                        - forward_values[F(-1)][row]
+                    )
+                    - (
+                        forward_values[F(2)][row]
+                        - forward_values[F(-2)][row]
+                    )
+                )
+                / F(12)
+                for row in range(8)
+            )
+        )
+
+    interpolated_jacobian = tuple(
+        tuple(derivative_columns[column][row] for column in range(8))
+        for row in range(8)
+    )
+    assert interpolated_jacobian == exact_zero_jacobian(EXPECTED_DESIGN)
 
 
 def test_hall_and_candidate_pair_ordering_is_deterministic() -> None:
@@ -492,7 +609,7 @@ def test_common_scale_determinant_has_degree_twenty_two(
 
 
 @pytest.mark.parametrize("scale", (F(-2), F(1), F(3, 2)))
-def test_single_nonzero_scale_has_cross_degree_rank_exactly_seven(
+def test_single_nonzero_scale_taylor_jet_consistency_has_rank_seven(
     scale: Fraction,
 ) -> None:
     matrix = single_scale_field_jet_matrix(scale)
@@ -516,22 +633,43 @@ def test_single_nonzero_scale_has_cross_degree_rank_exactly_seven(
     assert exact_matrix_rank(matrix) == 7
 
 
-def test_cross_degree_relation_is_a_represented_field_regression() -> None:
-    # Independently derived from D_x=(1-u^2)d/du and
-    # [f,g]=(D_x g)f-(D_x f)g, in ascending powers of u=tanh(y).
-    h2 = (F(-1, 2), F(0), F(1, 2), F(0), F(0))
-    h31 = (F(1, 2), F(0), F(0), F(0), F(-1, 2))
-    h43 = (F(1, 4), F(0), F(-1), F(0), F(3, 4))
-    polynomial_residual = tuple(
-        F(4) * h2[index] + F(3) * h31[index] + F(2) * h43[index]
-        for index in range(5)
+def test_exact_polynomial_recursion_certifies_function_rank_seven() -> None:
+    nodes = tuple(
+        node
+        for degree in range(1, 5)
+        for node in lyndon_basis(input_dim=2, degree=degree)
     )
-    assert polynomial_residual == (F(0),) * 5
+    assert tuple(format_lie_node(node) for node in nodes) == hall_basis_labels()
 
-    matrix = single_scale_field_jet_matrix(F(1))
-    first_seven_minor = tuple(tuple(row[:7]) for row in matrix)
+    represented_fields = tuple(
+        _independent_represented_polynomial(node) for node in nodes
+    )
+    assert all(len(coefficients) <= 7 for coefficients in represented_fields)
+
+    coefficient_matrix = tuple(
+        tuple(
+            coefficients[power] if power < len(coefficients) else F(0)
+            for coefficients in represented_fields
+        )
+        for power in range(7)
+    )
+    assert exact_matrix_rank(coefficient_matrix) == 7
+
+    relation = (F(0), F(0), F(4), F(3), F(0), F(0), F(0), F(2))
+    polynomial_residual = tuple(
+        sum(
+            (
+                coefficient * relation[column]
+                for column, coefficient in enumerate(row)
+            ),
+            start=F(0),
+        )
+        for row in coefficient_matrix
+    )
+    assert polynomial_residual == (F(0),) * 7
+
+    first_seven_minor = tuple(tuple(row[:7]) for row in coefficient_matrix)
     assert _determinant(first_seven_minor) == F(-3, 32)
-    assert len({scale for _, scale in EXPECTED_DESIGN}) >= 2
 
 
 SMALL_LOCAL_COORDINATES = (

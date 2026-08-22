@@ -1075,16 +1075,31 @@ and therefore
 \qquad z,z'\in B.
 \]
 
-The theorem proves existence of eight such scalar evaluations and qualitative
-local stability for object B.  It does not provide an explicit selected tuple,
-an exact joint determinant, a numerical conditioning constant, or a certified
-radius \(B\).  Those are separate proof obligations before claiming explicit
-local stability.
+The argument above proves existence of eight scalar evaluations and qualitative
+local stability for object B.  The downstream exact result
+`research_output/finite_observation_theorem.md` now selects
 
-For the exact tanh witness, and for almost every tanh parameter vector covered
-by the existing certificate, homogeneous injectivity supplies the hypothesis
-of this theorem.  This does not remove the distinction between truncated
-object B and full response C.
+\[
+\mathcal D_*=((-q,1),(-q,2),(-q,3),(0,2),(0,3),
+               (q,1),(q,2),(q,3))
+\]
+
+and certifies
+
+\[
+\det D\Phi_{\mathcal D_*}(0)
+ =\det B_*=-\frac{258733035}{524288}\ne0.
+\]
+
+That result also records the exact inverse, gives non-certifying binary64
+spectral diagnostics, proves a local analytic inverse, and proves directly
+from the fixed-design analytic determinant that this same design has an
+invertible zero-signature Jacobian for Lebesgue-almost every shallow-tanh
+parameter vector.  The diagnostics do not certify a stability neighborhood:
+no explicit neighborhood satisfying the displayed derivative bound, and
+hence no certified quantitative stability radius or constants, are yet
+supplied.  All these statements remain confined to object B and do not invert
+the full response C.
 
 ## 12. Standard results requiring citation
 
@@ -1164,35 +1179,38 @@ The proved result is the following.
   truncation level and for the truncated response.
 * Homogeneous injectivity also implies joint state--scale linear independence,
   hence existence of eight scalar evaluations with nonsingular zero-signature
-  Jacobian for the degree-four truncated response and a local inverse there
-  (object B).  At the exact witness, such a tuple must use at least two scales.
+  Jacobian for object B.  The downstream finite-observation theorem selects the
+  explicit design \(\mathcal D_*\) displayed above, certifies its exact Jacobian,
+  determinant, and inverse, and proves a local analytic inverse.  At the exact
+  witness every full-rank design needs at least two distinct scales.  When
+  states are restricted to \(\{-q,0,q\}\), eight distinct scalar rows require
+  at least three distinct scales, and \(\mathcal D_*\) uses exactly three.
 * Any continuous locally injective Euclidean observation map on an open subset
   of the eight-dimensional Hall-coordinate space needs scalar codomain
   dimension at least eight.
 
-The note does not prove ungraded direct-sum injectivity, recovery from one
-terminal state, a global inverse for object B or C, a finite-difference jet
-scheme, explicit joint state--scale locations, an exact joint Jacobian
-certificate, an explicit stability radius, a full-CDE remainder/control
-theorem, equality of the truncated and full responses at finite scale, or a
-rough-path extension.
+The combined results do not prove ungraded direct-sum injectivity, recovery
+from one terminal state, a global inverse for object B or C, a finite-difference
+jet scheme, a certified quantitative stability radius or constants, a full-CDE
+remainder/control theorem, equality of the truncated and full responses at
+finite scale, or a rough-path extension.
 
 ## 15. Unresolved proof obligations
 
-Within the frozen research direction, the remaining obligations after this
-bridge are:
+Within the frozen research direction, the remaining obligations are:
 
-1. select eight concrete state--scale pairs and certify their zero-signature
-   Jacobian exactly, using at least two distinct scales at the exact witness;
-2. derive explicit conditioning and a certified local stability neighborhood
-   for that selected truncated observation map;
-3. only if requested separately, first specify a path class with a uniform
+1. certify an explicit neighborhood for the selected truncated map on which
+   the derivative perturbation bound holds, and report the resulting
+   quantitative stability radius and constants;
+2. only if requested separately, first specify a path class with a uniform
    \(1\)-variation bound (or an appropriate homogeneous rough-path norm bound),
    and then control levels at least five to transfer a finite-scale statement
    from object B to the actual full CDE object C.  Fixing only the first four
    log-signature levels controls neither the path variation nor the higher
    levels, so the present hypotheses do not support a uniform remainder
-   constant over all BV realizations of the same \(z\).
+   constant over all BV realizations of the same \(z\).  This full-CDE remainder
+   problem is a separate future bridge, not part of quantitative local
+   stability for object B.
 
 ## Final status
 
