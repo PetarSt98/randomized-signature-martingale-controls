@@ -1130,12 +1130,10 @@ object B and do not invert the full response C.
 A formal paper version should cite the following standard inputs at the points
 where they are used:
 
-1. For bounded-variation signatures and controlled-ODE Taylor expansions:
+1. For bounded-variation signatures and controlled-ODE expansion background:
    Peter K. Friz and Nicolas B. Victoir, *Multidimensional Stochastic Processes
-   as Rough Paths*, Cambridge University Press, 2010, Section 7.1
-   (pp. 125--126) for BV signatures and Definition 10.1 with Proposition 10.3
-   (pp. 212--214) for the deterministic controlled-ODE Euler expansion and
-   remainder,
+   as Rough Paths*, Cambridge University Press, 2010, Chapters 1--3 and
+   Section 7.1,
    [DOI 10.1017/CBO9780511845079](https://doi.org/10.1017/CBO9780511845079).
    The word/operator order, scale-parameter regularity, and the precise local
    remainder used here were nevertheless derived directly in Section 2.  This

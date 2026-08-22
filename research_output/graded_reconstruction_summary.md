@@ -2,17 +2,27 @@
 
 ## Contribution
 
-This package establishes one theorem chain for a scalar, two-input shallow
-biased-tanh reservoir through homogeneous degree four:
+This package establishes one theorem package for a scalar, two-input shallow
+biased-tanh reservoir through homogeneous degree four. Its proof dependencies
+branch rather than form one linear implication chain:
 
 ```text
-generic homogeneous Lie injectivity
--> exact graded log-signature reconstruction
--> an explicit dimension-matched eight-output truncated observation
--> explicit quantitative local stability of that truncated observation
+homogeneous Lie injectivity
+|-- ideal graded reconstruction (object A)
+`-- joint state-scale independence
+    `-- explicit eight-output design (object B)
+        `-- exact zero Jacobian B_*
+            |-- local analytic inverse
+            `-- quantitative stability from exact B_*^{-1} and Delta(R)
 ```
 
-The chain deliberately distinguishes three observation objects:
+The shallow-tanh theorem supplies a concrete generic family satisfying the
+homogeneous-injectivity premise. Graded reconstruction and joint state-scale
+independence are sibling consequences of that premise. Quantitative stability
+comes from the exact inverse and Jacobian-variation majorant, not from the
+analytic inverse function theorem.
+
+The package deliberately distinguishes three observation objects:
 
 - **A. Ideal graded jets:** the normalized derivatives of the response to the
   scaled input path $rX$ at $r=0$, degree by degree.
@@ -253,6 +263,32 @@ The radius $R_*$ is the largest passing radius in the prescribed dyadic
 certificate list under the chosen coefficient-sum majorant. It is a
 conservative certified radius and is not claimed to be sharp, truly maximal,
 or the largest possible stable radius.
+
+## Related work and novelty boundary
+
+The closest prior work identified is Glückstad, Muça Cirone, and Teichmann,
+[*Signature Reconstruction from Randomized Signatures* (2025)](https://arxiv.org/html/2502.03163v1).
+It states ordinary tensor-signature reconstruction results, and its proof uses
+scale differentiation, homogeneous tensor-level separation, and finite
+initial-state selection. Its Euclidean proof also uses the asserted identity
+\(Y^{\eta,r}=rY^{\eta/r}\), which is not valid for general nonlinear vector
+fields in the displayed \(rV_i\)-scaled CDE; conditional on independently
+available scaled responses, the subsequent Taylor separation remains the
+relevant prior strategy. Section 5 identifies direct recovery in compressed
+log-signature/Lie coordinates as a further direction. Bailleul and Diehl's
+[*The Inverse Problem for Rough Controlled Differential Equations* (2015)](https://doi.org/10.1137/140995982)
+already establishes the inverse-CDE perspective, while free-Lie,
+Hall--Lyndon, signature/log-signature, tensor-exponential, and Chen--Fliess
+algebra are classical.
+
+Accordingly, no originality is claimed for scaling/Taylor arguments, inverse
+CDEs, or ordinary tensor-signature reconstruction. Relative to the closest
+work identified, the package-specific proved results are homogeneous
+free-Lie injectivity for the scalar shallow biased-tanh architecture through
+degree four, its exact witness and certificates, the fixed eight-output
+truncated design and genericity statement, and its exact local
+inverse-Lipschitz certificate. This comparison delimits the contribution; it
+is not a literature-priority claim.
 
 ## Scope and limitations
 
