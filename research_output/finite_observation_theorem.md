@@ -334,6 +334,29 @@ the actual full CDE response.
 The same statement holds for the centered map after translating \(W\) by
 \(-y_{\mathcal D_*}\).
 
+The downstream result in `research_output/local_stability_theorem.md` upgrades
+this qualitative local inverse, for the same witness and fixed design, to the
+exact inverse-Lipschitz estimate
+
+\[
+\|z-z'\|_\infty
+\le
+\frac{409087045009408}{21220001406063}
+\|\Phi_{\mathcal D_*}(z)-\Phi_{\mathcal D_*}(z')\|_\infty
+\]
+
+for \(\|z\|_\infty,\|z'\|_\infty\le1/2048\).  Its exact inputs are
+
+\[
+\|B_*^{-1}\|_\infty=\frac{23812}{2151},\qquad
+c_*=\frac{21220001406063}{409087045009408}.
+\]
+
+The radius \(1/2048\) is a conservative coefficient-majorant certificate, not
+a claim of the largest possible stable radius.  The result remains confined
+to object B, is not parameter-uniform, and does not transfer to the actual
+full CDE object C.
+
 ## 7. Dimension lower bound
 
 **Theorem 7.1.** Let \(U\subset\mathbb R^8\) be open with \(0\in U\). If
@@ -377,6 +400,17 @@ Therefore
 \]
 This is an algebraic identity. The restriction \(h\ne0\) is needed to retain
 nonsingularity.
+
+For the same fixed design, the downstream quantitative certificate further
+proves the exact inverse-linearization amplification
+
+\[
+\|B_*(h)^{-1}\|_\infty=\Theta(|h|^{-4})
+\qquad\text{as }h\to0.
+\]
+
+This is not asserted to be condition-number scaling or a nonlinear
+common-scale stability theorem.
 
 ## 9. Cross-degree scope boundary at the witness
 
@@ -471,12 +505,18 @@ The established result is:
   tanh witness;
 - the same fixed design works for almost every shallow-tanh parameter vector;
 - the truncated polynomial map has a local real-analytic inverse near zero;
+- for the exact witness and fixed design, the downstream quantitative theorem
+  certifies inverse-Lipschitz stability on
+  \(\|z\|_\infty\le1/2048\) with the exact constants displayed in Section 6;
 - fewer than eight scalar outputs cannot be continuously locally injective on
   an open eight-dimensional Hall-coordinate neighborhood;
-- common rescaling obeys the exact exponent-22 determinant law.
+- common rescaling obeys the exact exponent-22 determinant law and the
+  downstream zero-linearization inverse norm has
+  \(\Theta(|h|^{-4})\) amplification.
 
-No claim is made about global inversion, an explicit inverse-neighborhood
-radius, finite-difference reconstruction, the full CDE response, levels at
-least five, or universal measurement minimality.
+No claim is made about global inversion, a sharp or maximal stability radius,
+parameter-uniform stability, finite-difference reconstruction, the full CDE
+response, levels at least five, discrete-time or finance consequences, or
+universal measurement minimality.
 
 **Final status: PROVED.**
