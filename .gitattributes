@@ -1,0 +1,4 @@
+# These text artifacts are verified by byte-level SHA-256 manifests.
+/research_output/selected_target/*.json text eol=lf
+/research_output/stage_b/*.json text eol=lf
+/research_output/stage_b/*.csv text eol=lf

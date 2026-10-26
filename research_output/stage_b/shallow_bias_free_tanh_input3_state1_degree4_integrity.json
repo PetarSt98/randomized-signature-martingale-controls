@@ -1,0 +1,18 @@
+{
+  "artifacts": {
+    "csv": {
+      "name": "shallow_bias_free_tanh_input3_state1_degree4.csv",
+      "sha256": "4ab4f9a8f042407d272b6ccb005428426a6cc7f6bde537fbb540271bdf2f7cd6"
+    },
+    "json": {
+      "name": "shallow_bias_free_tanh_input3_state1_degree4.json",
+      "sha256": "7bbe690cc28ffc1c5ec4da92f4b24c623707111531414b1a220bbd45e017b0d8"
+    },
+    "matrices": {
+      "name": "shallow_bias_free_tanh_input3_state1_degree4_matrices.pt",
+      "sha256": "3ec355818977e5827b07a014ca5e0999f0bab941f29f43dbaac0fea29d2e2689"
+    }
+  },
+  "group_stem": "shallow_bias_free_tanh_input3_state1_degree4",
+  "schema_version": 1
+}
