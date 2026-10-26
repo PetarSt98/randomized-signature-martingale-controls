@@ -10,6 +10,16 @@ summarized in `research_output/technical_note.md`. It preserves the certified
 homogeneous-injectivity theorem and develops the object-A reconstruction
 result in detail.
 
+The separate [fixed-state Hall-rank theorem](intrinsic_hall_rank_theorem.md)
+now gives generic rank \(\min(D,\nu_{d,L})\) at initialization zero in the
+full biased shallow-tanh parameter space, where \(\nu_{d,L}\) is the total
+Hall dimension through degree \(L\). For \(D\geq\nu_{d,L}\), it gives
+local recovery near zero Hall coordinates from one degree-\(L\) truncated
+terminal vector at any fixed nonzero scale, with the sharp dimension
+threshold for that observation model. The scalar jet reconstruction proved
+here remains a different observation design; its exact constants are not
+constants for the new vector map.
+
 The three observation objects used in the note are different:
 
 1. **A. Ideal normalized scale jets** \(J_m(y;X)\), which are exact derivatives
@@ -542,9 +552,10 @@ F_y^{(4)}(r;z)
 If \(z_m=\ell_m(X)\), then the coefficient of \(r^m\) in this polynomial is
 the ideal jet \(J_m(y;X)\).  At a nonzero finite scale, however,
 \(F_y^{(4)}(r;z)\) is only object B.  The actual response C is
-\(Y_T^y(rX)\), and its expansion contains degrees at least five.  No equality
-between B and C, no finite-scale remainder bound, and no full-CDE inversion is
-claimed here.
+\(Y_T^y(rX)\), and its expansion contains degrees at least five. This
+definition does not identify B with C or provide a full-CDE inverse. The
+subsequent scalar actual-response theorem summarized in Section 15 supplies
+a uniform remainder bound under its additional total-variation hypothesis.
 
 ## 6. Finite-evaluation lemma
 
@@ -917,11 +928,12 @@ domain would make its image open in \(\mathbb R^8\), while that image lies in
 an \(N\)-dimensional coordinate plane with empty \(8\)-dimensional interior, a
 contradiction.
 
-This is only a lower bound on the scalar codomain dimension of a continuous
+This is a lower bound on the scalar codomain dimension of a continuous
 locally injective observation map defined on an open subset of this
-eight-dimensional coordinate space.  It is not a claim about minimal reservoir
-runs, scale values, terminal-state observations, or universal measurement
-minimality.
+eight-dimensional coordinate space. It is not a count of minimal reservoir
+runs or scale values, or universal measurement minimality. For one
+\(D\)-dimensional truncated terminal vector, the separate fixed-state
+Hall-rank theorem attains this lower bound at \(D=8\).
 
 ## 11. Joint state--scale linear independence
 
@@ -1151,7 +1163,8 @@ where they are used:
    as a Hall basis, Chapter 5, Theorem 5.1,
    [publisher record](https://academic.oup.com/book/53911).
 4. For exact finite-step path realizability:
-   Friz--Victoir, Theorems 7.28 (pp. 140--142) and 7.30 (pp. 142--144).  They
+   Friz--Victoir, Theorems 7.28 (printed pp. 142--143) and 7.30
+   (printed pp. 144--145) in the linked May 2009 author draft. They
    identify
    \(G^L(\mathbb R^d)=\exp(\mathfrak g^L(\mathbb R^d))\) with the set of
    truncated signatures of continuous bounded-variation paths, with
@@ -1183,7 +1196,7 @@ coefficients.  The universal limit theorem alone gives continuity, not the
 required differentiability in \(r\).  No such extension is claimed in this
 note.
 
-## 14. Strongest established result and exact scope
+## 14. Established results of this derivation and exact scope
 
 The proved result is the following.
 
@@ -1216,24 +1229,33 @@ The proved result is the following.
   of the eight-dimensional Hall-coordinate space needs scalar codomain
   dimension at least eight.
 
-The combined results do not prove ungraded direct-sum injectivity, recovery
-from one terminal state, a global inverse for object B or C, a finite-difference
-jet scheme, a sharp or maximal stability radius, parameter-uniform stability,
-a full-CDE remainder/control theorem, equality of the truncated and full
-responses at finite scale, or a rough-path extension.
+These scalar results do not prove ungraded direct-sum injectivity at the
+certified scalar witness or recovery of its eight coordinates from one scalar
+terminal value. Its mixed-degree obstruction remains unchanged. They also
+do not prove a global inverse for object B or C, a finite-difference jet
+scheme, a sharp or maximal stability radius, parameter-uniform stability,
+equality of the truncated and full responses at finite scale, or a rough-path
+extension. The separate fixed-state theorem supplies one-vector local
+recovery for object B at \(D\geq\nu_{d,L}\); it does not transfer this
+scalar witness's stability constants to that map.
 
-## 15. Unresolved proof obligations
+## 15. Subsequent actual-response result and remaining boundary
 
-Within the frozen research direction, the only substantive next mathematical
-bridge is the actual full-CDE remainder problem.  It would first require a path
-class with a uniform \(1\)-variation bound (or an appropriate homogeneous
-rough-path norm bound), followed by control of levels at least five to transfer
-a finite-scale statement from object B to the actual full CDE object C.  Fixing
-only the first four log-signature levels controls neither the path variation
-nor the higher levels, so the present hypotheses do not support a uniform
-remainder constant over all BV realizations of the same \(z\).  This is a
-separate future bridge, not part of the completed quantitative local stability
-theorem for object B.
+The [canonical manuscript](../paper/randomized_signature_identifiability.tex),
+in “Approximate recovery from actual responses” (Theorem `thm:actual`), now
+proves the bounded-variation remainder bridge for the existing scalar witness
+and its eight designed experiments. Under a known total-variation bound and
+sufficiently small common scale, a uniform fifth-order remainder and clipped
+decoder give approximate recovery with explicit truncation, observation-noise,
+and iteration-residual bounds. This is an object-C approximation theorem;
+it does not identify B with C or give exact recovery at a fixed nonzero scale.
+
+Fixing only the first four log-signature levels still controls neither path
+variation nor higher levels, so there is no uniform remainder conclusion here
+over all BV realizations of the same \(z\). The actual-response theorem is
+specific to the eight scalar experiments. No analogous actual-response bound
+or quantitative stability constant is supplied for the new one-vector
+fixed-state Hall map.
 
 ## Final status
 

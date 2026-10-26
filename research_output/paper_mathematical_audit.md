@@ -2,6 +2,8 @@
 
 Audit date: 5 September 2026. Repository HEAD: `48511d9db391c32c689256538828124ad6dbce0e`.
 
+**Update, 8 September 2026:** The final addendum records the proved approximate-recovery extension for the fixed eight actual CDE responses and its deterministic validation. The original audit and its historical scope below are retained; exact recovery at a fixed nonzero scale is still not asserted.
+
 **Decision before manuscript creation: PASS.** No load-bearing defect or disagreement between the exact artifacts, their reproducers, and the corrected theorem statements was found. The appropriate final classification is **PAPER MATHEMATICS VERIFIED WITH EXPLICIT CONDITIONAL STATEMENTS**. General reconstruction is conditional on homogeneous injectivity on the observation domain; the sufficient-width theorem supplies one sufficient architectural condition. Finance experiments remain preliminary. Full-CDE finite-scale reconstruction and a theorem for the implemented discrete recurrence are not established.
 
 This is an audit of the requested theorem chain and its finance motivation. It does not certify every unrelated experiment or untracked rank artifact in the repository. The manuscript is written only after the decision above. Existing mathematical statements and artifacts have not been repaired or generalized in place.
@@ -18,7 +20,7 @@ Principal inspected sources:
 - `local_stability_theorem.md`, `local_stability_certificate.json`, and its reproducer;
 - `general_shallow_tanh_width_theorem.md` and `reproduce_tensor_witness.py`;
 - the existing `lie_reservoir` free-Lie, bracket, activation, certificate, graded-reconstruction, finite-observation, and tensor-witness implementations, and their focused tests;
-- `README.md`, `rsmc/control.py`, `rsmc/hedging.py`, `rsmc/heston.py`, `rsmc/reservoir.py`, `scripts/hedging_demo.py`, and `tmp/research_notes_innovation_project_6.txt`.
+- `README.md`, `rsmc/control.py`, `rsmc/hedging.py`, `rsmc/heston.py`, `rsmc/reservoir.py`, `scripts/hedging_demo.py`, and `research_output/sources/research_notes_innovation_project_6.txt` (originally under `tmp/`).
 
 Before any edit, `git status --short` and `git diff --stat` were inspected. Four tracked files already differed from HEAD: `AGENTS.md`, `rsmc/__init__.py`, `rsmc/hedging.py`, and `tests/test_hedging.py` (981 insertions, 840 deletions in aggregate). Numerous unrelated untracked experiment files, `.idea/`, and `tmp/` were present. These were left in place. A SHA-256 baseline of every tracked file was retained for the final nonmodification check.
 
@@ -62,7 +64,7 @@ Sources: `hedging.py`, `heston.py`, June note. Standard input: Hilbert-space pro
 
 ### F4. Financial measurements — EMPIRICAL / PRELIMINARY
 
-Authoritative source: Petar Stojković's June 2026 research note, available as `tmp/research_notes_innovation_project_6.txt`. No committed detailed run artifact establishing these exact displayed values was located. They were not regenerated.
+Authoritative source: Petar Stojković's June 2026 research note, preserved as `research_output/sources/research_notes_innovation_project_6.txt` (originally under `tmp/`). No committed detailed run artifact establishing these exact displayed values was located. They were not regenerated.
 
 Context: observation noise `eta=0.02`; 10,000 training / 3,000 validation / 10,000 test paths; all model selection on validation paths; `N=252`; one seed; particle filter only for the one-asset problem.
 
@@ -175,6 +177,8 @@ For every finite `d,L>=1` and `D>=D0=sum_{m=0}^L d^m`, there is an open dense fu
 Sources: corrected width note and existing tensor-witness code. Proof: right-concatenation matrices on the truncated tensor-word space, initial state `e_empty`, nonempty-word coordinate rows. The linear word matrix is exactly the identity. W1 yields a nonzero raw determinant at an existential small epsilon. The fixed determinant is analytic in every entry of every weight and bias. Zero-set genericity then applies. For larger D, a zero inactive-coordinate block preserves the minor globally. The tensor construction is classical; the manuscript identifies the architecture-specific transfer separately.
 
 The strongest proved conclusion is joint finite-degree word-response field independence. It is stronger than joint Hall independence and homogeneous injectivity. No statement concerns trees, degrees beyond L, a nilpotent quotient representation of tanh, minimal width, compressed width, numerical conditioning, explicit epsilon, uniform stability, actual full-CDE reconstruction, the discrete recurrence, or finance performance.
+
+**2026-09-08 manuscript addendum.** Corollary `cor:zero` fixes `h0=0` at the unchanged sufficient width. Translating `c=e_empty` into the biases by `b_i -> b_i+A_i c` preserves exactly the existing `Q_{d,L}`-square nonempty-word minor at a finite nonzero-epsilon witness. Its determinant at zero is nontrivial real analytic in the full weights and biases, giving almost-everywhere independence of the nonempty word responses and the existing Lie-faithfulness consequences. The empty-word column is excluded and `S_0=1` is known separately; the scalar eight-observation design is unchanged.
 
 ### W3. Finite structural harness — VERIFIED computational checks
 
@@ -616,3 +620,527 @@ Scalar homogeneous condition numbers: `2.618034, 1.0, 2.5, 6.2704558`. Binary64 
 Eight-output binary64 condition number: `468.626825569`; singular values: `72.8678806904, 13.4576527068, 12.4585453832, 2.9110008089, 1.23631176424, 0.365987026873, 0.197225996535, 0.155492337857`. These diagnostics do not certify rank.
 
 The manuscript also contains a full 27-monomial coefficient table. It was generated using the existing `exact_centered_observation_polynomials` function, and substitution of each design scale was checked to reproduce all eight polynomial dictionaries (190 nonzero terms). No new word, tensor, or Lie implementation was used.
+
+## 2026-09-08: Approximate recovery from eight actual CDE responses
+
+The canonical manuscript's `thm:actual` proves one extension of the existing scalar certificate. The fields, Hall order, eight pairs, three initial states, polynomial map and exact artifacts are unchanged. For a continuous BV path starting at zero with total component variation at most \(M\), use \(0<h\leq1\) and \(c_m(hM)^m\leq R\), where
+\[
+(c_1,c_2,c_3,c_4)=(1,1,1,13/12),\qquad R=1/2048.
+\]
+For \(M>0\), \(h\leq\min(1,R/M)\) suffices. Only \(D_hz(X)\), not necessarily \(z(X)\), must lie in the certified cube.
+
+**Proof and constants.** Every response monomial has Hall weighted degree at most four, so the complete polynomial satisfies \(\Phi_h(z)=\Phi(D_hz)\). The tensor coefficient \(\ell^1\) bound and the existing identity Hall pivot matrices give the stated \(c_m\). The outermost-first recursion \(P_{iv}=v_i(1-s^2)P_v'\), \(v_1=s,v_2=1/2\), gives the conservative global bound \(K_5=2^4(1\cdot3\cdot5\cdot7)=1680\). The finite integral remainder and total component-variation measure give \(A=3^5K_5/5!=3402\), with no hidden scale dependence.
+
+The certificate uses the **induced row-sum infinity norm**, not an entrywise maximum:
+\[
+K=23812/2151,\quad
+\Delta(R)=2643019857/68719476736,\quad
+\kappa=1748210800969/4105988734976<1/2,\quad
+C=K/(1-\kappa)=409087045009408/21220001406063.
+\]
+The coordinatewise clipped contraction defines \(G(b)\) for every \(b\in\mathbb R^8\), agrees with the inverse on \(\Phi(Q_R)\), and is \(C\)-Lipschitz. With response error \(\|e\|_\infty\leq\delta\), the recovered coordinates obey
+\[
+\|D_h^{-1}G(b_h(X)+e)-z(X)\|_\infty
+\leq C(3402M^5h+\delta h^{-4}).
+\]
+A computed iterate adds \(h^{-4}r_n/(1-\kappa)\), where \(r_n=\|u_n-T_b(u_n)\|_\infty\) is the exact fixed-point residual. An unscaled iteration tolerance \(\tau\) therefore requires \(r_n\leq(1-\kappa)h^4\tau\). This decoder is neither a global polynomial inverse nor a least-squares minimizer.
+
+**Deterministic validation.** The single script `research_output/validate_actual_response_recovery.py` writes no artifacts. It reads and verifies the existing design, inverse and stability constants; checks exact full-polynomial scaling at \(h=1/2,-2,1/2048\); checks the Hall pivot conversion, tensor logarithm/re-exponentiation and path reversal; and compares the length-five polynomial recursion with existing exact word jets at three states. Its exact coefficient-norm enumeration returns 560, below the proof's deliberately unoptimized 1680.
+
+An axis segment is written (channel, signed increment), with channels numbered 1 and 2 here:
+
+- Alternating: \((1,1/3),(2,1/4),(1,-1/5),(2,1/6)\), total variation \(M=19/20\).
+- Rectangle: \((1,1/3),(2,1/4),(1,-1/3),(2,-1/4)\), \(M=7/6\).
+- Reversed: reverse the alternating segments and negate every increment; \(M=19/20\).
+
+Reference signatures are exact chronological products of segment tensor exponentials; their tensor logarithms and Hall coordinates use rational arithmetic. Actual responses independently compose \(F_a(y)=\operatorname{asinh}(e^a\sinh y)\) and \(H_b(y)=y+b/2\) in path order, with scaled signed increments. Runs use \(h=R/(M j)\), \(j=1,2,4\). Perturbed runs use \(e_i=(-1)^{i-1}\delta\), \(\delta=(hM)^5/100\); this is response error, unrelated to finance noise.
+
+The table records the 80-digit run. Coordinate errors use the exact rational Hall reference. Each residual column is the maximum over the clean and perturbed runs at that path/scale, and has its own definition: fixed-point residual \(r_n\) versus response-fit residual \(\|\Phi(u_n)-b\|_\infty\).
+
+| Path | \(h\) | Response remainder | Clean coordinate error | Perturbed coordinate error | Max fixed-point residual | Max response-fit residual |
+|---|---:|---:|---:|---:|---:|---:|
+| Alternating | 5.139803e-4 | 3.812074e-19 | 1.580985e-7 | 1.915026e-5 | 1.248493e-70 | 1.768738e-69 |
+| Alternating | 2.569901e-4 | 1.191486e-20 | 7.905598e-8 | 9.574754e-6 | 7.017146e-72 | 9.940581e-71 |
+| Alternating | 1.284951e-4 | 3.723727e-22 | 3.952967e-8 | 4.787282e-6 | 1.577444e-72 | 2.234561e-71 |
+| Rectangle | 4.185268e-4 | 4.764082e-19 | 3.212782e-6 | 4.064667e-5 | 3.987309e-75 | 2.882609e-74 |
+| Rectangle | 2.092634e-4 | 1.488829e-20 | 1.606525e-6 | 2.032320e-5 | 8.661077e-75 | 5.920002e-74 |
+| Rectangle | 1.046317e-4 | 4.652676e-22 | 8.032961e-7 | 1.016157e-5 | 1.651962e-80 | 1.129146e-79 |
+| Reversed | 5.139803e-4 | 3.187471e-18 | 4.217411e-6 | 1.575957e-5 | 1.248394e-70 | 1.768310e-69 |
+| Reversed | 2.569901e-4 | 9.963001e-20 | 2.109350e-6 | 7.880380e-6 | 7.016742e-72 | 9.939202e-71 |
+| Reversed | 1.284951e-4 | 3.113774e-21 | 1.054836e-6 | 3.940339e-6 | 1.577385e-72 | 2.234386e-71 |
+
+All 18 clean/perturbed cases satisfy the remainder and combined recovery bounds including the solver term. Iterations number 4–17. The conservative data-plus-truncation bounds range from about 6.52 to 59.33; they prove a uniform estimate and are much larger than the observed errors.
+
+Five polynomial round trips include zero, both constant-sign corners, an alternating-sign corner and a face point. Their maximum coordinate errors are \(3.95609\times10^{-56}\) at 80 digits and \(1.67220\times10^{-97}\) at 120 digits. A deliberately off-image datum \(b=\Phi(R\mathbf1)+B(R\mathbf1)\) returns the upper corner with computed fixed-point residual zero and response-fit residual approximately 0.0124626. All 18 path cases were repeated at 120 digits; maximum coordinate disagreement was \(3.7345235\times10^{-57}\). The stopping target was an unscaled accuracy \(10^{-(p-25)}\) at \(p\) decimal digits, with the required \(h^4(1-\kappa)\) factor.
+
+Reproduce from the repository root (Python 3.13.3, SymPy 1.14.0, mpmath 1.3.0):
+```powershell
+$env:PYTHONDONTWRITEBYTECODE='1'
+python research_output/validate_actual_response_recovery.py
+```
+
+The exact checks use existing utilities; the flow evaluations, numerical residuals and precision agreement are **numerical evidence, not new exact certificates or interval error enclosures**. Fixed nonzero response noise is amplified as \(h^{-4}\). Approximate recovery uses the designed eight actual responses; exact fixed-scale recovery, one zero-initialized scalar reservoir, discrete/Euler transfer, rough paths and finance consequences are not asserted.
+
+**Checks performed for this extension.** The validation command above passed at its default 80/120-digit settings. With `PYTHONDONTWRITEBYTECODE=1`, `python -m pytest tests/test_finite_observation.py tests/test_local_stability.py -q -p no:cacheprovider` passed **39 tests in 46.54 seconds**; the repository-required `python -m pytest -q -p no:cacheprovider` passed **233 tests in 167.36 seconds**. Static checks found 104 unique LaTeX labels, no missing references or citations, balanced braces and environments, valid Python syntax, and no trailing whitespace in the three changed files. All pre-existing theorem statements, numbered displays, matrix blocks, table bodies and bibliography entries were preserved. Scoped `git diff --check` passed; Git additionally reported its existing LF-to-CRLF conversion warning. No TeX engine was available, so compilation and visual inspection were not performed. No existing script, certificate, test or finance file was edited, and no experiment, PDF, alternate manuscript or result artifact was generated.
+
+
+## 2026-09-13: Central fixed-zero Hall-rank theorem and document integration
+
+**Verdict: VERIFIED in the stated fixed-state rank and local truncated-response
+scope.** The canonical manuscript now leads with generic rank
+\(\min(D,\nu_{d,L})\) in the full shallow biased-tanh parameter space, an
+explicit finite witness, and local recovery from one zero-initialized
+degree-\(L\) truncated-response vector at the sharp width \(D=\nu_{d,L}\).
+The preceding audit entries, counts, hashes, environments and the 8 September
+actual-response addendum remain historical records; this addendum does not
+reinterpret them as checks performed today. Current repository HEAD is
+1280c84f27e3a02c5ed1a2c8dba73c8789eadf57.
+
+### Authority, proof and preserved scope
+
+The authoritative sources are [the Hall-rank proof note](intrinsic_hall_rank_theorem.md)
+and [its exact finite certificate](intrinsic_hall_rank_certificate.json).
+The latter's SHA-256 is
+2bf2c8b57057619e98c36ab516d4535cd748aa12cdd3d9b3c5e2e026c53d6388.
+The manuscript's self-contained proof follows the note: grading-derived
+affine identities with the existing bracket sign, finite tanh jets,
+graded ideal quotients including \(D<d\), inactive padding for \(D>\nu\),
+and a nontrivial analytic minor in all weights and biases at state zero.
+
+The main theorem has no computational dimension cap. The finite witness
+uses actual parameters \(A_i=-\Lambda_{e_i}\), \(b_i=q e_i\), with
+\(q=\operatorname{atanh}(1/2)\); no limiting parameter or numerical rank
+establishes genericity. At width eight the complete matrix is
+\[
+ H_\theta=\tfrac12 I_8-\tfrac1{32}(E_{3,6}+E_{3,8})
+\]
+in Hall order \((1,2,12,112,122,1112,1122,1222)\), with one-based row and
+column indices. The two nonlinear entries are preserved. The actual-jet
+reproducer recomputes them rather than inserting this fixture.
+
+For \(r\ne0\), the derivative of the finite truncated response is
+\(H_\theta\operatorname{diag}(r^{\deg H_a})\). The selected projection has
+a local analytic inverse when \(D\geq\nu\). Invariance of domain supplies
+the matching scalar-output lower bound for an open Hall-coordinate
+domain. Neighborhoods depend on parameters and scale. This is Object B;
+it gives no exact full-CDE endpoint inverse, global inverse, trained
+linear readout, conditioning guarantee, or genericity for singular
+sampling families. The nonlinear action is applied to finite full-tensor
+representatives, not assumed to factor through the nilpotent quotient.
+
+The scalar homogeneous and rank-seven **function** certificates, normalized
+ideal jets, eight-output scalar truncated inverse/stability, scalar
+approximate recovery from eight actual CDE responses, and the larger-width
+all-word independence theorem retain their separate proofs and constants.
+The scalar exact sections, actual-response theorem and financial section
+are textually preserved. Of 108 original displayed-math/table blocks,
+106 are retained literally; the only replaced blocks are the notation
+table and the explanatory dependency diagram. The existing word proof and
+fixed-zero word corollary are preserved, with their architecture definition
+moved earlier. No scalar or word certificate value is changed.
+
+### Bounded primary-source comparison
+
+The checked locators and versions used in the integrated discussion are:
+
+- [Burde, author PDF dated 1 March 2011](https://homepage.univie.ac.at/dietrich.burde/papers/burde_24_pre_lie.pdf),
+  Section 3.1, Proposition 3.3 and Corollaries 3.4–3.5, printed pages 14–16;
+  journal metadata: *Central European Journal of Mathematics* 4(3):323–357
+  (2006). The nonsingular-derivation affine/pre-Lie construction is classical.
+- [Glückstad–Muça Cirone–Teichmann, arXiv:2502.03163v1](https://arxiv.org/html/2502.03163v1),
+  5 February 2025, still the current arXiv version checked: Section 3.3.2,
+  Remark 3.10, Theorem 4.1 and Section 5. Projected tree terms remain distinct
+  from complete summed fields; no refutation of their complete reconstruction
+  theorem or independently verified depth-two width comparison is asserted.
+  Scale-derivative access in the reconstruction proof is identified explicitly.
+- [Bailleul–Diehl, arXiv:1407.2768v3](https://arxiv.org/pdf/1407.2768v3),
+  14 November 2014, Theorem 6, printed page 7. The reconstruction matrix
+  includes the one-state case and degree-two brackets, for its small-time
+  rough-flow observation model.
+- [Biagini–Gonon–Walter, arXiv:2406.10214v2](https://arxiv.org/pdf/2406.10214v2),
+  6 September 2024: Sampling Scheme 4, Assumption 6, Lemma 7 and
+  Proposition 9 in Section 2.1 (PDF pages 5–6, 6, 6 and 9). The PDF numbering
+  is used because the HTML numbering differs. Their structured discrete-time
+  model includes an injective finite-datastream memory block and a terminal
+  increment linear-readout approximation result; it is not described as
+  approximation alone or equated with the full biased-tanh Hall-rank model.
+
+The contribution language distinguishes the classical machinery from the
+finite-jet tanh realization and the specific observation theorem. No worldwide
+priority claim is added.
+
+### Checks performed in this integration
+
+From the repository root, both commands completed successfully without
+writing certificates:
+
+~~~text
+python -B research_output/reproduce_intrinsic_hall_rank.py
+python -B research_output/reproduce_certificate.py
+~~~
+
+The new reproducer passed all 17 persisted exact cases, including the six
+full-width references \((d,L,\nu)=(2,2,3),(2,3,5),(2,4,8),(2,5,14),
+(3,3,14),(3,4,32)\), quotient and padding cases, and edge cases.
+The scalar reproducer confirmed determinants
+\(-1/4,-1/2,-45/256,135/8192\) and product \(-6075/16777216\), and also
+verified its generated note. That note required one added scope paragraph;
+the identical paragraph was added to its existing prose template in
+reproduce_certificate.py so the byte-for-byte comparison remains valid.
+No computation, validation logic, or certificate data in that script changed.
+
+Static checks found **113 unique manuscript labels**, no duplicate labels,
+no unresolved references, **17 bibliography entries** with no missing
+citations, and balanced braces and environments. Local Markdown links and
+anchors and the displayed reproduction/test paths were checked against the
+current repository. Scoped whitespace checks passed. Repository-wide
+git diff --check still reports **804 pre-existing** trailing-whitespace
+entries, confined to rsmc/__init__.py, rsmc/hedging.py, and
+tests/test_hedging.py. Those files and AGENTS.md were not changed.
+Content hashes confirm preservation of the existing exact JSON artifacts,
+research implementations and tests, apart from the stated generated-prose
+template. No experiment, new implementation, full test campaign, staging,
+commit, push, alternate manuscript or certificate regeneration was performed.
+
+The completed implementation stage's 38 focused, 135 affected-existing and
+271 full-suite passing tests remain documented in the authoritative note;
+they are **not new test runs for this prose integration**.
+
+No pdflatex, latexmk, lualatex, xelatex or tectonic executable was
+found in the Windows environment or WSL Ubuntu. Thus the canonical source
+was **not compiled in this stage**, and PDF page layout, visual overflow,
+and compiler diagnostics remain unverified. Static syntax checks do not
+substitute for those checks. The manuscript records a twice-run build
+command using paper/build when an engine is available. There is no
+unresolved mathematical obstruction identified in this integration; the
+remaining validation limitation is compilation and visual inspection.
+
+## Final independent Hall-rank audit — 13 September 2026
+
+**Verdict: VERIFIED within the stated scope; upgrade complete.** This entry
+records new checks of the current repository, independently of the preceding
+reviews. Their dates, counts, hashes and Stage 3 build limitation remain
+historical records. No central mathematical or implementation defect was found.
+
+The grading conjugation and cocycle give the affine homomorphism with the
+repository bracket sign, hence evaluation \(cH\), not \(c^{\deg H}H\).
+The finite-jet weight argument gives zero components above the Hall degree
+and diagonal blocks \(I/2\), while permitting lower-degree nonlinear
+components. The discarded subspace is a graded ideal, including partial
+top grades and \(D<d\); padding and the \(d=1,L=1\) edge cases are valid.
+No nonlinear quotient action or vanishing discarded Hall columns is inferred.
+The selected minor is analytic and nontrivial at the fixed state zero in
+the full weight-and-bias space. Its zero set need not equal the rank-deficient
+locus. The derivative of the truncated polynomial response is
+\(H_\theta\operatorname{diag}(r^{\deg H_a})\). Its local inverse, or projected
+inverse, for each fixed \(r\ne0\) and the open-domain dimensional lower bound
+have the stated hypotheses. Neither this proof nor the finite checks give
+an exact full-CDE inverse, singular-law genericity, linear-readout theorem,
+or parameter-uniform stability.
+
+### Findings and corrections
+
+- **Substantive wording/source scope, fixed:** the scalar actual-response
+  estimate guarantees consistency when observation error and exact iteration
+  residual are \(o(h^4)\); it does not prove pointwise necessity. The manuscript
+  and technical note now restrict Biagini–Gonon–Walter Proposition 9 to
+  continuous functions of preterminal history \(x_1,\ldots,x_{T-1}\).
+  The word note's remaining unqualified depth-two comparison now distinguishes
+  projected tree terms from complete summed fields and does not claim a
+  refutation of the complete reconstruction theorem.
+- **Cross-references and prose, fixed:** current overviews and the word/Hall
+  notes locate the fixed-zero word corollary in the canonical manuscript,
+  label `cor:zero`. The relocated finance paragraph says “in this paper.”
+  The Bailleul–Diehl link in the Hall note is pinned to the checked version.
+- **Layout, fixed:** `eq:dets` is split without changing values; certificate
+  paths are breakable and listed separately. A further small overflow in the
+  Hall-label paragraph was removed. Inline shell commands retain their spaces.
+  All 120 pre-audit displayed-math/table blocks remain, with only `eq:dets`
+  reformatted; the other 119 are literally preserved.
+
+Primary PDFs were independently opened and checked: [Burde's author version
+dated 1 March 2011](https://homepage.univie.ac.at/dietrich.burde/papers/burde_24_pre_lie.pdf),
+Section 3.1, Proposition 3.3 and Corollaries 3.4–3.5, pages 14–16;
+[Bailleul–Diehl v3](https://arxiv.org/pdf/1407.2768v3), Theorem 6, page 7;
+[Glückstad–Muça Cirone–Teichmann v1](https://arxiv.org/pdf/2502.03163v1),
+Lemma 3.4, Proposition 3.6, Section 3.3.2, Remark 3.10 and Theorem 4.1;
+and [Biagini–Gonon–Walter v2](https://arxiv.org/pdf/2406.10214v2),
+Sampling Scheme 4, Assumption 6, Lemma 7 and Proposition 9 (PDF page 9;
+the preterminal restriction is also explicit on page 10). The classical
+affine/pre-Lie attribution and bounded observation-model comparisons are
+supported. This check does not establish originality or publication acceptance.
+
+### Commands and preservation
+
+The following commands were executed successfully in this audit:
+
+~~~text
+python -B research_output/reproduce_intrinsic_hall_rank.py
+python -B research_output/reproduce_certificate.py
+python -B research_output/reproduce_graded_reconstruction.py
+python -B research_output/reproduce_finite_observation.py
+python -B research_output/reproduce_local_stability.py
+python -B research_output/reproduce_tensor_witness.py
+python -B -m pytest -q -p no:cacheprovider
+~~~
+
+All **17 full persisted Hall matrices, selected minors and payloads** matched,
+including all six requested full-width reference cases, quotients, padding
+and edge cases. An independent direct symbolic Jacobian-bracket calculation
+from the actual eight-dimensional tanh fields recovered
+\(I_8/2-(E_{3,6}+E_{3,8})/32\), determinant \(1/256\), in the recorded Hall
+order. A tampered payload with unchanged rank and determinant was rejected
+without changing the certificate's bytes or modification time. Independent
+tests cover bracket signs, the full small truncated-map Jacobian at scales
+\(0,1,1/3,-2\), and the normalized tanh coefficient \(-17/315\).
+The full suite passed **271 tests in 127.32 seconds**, using Python 3.13.3,
+pytest 9.1.1 and SymPy 1.14.0. All five legacy reproducers passed, including
+the scalar generated-note comparison. No certificate was regenerated.
+
+The central Hall argument and width-eight computation were independently
+rederived here. Legacy scalar homogeneous/cross-degree, eight-observation,
+stability and word certificates were checked for preservation and reproduced;
+the existing scalar actual-response estimate was checked for consistent
+scope, without rerunning its numerical validation. No finance experiment ran.
+Content hashes confirm that all implementation, test and certificate files,
+AGENTS.md and unrelated work are unchanged from this audit's starting state.
+Edits are confined to the canonical TeX, technical note, reconstruction
+summary, word theorem note, Hall theorem note and this audit, plus normal
+LaTeX outputs in `paper/build`. No staging, commit or push was performed.
+
+Static checks found 113 unique labels and 17 bibliography entries, with no
+missing references or citations; local document links resolve. Scoped
+whitespace checks passed. The required global `git diff --check` was run
+and still fails on **804 pre-existing trailing-whitespace entries** in
+`rsmc/__init__.py` (53), `rsmc/hedging.py` (410), and
+`tests/test_hedging.py` (341). Those files were left untouched.
+
+### Canonical PDF verification
+
+No installed Windows or WSL engine was initially available. A portable
+Tectonic 0.17.0 executable was obtained from its official release, checked
+against the release SHA-256, and kept outside the repository. The final
+PowerShell build command used the available font configuration:
+
+~~~powershell
+$env:FONTCONFIG_FILE = 'C:/Users/petar/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/poppler/Library/etc/fonts/fonts.conf'
+& (Join-Path $env:TEMP 'codex-hall-audit-tectonic-0.17.0/tectonic.exe') --keep-logs --keep-intermediates --outdir paper/build paper/randomized_signature_identifiability.tex
+~~~
+
+Tectonic reran TeX until references settled; the build was repeated after
+layout fixes. The final local build (`paper/build/randomized_signature_identifiability.pdf`,
+regenerable from the tracked TeX source using the command above)
+has **37 pages**. All pages were rendered and visually inspected, including
+the main proof, fraction-heavy appendices, continuation pages and references;
+the final changed page was inspected again after rebuilding. There are no
+overfull boxes, unresolved references, missing citations or material visible
+clipping. The log retains an innocuous UTF-8-engine `inputenc` warning and
+one underfull bibliography paragraph (badness 1048), which is readable on
+inspection. These are not mathematical or PDF-verification blockers.
+
+## Literature revision — 13 September 2026
+
+The literature findings in the supplied rigorous_paper_audit.pdf were
+checked against the current canonical source and the primary texts below.
+The earlier audit entries remain historical records. Their literature
+comparison omitted three relevant antecedents; mathematical verification
+does not certify novelty or publication significance.
+
+- [Monzio Compagnoni et al., arXiv:2201.00384v3](https://arxiv.org/pdf/2201.00384v3):
+  Definition II.5 and Theorem IV.1 were checked. The same shallow biased
+  architecture and its asserted generic Hörmander argument are now credited,
+  without equating unrestricted spanning with maximal Hall rank at a
+  prescribed cutoff or adopting the broad analytic-activation claim.
+- [Cuchiero–Larsson–Teichmann, arXiv:1908.07838v2](https://arxiv.org/pdf/1908.07838v2):
+  Theorem 5.1, Corollary 5.4, Example 5.5 and Lemma 6.1 were checked.
+  The manuscript credits witness-and-analytic-minor methodology and
+  distinguishes the activation family with polynomial specializations
+  from fixed tanh. Its interpolation summary states the dimension,
+  generic-data and trained-control/readout qualifications.
+- [Grong–Vega-Molino, arXiv:2403.08090v3](https://arxiv.org/html/2403.08090v3):
+  Remark 3.2 explicitly contains the scalar constant/tanh pair and
+  polynomial/Vandermonde argument. Attribution is added beside the scalar
+  witness and in related work. The prescribed-degree certificates and
+  state-scale inverse remain separate results.
+
+The abstract, introduction, contribution summary, related work, conclusion
+and affected technical/theorem summaries now focus on the explicit finite
+tanh realization, exact prescribed-degree minors and local truncated
+inverse. No claim rests on absence of a located precedent or a defect in
+another paper. No new theorem, architecture, application or research
+direction was introduced.
+
+The portfolio citation now gives the publisher-verified Quantitative
+Finance 25(2):197–216 (2025), DOI 10.1080/14697688.2025.2458613.
+The derivation note's Friz–Victoir draft locators are corrected to printed
+pages 142–143 and 144–145 for Theorems 7.28 and 7.30. The conditional
+remark after the control-projection proposition now explicitly requires
+conditional centering and finite conditional moments, with conditional
+means/moments used in the formula. The numbered proposition is unchanged.
+
+All three requested full texts and relevant locators were accessible and
+checked. This was a bounded literature revision, not a fresh verification
+of every historical source or experiment. Source-specific read-only
+reviewers also checked the revised comparisons.
+
+Validation: the portable Tectonic build command recorded above was run
+after the edits and again after the final qualifications; TeX reran until
+references settled. The canonical build has 38 pages, with no overfull
+boxes or unresolved references/citations. The affected front matter,
+scalar attribution, conditional remark, related work, conclusion,
+appendices and references were visually inspected. Only the previously
+recorded inputenc and readable underfull-bibliography warnings remain.
+Static checks found 113 unique labels and 20 bibliography entries.
+All 120 displayed-math/table blocks and all 52 theorem/proof blocks are
+unchanged from this revision's starting source. Relative links and scoped
+whitespace checks passed. The global whitespace gate still reports the
+same 804 pre-existing entries in the three untouched finance files.
+Implementations, tests, certificate data and AGENTS.md were preserved;
+no tests or experiments were rerun for these document-only changes.
+
+## Mathematical scope and evidence revision — 13 September 2026
+
+This review independently checked Sections 6, 7.3–7.4, 8.3 and 9 of the
+supplied rigorous_paper_audit.pdf against the latest canonical manuscript
+and available repository material. The preceding runs, counts, timings
+and review conclusions remain historical records.
+
+**Conditional projection.** The previous revision already supplies the
+necessary conditional centering, so that remark was retained. Apply the
+sample-split unbiasedness argument coordinatewise to the predictable
+terminal controls: it gives \(\mathbb E[Q\mid\mathcal T]=0\).
+The projection proposition's \(Q,G_N\in L^2\) assumptions give finite
+conditional second moments almost surely. Evaluation/training independence
+also gives \(\mathbb E[G_N\mid\mathcal T]=p_N\). This does not require
+\(Q\) itself to be independent of training. Without conditional centering,
+the corresponding identity would have to use conditional covariances.
+The audit's Rademacher counterexample to the old unconditional-only reading
+is valid, but does not contradict the current corrected remark.
+
+**Affine scaling.** Set \(S_\epsilon(y)=\epsilon y\), \(c=1/2\), and
+\(V_i^\epsilon(x)=\tanh(\epsilon ce_i-\Lambda_{e_i}x)\). These are actual
+admissible fields at every finite nonzero \(\epsilon\). The pullbacks are
+\[
+U_i^\epsilon=S_\epsilon^*V_i^\epsilon
+=\epsilon^{-1}\tanh(\epsilon W_{e_i}^c).
+\]
+Writing \(\tanh t=t+t^3g(t)\), with \(g\) analytic near zero, shows
+\(U_i^\epsilon=W_{e_i}^c+O(\epsilon^2)\) in every fixed finite derivative
+order on compact neighborhoods. This uses a local finite-jet argument,
+not an infinite-radius expansion. The chain rule with the repository
+bracket sign gives, inductively for every Hall element,
+\[
+\rho_{V^\epsilon}(H)(\epsilon y)
+=\epsilon\,\rho_{U^\epsilon}(H)(y).
+\]
+Thus the factor is one \(\epsilon\), independent of Hall degree.
+Brackets through length \(L\) use jets through order \(L-1\); their
+pullback evaluation matrix tends to \(cI_\nu\). Consequently the original
+matrix has determinant \(\epsilon^\nu(c^\nu+o(1))\), nonzero for small
+finite positive \(\epsilon\). The existing graded quotient gives the
+analogous \(D\)-minor below full width, and padding preserves the
+\(\nu\)-minor above it. The manuscript adds only a short explanatory
+paragraph relating this qualitative observation to the classical action.
+It is not attributed to a prior publication and does not replace the
+explicit \(q\)-witness, its exact graded blocks or selected determinants.
+
+**Recovery and quantitative scope.** The current claims already separate
+ideal jets, the central local truncated inverse in the full biased family,
+and the eight-response scalar approximation. No unsupported endpoint,
+sampling-law, linear-readout or finance-performance extension was found.
+Independent rational arithmetic confirms \(A=3402\),
+\(C=409087045009408/21220001406063\), and
+\(\kappa=1748210800969/4105988734976\). At \(M=1,h=1/2048\), the noiseless
+upper-bound term is approximately \(32.02393349\), and the response-error
+coefficient is \(3.39148677\times10^{14}\). The manuscript now uses these
+figures to explain the certificate's limits: they neither measure actual
+error nor prove numerical failure, and asymptotic consistency alone does
+not certify useful finite-precision accuracy. No scalar constant is
+transferred to the Hall-width construction. The supplied audit's 70/100-digit
+path calculations and the repository's recorded 80/120-digit validation
+are distinct evidence sets; neither was rerun in this review.
+
+**Empirical evidence.** All eleven displayed RMSE values match the local
+June-note extraction. Exact arithmetic on the printed decimals gives gap
+ratios \(183595/199317\) and \(328414032/368020345\), hence
+\(92.11206269\%\) and \(89.23800993\%\). This verifies the reported rounding,
+not the experiment. Source inspection confirms predictable prefixes,
+training-standardization reversal and intercept omission in the current
+control implementation. Code, tests, certificates and the June-note
+extraction exist locally; the extraction is untracked. No run-specific
+data or fitted-model artifact establishing the displayed hedging values
+was located. The existing demo log concerns a different pricing run.
+The manuscript now states available evidence and the reproduction limit
+explicitly. Attachment-only omissions do not establish that historical
+execution claims are false, and present arithmetic does not authenticate
+their dates or counts.
+
+**Checks in this review.** In-memory Python Fraction calculations checked
+the constants and table ratios above. No test suite, certificate
+regeneration or experiment ran. The portable Tectonic command recorded
+above compiled the canonical source after edits and reran until references
+settled. The final build has 39 pages; affected pages and continuations
+were rendered and inspected, with no overfull boxes or unresolved
+references/citations. The existing readable underfull bibliography and
+inputenc warnings remain. All 120 displayed-math/table blocks and all
+52 theorem/proof blocks are preserved. Scoped whitespace and reference
+checks passed; the global whitespace gate retains the same 804 unrelated
+entries. Only the canonical TeX and this audit record were edited, besides
+normal build outputs. The other notes already agree with these corrections.
+
+## Final consistency check — 13 September 2026
+
+The latest canonical manuscript, authoritative Hall note, current supporting
+notes, supplied rigorous audit and available verification material were
+compared. The main theorem's assumptions and proof agree: fixed-zero Hall
+rank in the full biased parameter family, with local inversion only for the
+truncated polynomial observation. Conditional centering, the affine scaling
+argument, the separate scalar actual-response bound and the revised
+literature comparisons remain correct. Independent review also derived the
+two width-eight nonlinear entries directly from the tanh components.
+No theorem, equation, matrix entry or certificate required correction.
+One stale directional reference in the relocated finance section was changed
+from "studied below" to "studied in this paper."
+
+Checks executed in this final review, distinct from the historical runs:
+
+- `python -B research_output/reproduce_intrinsic_hall_rank.py`: all 17
+  exact cases passed full deterministic payload comparison.
+- `python -B research_output/reproduce_local_stability.py`: the design,
+  Jacobian, inverse, variation bound and common-scale identities passed.
+- The supplied `check_intrinsic_width.py` was read from
+  `randomized_signature_novelty_verification.zip` and executed in memory;
+  all six outputs matched its supplied expected JSON. Its unrelated
+  financial-extension script was not run.
+- `exact_setup()` from `validate_actual_response_recovery.py` passed its
+  existing exact scaling, Hall/tensor and word-polynomial checks. Fresh
+  Fraction calculations confirmed the revised bound figures and both
+  finance percentages. No high-precision path run, financial experiment
+  or full test suite was repeated.
+- All eleven matrix blocks in the available older layout-bundle source
+  are retained. That source predates the Hall upgrade. The exact Stage-3
+  source snapshot and separate reproduction bundle named in the rigorous
+  audit were not located, so a complete textual comparison with that
+  snapshot is not claimed.
+- Static checks found 113 unique labels, 20 bibliography entries, no
+  unresolved references/citations, and 53 resolving relative file links
+  across the checked notes. Scoped `git diff --check` passed.
+
+The portable Tectonic command recorded above compiled the canonical source
+and settled references, including after the final wording correction.
+All 39 rendered pages were visually inspected. The changed page was
+inspected again after rebuilding; subsequent rendered pages were unchanged.
+There are no overfull boxes or material layout defects. The existing
+inputenc warning and readable underfull bibliography paragraph remain.
+Only the canonical TeX, this appended record and normal build outputs
+changed; implementations, tests, certificates and earlier records were
+preserved.
+
+**Status:** the scoped consistency check and exact reproductions pass.
+The revised primary-source comparisons were checked, but this does not
+certify originality; unchanged Reutenauer book locators were not newly
+authenticated in this review. Finance arithmetic is verified, while
+run-specific data/model provenance and experimental reproduction remain
+unverified. Missing audit attachments do not disprove historical execution
+records. No unresolved mathematical or layout defect was found in the
+revisions checked here.

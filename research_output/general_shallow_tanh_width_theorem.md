@@ -1,10 +1,27 @@
 # Generic finite-degree word-field independence for shallow componentwise-tanh vector fields at an explicit sufficient state dimension
 
-This note addresses one architecture question only: whether an explicit
-sufficient state dimension guarantees generic finite-degree word-field
-independence for shallow componentwise-tanh vector fields. It neither uses nor
-proves a CDE reconstruction theorem. The existing scalar theorem and its
-reconstruction and stability consequences remain separate.
+This note proves generic finite-degree word-field independence for shallow
+componentwise-tanh vector fields at an explicit sufficient state dimension.
+It neither uses nor proves a CDE reconstruction theorem. The existing scalar
+theorem and its reconstruction and stability consequences remain separate.
+
+The central [fixed-state Hall-rank theorem](intrinsic_hall_rank_theorem.md)
+now establishes generic rank \(\min(D,\nu_{d,L})\) at zero in the full
+biased shallow-tanh family, where \(\nu_{d,L}\) is the total Hall dimension
+through degree \(L\). It gives dimension-optimal local recovery near
+zero Hall coordinates from one degree-\(L\) truncated terminal vector at
+a fixed nonzero scale when \(D\geq\nu_{d,L}\). That Hall-family result
+does not prove independence of all \(Q_{d,L}=\sum_{m=1}^L d^m\) nonempty
+word responses at width \(\nu_{d,L}\). The word-family theorem below
+retains its sufficient threshold \(D_0(d,L)=\sum_{m=0}^L d^m\), proof,
+and full conclusion.
+
+The separate fixed-zero word-evaluation corollary is in the
+[canonical manuscript](../paper/randomized_signature_identifiability.tex),
+label \(\texttt{cor:zero}\). It translates the witness and keeps a
+nonempty-word minor; the known empty signature coefficient is not an
+additional unknown. References to that corollary elsewhere refer to the
+manuscript, not to a further theorem proved in this note.
 
 ## 1. Precise setting
 
@@ -873,8 +890,10 @@ This conclusion is qualitative. It gives no conditioning estimate; the fixed
 determinant may deteriorate rapidly with \(d\) and \(L\); and it supplies no
 parameter-uniform neighborhood or stability constant. The theorem gives the
 explicit sufficient state dimension \(D_0(d,L)\), which is only a conservative
-sufficient width, and proves no width lower bound. In particular, it does not
-address compressed state dimensions \(D\ll d^L\).
+sufficient width, and proves no width lower bound for the word-family
+objective. In particular, it does not establish word-field independence in
+compressed state dimensions \(D\ll d^L\). The sharp Hall-rank threshold
+of the separate fixed-state theorem concerns a different observation family.
 
 ## 6. Extension to every \(D>D_0(d,L)\)
 
@@ -1105,7 +1124,8 @@ The conclusion is qualitative and finite-degree. Precisely:
   system need not factor through the free step-\(L\) nilpotent quotient;
 - no tree-level independence statement is made;
 - \(D_0(d,L)\) is the explicit sufficient state dimension and only a
-  conservative sufficient width; no width lower bound is proved;
+  conservative sufficient width for the word-family result; no width lower
+  bound for that objective is proved;
 - no exact or numerical admissible nonzero \(\epsilon\) is certified by the
   general proof;
 - no conditioning estimate is obtained, and the determinant may deteriorate
@@ -1113,7 +1133,8 @@ The conclusion is qualitative and finite-degree. Precisely:
 - no parameter-uniform neighborhood or stability constant is proved;
 - the inactive-coordinate extension gives no expressivity monotonicity or
   lower bound in \(D\);
-- the compressed regime \(D\ll d^L\) is untouched;
+- word-field independence in the compressed regime \(D\ll d^L\) is
+  untouched by this proof;
 - no ranking against a depth-two or any other architecture is asserted; and
 - no actual full-CDE reconstruction, discrete-time reconstruction, finance
   consequence, or parameter-uniform stability statement is made.
@@ -1215,15 +1236,20 @@ finite-degree word-field independence for
 \(F_w^\theta=\Gamma_\theta(w)\operatorname{Id}\); it does not prove
 tree-level independence.
 
-They construct depth-two nested-exponential vector fields with exponential
-activation for which their tree-level condition holds through level \(L\) when
-their hidden-state dimension \(N\) satisfies \(N\geq L-1\). That symbol \(N\)
-is analogous to the state dimension \(D\) here and is unrelated to either the
-word count \(Q_{d,L}\) or the intrinsic Hall count \(N_{d,L}\). Their no-depth
-analysis also exhibits a tree-level dependence obstruction for the classical
-shallow bias-free form \(V_i(x)=\sigma(A_i x)\). This does not contradict the
-present word-level result, because failure of tree-level independence does not
-imply failure of word-level independence.
+Their Section 3.3 presents depth-two nested-exponential vector fields and
+claims that its tree condition holds through level \(L\) when the hidden
+dimension \(N\) satisfies \(N\geq L-1\), with positive dimension understood.
+That \(N\) denotes their state dimension and is distinct from the counts here.
+The intermediate independence assertion for direction-resolved projected
+tree terms in version 1 requires qualification: dependence among individual
+projected terms does not decide independence of the complete summed tree
+fields. The claimed depth-two width is therefore not used here as an
+independently verified comparison bound or a proof premise.
+
+Their Remark 3.10 concerns direction-resolved tree terms for shallow
+bias-free fields \(V_i(x)=\sigma(A_i x)\). Dependence at that level does
+not imply dependence of the word-response fields studied here. These
+qualifications do not refute the complete reconstruction theorem.
 
 Their Remark 3.7 also gives a universal finite-dimensional iterated
 word-operator relation: for
@@ -1242,15 +1268,33 @@ depth-two construction and the present shallow componentwise-tanh construction
 use different architectures and different independence conditions; no ranking
 between them is asserted.
 
-### 8.4 Constrained contribution statement
+### 8.4 Rank and control antecedents
 
-The targeted primary-source audit identified no prior proof of this
-finite-degree shallow componentwise-tanh word-field independence and
-genericity result at the stated sufficient width.
+[Monzio Compagnoni et al., arXiv v3](https://arxiv.org/pdf/2201.00384v3),
+Definition II.5 and Theorem IV.1, use the same shallow biased fields and
+assert generic Hörmander spanning in a Brownian-density argument.
+[Cuchiero–Larsson–Teichmann, arXiv v2](https://arxiv.org/pdf/1908.07838v2),
+Theorem 5.1 and Lemma 6.1, give a witness-and-analytic-minor argument for
+generic interpolation. Their activation-family corollary requires
+linear/quadratic specializations; it does not prove a fixed-tanh theorem.
+[Grong–Vega-Molino, arXiv v3](https://arxiv.org/html/2403.08090v3),
+Remark 3.2, use the scalar constant/tanh pair and polynomial brackets for
+landmark controllability. These are relevant antecedents for rank,
+genericity and the scalar witness. None of these statements is
+independence of the full finite word-response family considered here.
 
-The result is technically new but conceptually expected and serves as the
-general structural theorem supporting the direct Hall-coordinate
-identifiability package. No priority claim is made.
+### 8.5 Constrained contribution statement
+
+The result here is the explicit normalized tensor-to-tanh transfer and
+finite-degree word-response independence at the stated sufficient width.
+It uses established linear representations and analytic-minor genericity.
+Absence of a matching statement in the sources checked, or a qualification
+of an earlier proof, does not establish priority.
+
+This result supplies a general word-family theorem supporting the
+Hall-coordinate identifiability package. The separate fixed-state theorem
+supplies its sharper Hall-specific rank and one-vector local truncated
+recovery statement. No priority claim is made.
 
 ## 9. Relation to the existing \(d=2,D=1,L\leq4\) result
 
@@ -1266,8 +1310,16 @@ For the homogeneous-injectivity objective, the comparison with \(D=1\) shows
 that \(D_0(2,4)=31\) is a conservative sufficient width. It does not give
 a smaller state dimension for the stronger finite-degree word-field
 independence conclusion of Theorem 7.1. Its certified cross-degree relation is
-therefore consistent with the present theorem. The two results complement
-rather than replace one another.
+therefore consistent with the present theorem.
+
+The fixed-state Hall-rank theorem gives a third, distinct conclusion. For
+\(d=2,L=4\), one width-eight vector of truncated observations suffices
+locally near zero Hall coordinates, whereas this word construction uses
+\(D_0=31\) to certify all \(Q=30\) nonempty word responses. The scalar
+witness keeps its eight designed observations, exact stability constants,
+and subsequent approximate actual-response theorem under a BV
+total-variation bound and small common scale. Neither those quantitative
+constants nor that object-C theorem are transferred to the new Hall map.
 
 ## 10. Final status
 

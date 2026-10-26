@@ -22,6 +22,17 @@ of every homogeneous map \(\rho_{\theta,m}\). It does not prove that arbitrary
 shallow-tanh architectures satisfy that premise. The second result is an
 embedding theorem: the added coordinates are inactive at the witness.
 
+The central [fixed-state Hall-rank theorem](intrinsic_hall_rank_theorem.md)
+is established separately. Writing \(\nu_{d,L}=N_{d,L}\) for the total Hall
+dimension used below, it proves generic rank \(\min(D,\nu_{d,L})\) at
+initialization zero in the full biased shallow-tanh parameter space. When
+\(D\geq\nu_{d,L}\), it supplies homogeneous injectivity and the stronger
+conclusion of local Hall-coordinate recovery near zero from one
+degree-\(L\) truncated terminal vector at any fixed nonzero scale. Its
+sharp dimension threshold concerns that one-vector observation model.
+The conditional proof and the scalar embedding below retain their own
+assumptions and constants; neither is replaced by a new proof here.
+
 Three observation objects are used and kept distinct:
 
 - **A. Ideal normalized graded scale jets**, obtained by differentiating the
@@ -32,6 +43,12 @@ Three observation objects are used and kept distinct:
   scale, which contains all homogeneous levels.
 
 Nothing below identifies object B at nonzero scale with object C.
+For the existing scalar witness and eight designed experiments, the
+[canonical manuscript](../paper/randomized_signature_identifiability.tex),
+Theorem `thm:actual`, separately proves approximate object-C recovery under
+a BV total-variation bound at sufficiently small common scale. Its explicit
+remainder and decoder estimates are not estimates for the new fixed-state
+Hall map.
 
 ## Part I. General setting and repository conventions
 
@@ -793,9 +810,12 @@ such that
 \tag{41}
 \]
 
-The design is existential and representation-dependent. No fixed generic
-design, quantitative radius, or parameter-uniform stability constant is
-deduced for arbitrary \(d,D,L\). This local inverse concerns the truncated
+The design obtained from this conditional argument is existential and
+representation-dependent. The argument gives no fixed generic design,
+quantitative radius, or parameter-uniform stability constant for arbitrary
+\(d,D,L\). The separate fixed-state theorem gives a fixed-zero,
+single-scale vector observation when \(D\geq\nu_{d,L}\), also without a
+quantitative stability constant. The local inverse here concerns the truncated
 finite-scale map B only; it is not an inverse for the actual full CDE response
 C.
 
@@ -822,9 +842,12 @@ domain would make the image open in \(\mathbb R^{N_{d,L}}\), but the image
 lies in an \(M\)-dimensional coordinate plane with empty
 \(N_{d,L}\)-dimensional interior.
 
-This counts scalar codomain dimensions only. It is not a lower bound on
-distinct runs, initial states, scale values, or vector-valued observations,
-and it is not a universal measurement-minimality claim.
+This counts total scalar codomain dimension. It is not a lower bound on the
+number of distinct runs, initial states, scale values, or vector-valued
+observations, and it is not a universal measurement-minimality claim. For
+one \(D\)-dimensional truncated terminal vector it requires
+\(D\geq N_{d,L}\); the separate fixed-state Hall-rank theorem attains
+this bound for local recovery near zero.
 
 ## Part IV. Lifting the exact scalar witness to every state dimension
 
@@ -1206,6 +1229,16 @@ All coordinates after the first are inactive at the block witness.
 The lifting proves no ungraded direct-sum injectivity; at the block witness it
 fails by (51a).
 
+### Separate fixed-state theorem
+
+The [authoritative fixed-state note](intrinsic_hall_rank_theorem.md) proves
+generic maximal Hall evaluation rank for every finite \(d,D,L\) in the
+full biased parameter family. For \(D\geq\nu_{d,L}\), the resulting
+one-vector local inverse of object B is dimension-optimal. Its witness has
+different parameters from the scalar embedding. The scalar mixed-degree
+relation and exact constants above therefore remain valid without constraining
+that separate witness or transferring its quantitative estimates.
+
 ## Standard results requiring citation
 
 The following inputs are standard and should be cited in a paper version.
@@ -1253,9 +1286,13 @@ The underlying frozen scalar statements remain those in the
 [local-stability theorem](local_stability_theorem.md); this note neither
 rewrites nor weakens them.
 
-No unconditional homogeneous-injectivity theorem for arbitrary
-\((d,D,L)\) is proved here. No generic explicit observation design and no
-quantitative stability theorem are proved for arbitrary \((d,D,L)\).
+The general reconstruction theorem in this note remains conditional; it does
+not assert homogeneous injectivity for unrestricted \((d,D,L)\). The
+separate fixed-state theorem supplies a generic sufficient condition at
+\(D\geq\nu_{d,L}\), and the sufficient-width word theorem supplies its
+stronger word-family conclusion at its existing threshold. No quantitative
+stability theorem for arbitrary \((d,D,L)\) follows from these qualitative
+generic-rank statements.
 
 ## Final status
 
@@ -1264,4 +1301,5 @@ quantitative stability theorem are proved for arbitrary \((d,D,L)\).
 | Arbitrary-\(L\) ordered-composition and triangular scale-jet identities under the stated \(C^L\)/BV hypotheses | **PROVED** |
 | Arbitrary-\((d,D,L)\) reconstruction, finite truncated observation, and local inverse under homogeneous injectivity (25) | **CONDITIONALLY PROVED** |
 | State-dimension lifting of the exact \(d=2,\ L\leq4\) scalar tanh witness to every \(D\geq1\) | **PROVED** |
-| Unconditional homogeneous free-Lie injectivity for arbitrary shallow-tanh \((d,D,L)\) | **NOT PROVED** |
+| Unconditional homogeneous free-Lie injectivity for arbitrary shallow-tanh \((d,D,L)\), without a width or injectivity hypothesis | **NOT PROVED** |
+| Generic fixed-zero rank \(\min(D,\nu_{d,L})\) and dimension-optimal one-vector local truncated recovery at \(D\geq\nu_{d,L}\) | **VERIFIED in the separate authoritative note** |

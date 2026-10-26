@@ -10,6 +10,15 @@ tanh witness
 q=\frac{\log 3}{2},\qquad V_1(x)=\tanh x,\qquad V_2(x)=\frac12.
 \]
 
+The separate [fixed-state Hall-rank theorem](intrinsic_hall_rank_theorem.md)
+gives generic rank \(\min(D,\nu_{d,L})\) at zero in the full biased
+shallow-tanh family, where \(\nu_{d,L}\) is the total Hall dimension through
+degree \(L\), and, for \(D\geq\nu_{d,L}\), dimension-optimal local
+recovery near zero Hall coordinates from one truncated terminal vector at
+a fixed nonzero scale. That qualitative result has no certified radius or
+conditioning constant. None of the scalar design's exact constants below
+is asserted for the new vector map.
+
 All word, tensor, Hall-basis, operator-order, bracket-sign, and factorial
 conventions are those proved in
 `research_output/graded_reconstruction_derivation.md`.  The fixed ordered
@@ -322,6 +331,16 @@ degree-five-and-higher truncation discrepancy may be inserted into
 No such bound is proved here, and both coordinate vectors must already be in
 the certified cube.
 
+The subsequent theorem “Approximate recovery from actual responses”
+(`thm:actual`) in the
+[canonical manuscript](../paper/randomized_signature_identifiability.tex)
+provides the separate fifth-order remainder bound for this scalar witness and
+all eight experiments at sufficiently small common scale, under a known BV
+total-variation bound. Its clipped decoder is defined for every observation
+vector and gives explicit approximate-recovery bounds, including observation
+noise and iteration residual. That additional proof resolves the corresponding
+object-C approximation problem without asserting an exact full-CDE inverse.
+
 ## 6. Common-scale inverse-linearization amplification
 
 Let \(h\ne0\) and replace the base design scales \(r_j\) by \(hr_j\).  Denote
@@ -406,7 +425,7 @@ The theorem assumes and proves exactly the following:
 The rational certificate proves inequalities for all real Hall coordinates in
 the cube; it is not limited to rational coordinate vectors.
 
-The theorem does **not** establish:
+The quantitative theorem proved in this note does **not by itself** establish:
 
 - stability or inversion of the actual full CDE response, which contains
   levels five and above;

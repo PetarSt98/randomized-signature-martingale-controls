@@ -261,6 +261,25 @@ python scripts/lie_rank_atlas.py single --architecture shallow_biased_tanh --inp
 python scripts/lie_rank_atlas.py full
 ```
 
+The separate mathematical module now proves generic fixed-zero Hall evaluation
+rank `min(D, nu)` for shallow biased-tanh fields in the full parameter space,
+where `nu` is the number of Hall coordinates through degree `L`. Its finite
+grading witness has selected minor `2^(-min(D,nu))`. Thus `D=nu` is the sharp
+width for local recovery from one vector of the **degree-L truncated polynomial
+response**. This does not assert exact recovery from an actual CDE endpoint
+or a result for the implemented discrete recurrence. The
+[authoritative theorem note](research_output/intrinsic_hall_rank_theorem.md)
+contains the proof; the [current overview](research_output/technical_note.md)
+also distinguishes the preserved scalar eight-response results and the
+separate sufficient-width word theorem. The
+[manuscript](paper/randomized_signature_identifiability.tex) includes the full
+proofs and the scalar actual-response error bound. Reproduce the 17 finite exact witness
+checks without writing artifacts:
+
+```bash
+python -B research_output/reproduce_intrinsic_hall_rank.py
+```
+
 `scripts/control_variates_demo.py` is written with `# %%` cell markers, so you can open it in
 Cursor / VS Code (or Jupyter) and run it cell by cell like a notebook.
 `DEFAULT_SIZES`, `SMOKE_SIZES`, `DEFAULT_N_STEPS`, `RESERVOIR_DIMS`,

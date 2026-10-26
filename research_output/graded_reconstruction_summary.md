@@ -1,328 +1,140 @@
-# Graded reconstruction and finite truncated observation
+# Fixed-zero Hall rank and local truncated recovery
 
-## Contribution
+## Main result
 
-This package establishes one theorem package for a scalar, two-input shallow
-biased-tanh reservoir through homogeneous degree four. Its proof dependencies
-branch rather than form one linear implication chain:
+Fix positive integers \(d,D,L\), and let \(\nu=\nu_{d,L}\) be the
+number of Hall/log-signature coordinates through degree \(L\). For
+componentwise shallow biased-tanh fields
+\[
+V_i(x)=\tanh(A_ix+b_i),\qquad i=1,\ldots,d,
+\]
+the degree-ordered Hall evaluation matrix satisfies
+\[
+\operatorname{rank}[\rho(H_1)(0)\ \cdots\ \rho(H_\nu)(0)]
+=\min(D,\nu)
+\]
+outside a Lebesgue-null analytic exceptional set in the **full** parameter
+space \(\mathbb R^{d(D^2+D)}\). Initialization is fixed at zero. The result
+holds almost surely under jointly absolutely continuous parameter laws;
+bias-free, tied, sparse or other singular laws are not covered automatically.
+
+When \(D\geq\nu\), one zero-initialized vector of the **degree-\(L\)
+truncated polynomial response** locally determines all Hall coordinates
+near zero, at any fixed nonzero input scale. At \(D=\nu\), the whole vector
+has a local analytic inverse; for \(D>\nu\), a selected \(\nu\)-coordinate
+projection does. The inverse neighborhood may depend on parameters and scale.
+Invariance of domain rules out continuous local injectivity from an open
+\(\nu\)-dimensional Hall-coordinate domain into \(D<\nu\) outputs.
+Thus \(D=\nu\) is sharp for this one-vector truncated observation model.
+
+The specific contribution is the finite-parameter tanh realization and its
+exact prescribed-degree Hall minors. Generic Lie spanning and the use of
+analytic evaluation determinants have precedents; the scalar constant/tanh
+pair also predates this work. The source comparison below separates these
+antecedents from the present finite-degree statement.
+
+## Why the rank statement is proved
+
+Identify the free step-\(L\) Lie algebra with its Hall coordinates, write
+\(e_i\) for its generators, and let \(\mathcal E\) multiply grade \(m\)
+by \(m\). The finite witness at width \(\nu\) is
+\[
+\Lambda_a=\mathcal E^{-1}\operatorname{ad}_a\mathcal E,\qquad
+V_i(x)=\tanh(qe_i-\Lambda_{e_i}x),\qquad q=\operatorname{atanh}(1/2).
+\]
+The classical affine action \(a/2-\Lambda_ax\) preserves the repository
+bracket. A finite weighted-jet argument gives a block upper triangular
+Hall matrix with diagonal blocks \(I/2\). Lower-grade off-diagonal entries
+can be nonzero: the full matrix need not equal \(I/2\).
+
+Graded ideal quotients cover \(D<\nu\), including \(D<d\); inactive
+coordinates cover \(D>\nu\). In every case the selected square minor is
+exactly \(2^{-\min(D,\nu)}\). This is an admissible finite tanh witness,
+not a limiting field or a numerical rank sample. Analyticity of that fixed
+minor in all weights and biases yields genericity.
+
+The [authoritative theorem note](intrinsic_hall_rank_theorem.md) contains
+the complete proof, the local inverse and dimension lower bound, and the
+precise attribution of the affine construction to Burde. Finite exact checks
+support the implementation; they do not replace the general proof.
+
+## Three observation objects
+
+- **A. Ideal scale jets:** normalized derivatives
+  \(J_m=(1/m!)\partial_r^mY_T^{y,r}(X)|_{r=0}\).
+- **B. Truncated responses:** the finite polynomial retaining tensor word
+  length, equivalently Hall weighted degree, through \(L\).
+- **C. Actual CDE responses:** the full reservoir flow, including higher
+  levels beyond the truncation.
+
+The new one-vector inverse concerns B. It does not establish exact recovery
+from one actual full-CDE endpoint at fixed nonzero scale, a linear-readout
+approximation, global inversion, or practical conditioning.
+
+## Preserved scalar results
+
+For \(d=2,D=1,L=4\), the separate witness
+\(V_1(y)=\tanh y\), \(V_2(y)=1/2\) has exact nonzero homogeneous
+certificates in every degree through four. Its eight Hall fields nevertheless
+have cross-degree function rank seven, so homogeneous injectivity is not
+joint injectivity. The scalar witness and certificates are unchanged.
+
+Homogeneous injectivity supports recursive Hall recovery from A and,
+separately, joint state-scale independence for B. The existing eight-output
+design uses initial states \(-q,0,q\) and scales \(1,2,3\). Its local
+truncated inverse has an exact rational stability certificate on the cube
+of radius \(R_*=1/2048\), with inverse bound \(C_*\). The
+[technical overview](technical_note.md) records the scalar determinants,
+ordered design and constants, and links to the complete matrices and proofs.
+
+The existing actual-response theorem additionally gives **approximate**
+recovery from those same eight experiments. For a continuous BV path with
+\(X_0=0\) and total component variation at most \(M\), let
+\[
+D_h=\operatorname{diag}(h,h,h^2,h^3,h^3,h^4,h^4,h^4),\qquad
+(c_1,c_2,c_3,c_4)=(1,1,1,13/12).
+\]
+Require \(0<h\leq1\) and \(c_m(hM)^m\leq R_*\) for every \(m\leq4\).
+Only \(D_hz(X)\), not the unscaled coordinates, must lie in the cube.
+For the existing pairs \((y_j,r_j)\), put
+\(b_h(X)_j=Y_T^{y_j,hr_j}(X)-y_j\). With response error
+\(\|e\|_\infty\leq\delta\), and the existing clipped decoder \(G\),
+\[
+\|b_h(X)-\Phi(D_hz(X))\|_\infty\leq3402h^5M^5,
+\qquad
+\|D_h^{-1}G(b_h(X)+e)-z(X)\|_\infty
+\leq C_*(3402M^5h+\delta h^{-4}).
+\]
+Finite iteration has a separate residual bound; response-fit error and
+roundoff are also distinct. These scalar estimates do not transfer to the
+new general Hall map. The [actual-response audit addendum](paper_mathematical_audit.md#2026-09-08-approximate-recovery-from-eight-actual-cde-responses)
+records the proof assumptions and deterministic validation.
+
+## Separate word theorem and reproduction
+
+The [sufficient-width word theorem](general_shallow_tanh_width_theorem.md)
+and the fixed-zero corollary in the
+[canonical manuscript](../paper/randomized_signature_identifiability.tex)
+(label \(\texttt{cor:zero}\)) prove generic independence of all
+\(Q_{d,L}=\sum_{m=1}^L d^m\) nonempty word responses, at sufficient width
+\(D\geq D_0(d,L)=\sum_{m=0}^L d^m\). The Hall theorem does not establish
+independence of that larger family at width \(\nu\). For \(d=2,L=4\),
+these counts are \(\nu=8\), \(D_0=31\) and \(Q=30\).
+
+The authoritative note gives the narrow comparison with existing
+reconstruction references. [Monzio Compagnoni et al.](https://arxiv.org/pdf/2201.00384v3)
+are a same-architecture bracket-generation antecedent.
+[Cuchiero–Larsson–Teichmann](https://arxiv.org/pdf/1908.07838v2) supply
+analytic-minor genericity methodology for interpolation.
+[Grong–Vega-Molino](https://arxiv.org/html/2403.08090v3), Remark 3.2,
+already use the scalar constant/tanh pair for landmark controllability.
+These results do not specify the exact finite-degree Hall matrix here.
+Classical affine machinery is attributed, and projected tree terms remain
+distinct from complete summed fields. No worldwide priority, new general
+reconstruction principle, or financial-performance consequence is claimed.
+
+Reproduce the 17 finite exact witness checks without writing artifacts:
 
 ```text
-homogeneous Lie injectivity
-|-- ideal graded reconstruction (object A)
-`-- joint state-scale independence
-    `-- explicit eight-output design (object B)
-        `-- exact zero Jacobian B_*
-            |-- local analytic inverse
-            `-- quantitative stability from exact B_*^{-1} and Delta(R)
+python -B research_output/reproduce_intrinsic_hall_rank.py
 ```
-
-The shallow-tanh theorem supplies a concrete generic family satisfying the
-homogeneous-injectivity premise. Graded reconstruction and joint state-scale
-independence are sibling consequences of that premise. Quantitative stability
-comes from the exact inverse and Jacobian-variation majorant, not from the
-analytic inverse function theorem.
-
-The package deliberately distinguishes three observation objects:
-
-- **A. Ideal graded jets:** the normalized derivatives of the response to the
-  scaled input path $rX$ at $r=0$, degree by degree.
-- **B. Degree-four truncated response:** the finite-scale polynomial obtained
-  by retaining homogeneous degrees one through four.
-- **C. Actual full CDE response:** the reservoir-flow response, which also
-  contains terms of degree at least five.
-
-Graded reconstruction concerns A. The eight-output inverse and quantitative
-stability theorems concern B. No result below identifies B with C.
-
-## Homogeneous injectivity and graded reconstruction
-
-For
-
-\[
-V_i^\theta(x)=\tanh(a_i x+b_i),\qquad
-\theta=(a_1,b_1,a_2,b_2)\in\mathbb R^4,
-\]
-
-on a scalar state space, with two input letters and bracket convention
-
-\[
-[V,W]=DW\,V-DV\,W,
-\]
-
-the restrictions
-
-\[
-\rho_m:\mathcal L_{2,m}\longrightarrow\mathfrak X(\mathbb R)
-\]
-
-are simultaneously injective, separately for each $m=1,2,3,4$, for
-Lebesgue-almost every $\theta$. The exact nonvanishing witness is
-
-\[
-q=\frac{\log 3}{2},\qquad
-\theta_*=(1,0,0,q),\qquad
-V_1(x)=\tanh x,\quad V_2(x)=\frac12.
-\]
-
-This is a homogeneous statement and does not assert injectivity on the
-ungraded direct sum.
-
-The reconstruction criterion is logically separate from this concrete tanh
-theorem. For continuous bounded-variation inputs (in particular, continuous
-piecewise-$C^1$ inputs) and known $C^4$ scalar vector fields satisfying the
-local solution hypotheses, define the ideal normalized scale jets by
-
-\[
-J_m(y;X)=\frac1{m!}\left.\partial_r^mY_T^y(rX)\right|_{r=0}.
-\]
-
-If every homogeneous restriction $\rho_m$ is injective, then the intrinsic
-Hall coordinates of the homogeneous log-signature components
-$\ell_1,\ldots,\ell_4$ are recovered recursively from finitely many such jets. The
-triangular identity is
-
-\[
-J_m(y;X)
-=\rho(\ell_m)(y)
-+\Psi_m(y;\ell_1,\ldots,\ell_{m-1}),
-\]
-
-so, at the certified degree-specific states,
-
-\[
-\lambda_m
-=M_m^{-1}\bigl(\mathbf J_m-\boldsymbol\Psi_m\bigr).
-\]
-
-In deterministic degree-then-Lyndon order, the exact witness matrices are
-
-\[
-M_1\big|_{(0,q)}=
-\begin{pmatrix}
-0&1/2\\
-1/2&1/2
-\end{pmatrix},\qquad
-M_2\big|_{(0)}=
-\begin{pmatrix}-1/2\end{pmatrix},
-\]
-
-\[
-M_3\big|_{(-q,q)}=
-\begin{pmatrix}
-15/32&3/16\\
-15/32&-3/16
-\end{pmatrix},
-\]
-
-and
-
-\[
-M_4\big|_{(-q,0,q)}=
-\begin{pmatrix}
--57/128&-3/32&3/64\\
--1/2&0&1/4\\
--57/128&3/32&3/64
-\end{pmatrix}.
-\]
-
-Their exact determinants are, respectively,
-
-\[
--\frac14,\quad -\frac12,\quad -\frac{45}{256},\quad
-\frac{135}{8192},
-\]
-
-and their exact inverses drive the certified triangular decoder. Thus the
-general homogeneous-injectivity criterion becomes an exact decoder for the
-concrete tanh witness.
-
-## Eight-output degree-four truncated observation
-
-The Hall-coordinate dimensions in degrees one through four are
-
-\[
-2+1+2+3=8.
-\]
-
-Let $z\in\mathbb R^8$ be ordered degree by degree and let $\Phi$ denote the
-degree-four truncated observation polynomial for the ordered state-scale
-design
-
-\[
-\mathcal D_*=\bigl(
-(-q,1),
-(-q,2),
-(-q,3),
-(0,2),
-(0,3),
-(q,1),
-(q,2),
-(q,3)
-\bigr).
-\]
-
-The eight outputs are eight state-scale experiments applied to the same
-unknown truncated Hall-coordinate vector. The exact zero-signature Jacobian
-$B_*=D\Phi(0)$ satisfies
-
-\[
-\det B_*=-\frac{258733035}{524288}\ne0.
-\]
-
-Consequently, at the witness, there are neighborhoods $U$ of $z=0$ and $W$ of
-$\Phi(0)$ such that $\Phi|_U:U\to W$ is a real-analytic diffeomorphism. This is
-a local statement for the truncated polynomial, not global invertibility.
-
-Keeping the same states and scales fixed, the zero-signature determinant is a
-nontrivial real-analytic function of the four shallow-tanh parameters.
-Therefore the same fixed design has an invertible zero-signature Jacobian for
-Lebesgue-almost every parameter vector. The inverse neighborhood and its
-stability constants may depend on the parameter and may degenerate near the
-analytic determinant-zero set. The explicit constants below are for the
-certified witness $\theta_*$.
-
-The output count is dimension-matched in a precise topological sense: if
-$U\subset\mathbb R^8$ is open and $M<8$, no continuous map
-$U\to\mathbb R^M$ can be locally injective. This is a dimension lower bound
-for continuous local injectivity on an open Hall-coordinate domain, not a
-claim of universal measurement minimality.
-
-## Cross-degree and scale structure
-
-At the witness, the eight represented Hall fields through degree four have
-cross-degree function rank exactly seven. Their exact relation is
-
-\[
-\rho\!\left(
-4[X_1,X_2]
-+3[X_1,[X_1,X_2]]
-+2[[[X_1,X_2],X_2],X_2]
-\right)=0.
-\]
-
-Thus homogeneous injectivity does not become ungraded injectivity, and an
-all-at-one-nonzero-scale design is singular. A successful eight-output design
-requires multiple scales; within the certified three-state grid, three
-distinct scales are required and $\mathcal D_*$ uses scales 1, 2, and 3.
-
-Under a common nonzero scale multiplier $h$, the degree multiplicities
-$(2,1,2,3)$ give
-
-\[
-\det B(h)=h^{22}\det B(1).
-\]
-
-The exact inverse row-sum formula further yields
-
-\[
-\lVert B(h)^{-1}\rVert_\infty
-=\Theta(|h|^{-4})
-\qquad\text{as }h\to0.
-\]
-
-This is inverse-linearization amplification for the degree-four truncated
-map, not exact condition-number scaling.
-
-## Quantitative local stability
-
-For the witness and the fixed design $\mathcal D_*$, exact coefficient-sum control of
-$D\Phi(z)-B_*$, using the vector infinity norm and its induced matrix norm,
-gives
-
-\[
-R_*=\frac1{2048},\qquad
-\lVert B_*^{-1}\rVert_\infty=\frac{23812}{2151},
-\]
-
-\[
-c_*=\frac{21220001406063}{409087045009408},\qquad
-C_*=\frac{409087045009408}{21220001406063}.
-\]
-
-For every $z,z'\in\mathbb R^8$ satisfying
-
-\[
-\lVert z\rVert_\infty,\ \lVert z'\rVert_\infty\le\frac1{2048},
-\]
-
-the degree-four truncated observation obeys
-
-\[
-\lVert\Phi(z)-\Phi(z')\rVert_\infty
-\ge c_*\lVert z-z'\rVert_\infty,
-\]
-
-and hence
-
-\[
-\lVert z-z'\rVert_\infty
-\le C_*\lVert\Phi(z)-\Phi(z')\rVert_\infty.
-\]
-
-The radius $R_*$ is the largest passing radius in the prescribed dyadic
-certificate list under the chosen coefficient-sum majorant. It is a
-conservative certified radius and is not claimed to be sharp, truly maximal,
-or the largest possible stable radius.
-
-## Related work and novelty boundary
-
-The closest prior work identified is Glückstad, Muça Cirone, and Teichmann,
-[*Signature Reconstruction from Randomized Signatures* (2025)](https://arxiv.org/html/2502.03163v1).
-It reconstructs finite tensor-signature levels from CDE/randomized-signature
-observations under a word/tree-level linear-independence condition. Its proof
-uses a scale parameter, differentiation at zero, homogeneous-level separation,
-and finite initial-state selection, and its explicit positive construction
-uses depth-two exponential vector fields.
-
-Section 5 identifies direct recovery in compressed log-signature/Lie
-coordinates as a further direction. Where its tensor-signature reconstruction
-theorem applies, the corresponding truncated log-signature can also be
-obtained indirectly through the classical tensor logarithm.
-
-Bailleul and Diehl's
-[*The Inverse Problem for Rough Controlled Differential Equations* (2015)](https://doi.org/10.1137/140995982)
-establishes important prior art for inverse controlled/rough differential
-equations. Free-Lie and Hall--Lyndon algebra, signature/log-signature algebra,
-tensor exponential and logarithm, and Chen--Fliess expansions are classical.
-
-Accordingly, no originality is claimed here for scale/Taylor arguments,
-homogeneous-level separation, finite initial-state selection, inverse-CDE
-problems, or ordinary tensor-signature reconstruction.
-
-Relative to the closest prior work identified, this package works directly
-with homogeneous free-Lie coordinates for the scalar shallow biased-tanh
-architecture and establishes the exact witness, the fixed dimension-matched
-eight-output truncated design, fixed-design genericity, and an exact
-quantitative local inverse-Lipschitz certificate. This comparison delimits the
-proved contribution and is not a literature-priority claim.
-
-## Scope and limitations
-
-The exact result concerns object B, the degree-four truncated observation
-polynomial. Object C, the actual full CDE response, contains degree-five and
-higher terms that the present theorem does not control. In particular, the
-package does not establish reconstruction from ordinary full-CDE
-observations.
-
-The genuine limitations are:
-
-- the concrete architecture theorem is restricted to two inputs, scalar
-  state, and degrees at most four;
-- the finite observation theorem is truncated rather than a theorem for the
-  full CDE;
-- stability is local rather than global;
-- the explicit stability certificate is not parameter-uniform;
-- there is no discrete-time theorem;
-- there is no financial theorem; and
-- there is no rough-path extension.
-
-The detailed proofs and exact artifacts are recorded in
-[the homogeneous certificate note](certificate_note.md) and
-[exact certificate](certificate.json),
-[the graded reconstruction derivation](graded_reconstruction_derivation.md),
-[the finite-observation theorem](finite_observation_theorem.md), and
-[the local-stability theorem](local_stability_theorem.md).
-
-## Next mathematical question
-
-Can the degree>=5 full-CDE remainder be bounded sharply enough, on an appropriately bounded path class, to transfer the truncated local stability theorem to actual shallow reservoir-flow observations?

@@ -600,6 +600,13 @@ one through four. It does not prove ungraded cross-degree independence or
 injectivity on the ungraded direct sum, because images from different degrees
 could still cancel.
 
+The separate [sharp fixed-state Hall-rank theorem](intrinsic_hall_rank_theorem.md)
+proves generic rank min(D, nu) in the full biased-tanh parameter space and
+local recovery of the truncated Hall response from one zero-initialized vector
+at D >= nu. It uses a different witness. This scalar certificate and its
+cross-degree scope remain unchanged; none of its constants transfers to that
+construction.
+
 Reproduce with:
 
 ```text

@@ -1,0 +1,2783 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{booktabs,tabularx,array,longtable,enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+\numberwithin{equation}{section}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\DeclareMathOperator{\Id}{Id}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\spanop}{span}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\atanh}{atanh}
+\DeclareMathOperator{\range}{range}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Lie}{\mathcal L}
+\newcommand{\Dop}{\mathcal D}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1\right\rvert}
+\newcommand{\pair}[2]{\left\langle #1,#2\right\rangle}
+\DeclareUrlCommand\file{\urlstyle{tt}}
+\setlength{\emergencystretch}{2em}
+\setlist{itemsep=3pt,topsep=5pt}
+
+\title{Intrinsic Finite-Degree Identifiability of Shallow\\Randomized-Signature Reservoirs}
+\author{}
+\date{13 September 2026}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+For shallow biased componentwise-tanh vector fields with $d$ inputs and
+$D$ state coordinates, we construct an explicit finite-parameter witness
+whose degree-$L$ Hall evaluation matrix at zero has rank
+$\min(D,\nu_{d,L})$. Here $\nu_{d,L}$ is the dimension of the free step-$L$
+Lie algebra. A classical grading-derived affine action and finite weighted
+jets give a block upper triangular tanh Hall matrix with diagonal blocks
+$\tfrac12 I$ and exact selected minors at every width. The established
+analytic-minor method then gives the same rank outside a Lebesgue-null
+analytic exceptional set in the full weight and bias space.
+Consequently, one zero-initialized vector of the
+degree-$L$ truncated response locally determines all Hall coordinates
+when $D\geq\nu_{d,L}$; the width is sharp for continuous local recovery
+from this observation model. This is a statement about a finite
+polynomial, not an exact inverse of a full CDE endpoint.
+Separate supporting results give a scalar two-channel homogeneous
+certificate through degree four, its rank-seven cross-degree obstruction,
+ideal scale-jet reconstruction, and an explicit eight-observation scalar
+truncated inverse with rational stability constants. A finite remainder
+bound extends that scalar decoder to approximate recovery from eight
+actual CDE responses. A larger-width tensor-to-tanh construction proves
+independence of all finite-degree word-response fields. These statements
+have distinct observation assumptions and quantitative content; they
+do not imply a linear-readout theorem or explain the preliminary
+financial experiments that motivated the question.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+A shallow randomized-signature reservoir maps an input path into a state
+vector using fixed nonlinear vector fields. Which intrinsic path
+coordinates can that vector retain? We answer this question for the
+degree-$L$ truncated response, whose unknowns are the
+$\nu_{d,L}$ Hall coordinates of a truncated log-signature. The observation
+is one $D$-dimensional vector at a fixed nonzero input scale, with
+initialization fixed at zero.
+
+Generic bracket generation for this shallow architecture has already been
+studied by Monzio Compagnoni et al.\ \cite{MonzioCompagnoni}.
+Cuchiero, Larsson, and Teichmann \cite{CuchieroLarssonTeichmann} use
+analytic minors of Lie-field evaluations to prove generic interpolation,
+and Grong and Vega-Molino \cite{GrongVegaMolino} use the scalar constant/tanh
+pair for landmark controllability. Here we specify the Hall family through
+a prescribed finite degree and construct exact maximal minors for it.
+The distinction is the finite-degree realization and observation theorem,
+rather than bracket generation or analytic genericity by themselves.
+
+Our main result is the generic rank law
+\[
+ \rank\bigl[\rho_\theta(H_1)(0)\ \cdots\
+                 \rho_\theta(H_{\nu_{d,L}})(0)\bigr]
+ =\min(D,\nu_{d,L})
+\]
+for shallow biased componentwise tanh in the full parameter space.
+The Hall basis is ordered by degree, and $\rho_\theta$ replaces
+generators by vector fields and brackets by vector-field brackets.
+This matrix is the linearization of the truncated response, with
+nonzero degree-dependent scale factors. It yields local analytic
+recovery at width $D\geq\nu_{d,L}$. Invariance of domain rules out a
+continuous locally injective encoding of an open Hall-coordinate
+neighborhood into fewer than $\nu_{d,L}$ real outputs.
+
+The proof uses a classical affine action obtained from an invertible
+grading derivation. We realize its leading weighted terms by actual
+shallow tanh fields at finite parameters. A finite-jet argument preserves
+the diagonal Hall blocks at zero, while allowing nonlinear entries above
+them. Graded quotients supply the smaller-width witnesses, and inactive
+coordinates supply larger widths. The resulting nonzero minor is real
+analytic in all weights and biases. This proves genericity at the fixed
+state directly, without sampling initial states or taking a limiting
+parameter as the witness. The witness-and-analytic-minor method has a
+direct precedent in \cite[Lemma 6.1]{CuchieroLarssonTeichmann}; the
+construction here supplies the prescribed-degree minor for fixed tanh.
+
+\paragraph{Contributions and observation models.}
+The central contribution is the explicit witness and sharp fixed-state
+Hall-rank law in \cref{thm:hallrank}, together with the one-vector local
+truncated inverse in \cref{cor:hallinverse} and its dimensional lower
+bound. Three supporting parts address different questions. First, the
+previously used constant/tanh pair has homogeneous injectivity through
+degree four but joint function rank seven, demonstrating why homogeneous
+information alone need not give fixed-state recovery. Second, ideal
+normalized scale derivatives give a general graded decoder, while a
+designed set of eight scalar truncated observations has an exact local
+stability certificate; a uniform remainder and a clipped decoder give
+approximate recovery from the corresponding eight actual CDE responses.
+Third, a tensor-to-tanh transfer at the larger sufficient width
+$\sum_{m=0}^L d^m$ proves independence of all nonempty word responses
+through length $L$, a larger family than the Hall fields.
+
+We distinguish ideal scale jets (Object A), finite truncated response
+polynomials (Object B), and actual CDE responses (Object C). The new
+one-vector inverse concerns Object B. It inherits neither the scalar
+design's constants nor its actual-response estimate. It also does not
+turn a nonlinear inverse into a trained linear readout.
+
+Preliminary pricing and partial-information hedging experiments
+motivated the representation question: useful history features do not
+by themselves establish preservation of specified path coordinates.
+The existing financial material is retained in \cref{sec:finance} as
+motivation, without a performance implication from the Lie theorems.
+The classical affine construction and the bounded comparison with
+reconstruction and randomized-signature sources are discussed in
+\cref{sec:related}.
+
+\begin{table}[htbp]
+\centering
+\caption{Notation. The symbol $N$ is reserved for a time-step count.}
+\label{tab:notation}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+Symbol & Meaning \\
+\midrule
+$d,D,L,N$ & Input channels, state dimension, truncation level, time steps \\
+$m,r,h,z$ & Homogeneous degree, input scale, common scale multiplier, Hall coordinates \\
+$T(E),T^{\leq L}(E)$ & Tensor algebra and its degree-$L$ truncation, $E=\R^d$ \\
+$\Lie_{d,m},n_m,\nu_{d,L}$ & Homogeneous free-Lie space, its dimension, $\sum_{m=1}^L n_m$ \\
+$H_{m,a},H_a$ & Homogeneous Hall basis and its flattened degree order \\
+$H_\theta$ & Matrix of Hall-field evaluations at the fixed state zero \\
+$\mathcal E,\Lambda_a$ & Grading derivation and $\mathcal E^{-1}\operatorname{ad}_a\mathcal E$ \\
+$\Gamma,\rho$ & Tensor-to-operator homomorphism and Lie-to-vector-field map \\
+$F_w=\Gamma(w)\Id$ & Word-response field, distinct from the operator $\Gamma(w)$ \\
+$S_m,\ell_m$ & Signature and log-signature components of degree $m$ \\
+$J_m$ & Normalized scale jet $(1/m!)\partial_r^mY_T^{y,r}|_{r=0}$ \\
+$F_y^{\leq L}(r;z)$ & Degree-$L$ truncated response polynomial \\
+$B,K,\Delta(R)$ & Scalar-design Jacobian, $\norm{B^{-1}}_\infty$, variation majorant \\
+$D_0,Q_{d,L}$ & $\sum_{m=0}^L d^m$ and $\sum_{m=1}^L d^m$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Algebraic and analytic preliminaries}
+\label{sec:prelim}
+\subsection{Words, signatures, and Hall coordinates}
+Fix integers $d,L\geq1$ and put $E=\R^d$, with ordered basis letters
+$X_1,\ldots,X_d$. A word $w=i_1\cdots i_m$ denotes
+$X_{i_1}\otimes\cdots\otimes X_{i_m}$ and has length $|w|=m$.
+The empty word is the unit $1$. The tensor algebra
+$T(E)=\bigoplus_{m\geq0}E^{\otimes m}$ has concatenation product $uv$.
+Its truncation $T^{\leq L}(E)$ discards products of degree greater than $L$;
+$\pi_m$ is projection onto degree $m$.
+
+For a continuous bounded-variation (BV) path $X:[0,T]\to\R^d$, define
+\begin{equation}\label{eq:signature}
+ S_m(X)=\sum_{i_1,\ldots,i_m}
+ \left(\int_{0<t_1<\cdots<t_m<T}
+ dX_{t_1}^{i_1}\cdots dX_{t_m}^{i_m}\right)i_1\cdots i_m,
+ \qquad S_0(X)=1.
+\end{equation}
+The path and the formal letters share the conventional symbol $X$; their
+roles are distinguished by time subscripts and algebraic expressions.
+The earliest time is on the left. For concatenated paths $X*\widehat X$,
+splitting each integration simplex at the joining time yields Chen's
+identity $S^{\leq L}(X*\widehat X)=S^{\leq L}(X)S^{\leq L}(\widehat X)$.
+For a straight segment with increment $a\in E$, the simplex volume is
+$1/m!$, so its signature is $\sum_{m=0}^L a^m/m!$.
+
+The free Lie algebra $\Lie_d$ is realized as the Lie subalgebra of $T(E)$
+generated by the letters under $[u,v]=uv-vu$. Its homogeneous components are
+$\Lie_{d,m}=\Lie_d\cap E^{\otimes m}$ and
+$\Lie_d^{\leq L}=\bigoplus_{m=1}^L\Lie_{d,m}$. Here the latter notation
+first denotes a vector space. Equipping it with a truncated bracket makes
+the free step-$L$ nilpotent Lie algebra, but the nonlinear vector-field map
+below need not respect that truncated bracket.
+
+A nonempty word is Lyndon if it is lexicographically smaller than all its
+nontrivial cyclic rotations. A letter brackets to itself. A longer Lyndon
+word $w=uv$ brackets as $H_w=[H_u,H_v]$, with $v$ its longest proper Lyndon
+suffix. Order these words by degree and then lexicographically. The
+free-Lie embedding theorem and the Lyndon basis theorem state that this
+construction gives a basis in each degree; its size is
+\begin{equation}\label{eq:witt}
+ n_m=\dim\Lie_{d,m}=\frac1m\sum_{k\mid m}\mu(k)d^{m/k},
+ \qquad \nu_{d,L}=\sum_{m=1}^L n_m,
+\end{equation}
+where $\mu$ is the arithmetic M\"obius function. These are classical inputs
+\cite[Theorems 0.4--0.5, 4.9, Corollary 4.14, Theorem 5.1]{Reutenauer}.
+They apply to our finite ordered alphabet over $\R$. No algebraic freeness
+or basis theorem is inferred from a numerical rank.
+
+Write the ordered degree-$m$ basis as $H_{m,1},\ldots,H_{m,n_m}$. A coordinate
+vector $z=(z_{m,a})\in\R^{\nu_{d,L}}$ represents
+$\ell(z)=\sum_{m=1}^L\ell_m(z)$, where
+$\ell_m(z)=\sum_a z_{m,a}H_{m,a}$. In the truncated algebra define
+\[
+ \exp_\otimes(\ell)=\sum_{k=0}^L\frac{\ell^k}{k!},\qquad
+ \log_\otimes(1+s)=\sum_{k=1}^L\frac{(-1)^{k+1}s^k}{k}.
+\]
+Terms of degree above $L$ are discarded. These inverse finite polynomial
+maps are used only for positive-degree $\ell,s$.
+
+The precise signature realization input needed later is as follows: the
+step-$L$ signature of a continuous BV path belongs to
+$\exp_\otimes(\Lie_d^{\leq L})$, and every element of that group is the
+signature of a piecewise-linear path. In the Friz--Victoir author draft,
+Theorems 7.28 and 7.30 identify this group with products of exponentials of
+degree-one elements \cite{FrizVictoir}. Each such product is realized by
+concatenating straight segments, in the order of \eqref{eq:signature}.
+Consequently $\ell(X)=\log_\otimes S^{\leq L}(X)$ has the coordinates just
+defined. This realization statement concerns unrestricted BV inputs.
+
+\subsection{Operators and represented Lie fields}
+Let $U\subseteq\R^D$ be open and let $V_1,\ldots,V_d$ be smooth vector
+fields on $U$. For a scalar or vector-valued smooth function $f$, put
+$\Dop_Vf=Df\,V$, component by component. Define
+\begin{equation}\label{eq:Gamma}
+ \Gamma(i_1\cdots i_m)=\Dop_{V_{i_1}}\cdots\Dop_{V_{i_m}},
+ \qquad \Gamma(1)=\mathrm{identity\ operator}.
+\end{equation}
+Composition acts on the function to its right; the first letter is the
+outermost operator. Thus $\Gamma(uv)=\Gamma(u)\Gamma(v)$ on the full
+tensor algebra.
+
+For two vector fields the convention is
+$[V,W]=DW\,V-DV\,W$. Direct differentiation gives
+\[
+ (\Dop_V\Dop_W-\Dop_W\Dop_V)f
+ =Df(DW\,V-DV\,W)=\Dop_{[V,W]}f,
+\]
+since the two Hessian terms cancel. The universal property of the free Lie
+algebra therefore defines $\rho:\Lie_d\to\mathcal X(U)$ by
+$\rho(X_i)=V_i$, where $\mathcal X(U)$ is the space of smooth fields with
+this bracket. Induction on brackets proves the operator identity
+\begin{equation}\label{eq:Lieoperator}
+ \Gamma(H)=\Dop_{\rho(H)}\quad(H\in\Lie_d),\qquad
+ \Gamma(H)\Id=\rho(H).
+\end{equation}
+The second equality follows from the first, not conversely. We call
+$F_w=\Gamma(w)\Id$ a \emph{word-response field}; it is a vector-valued
+function, whereas $\Gamma(w)$ is a differential operator. A word-response
+field generally is not itself a represented Lie field.
+
+\begin{definition}[Three independence requirements]
+Homogeneous free-Lie injectivity through degree $L$ means that each
+$\rho_m=\rho|_{\Lie_{d,m}}$ is injective. Injectivity on the truncated
+free-Lie vector space means that $\rho|_{\Lie_d^{\leq L}}$ is injective
+as a linear map. Finite-degree word-response field independence means that
+the family $\{\Gamma(w)\Id:1\leq|w|\leq L\}$ is jointly linearly
+independent over $\R$ as functions on the observation domain.
+\end{definition}
+By the tensor embedding and \eqref{eq:Lieoperator}, the last property implies
+the second, which implies the first. None of these finite statements says
+that represented brackets of degree greater than $L$ vanish.
+
+\subsection{Finite evaluations and analytic arguments}
+\begin{lemma}[Scalar point-coordinate evaluation]\label{lem:evaluation}
+Let $f_1,\ldots,f_s:A\to\R^D$ be linearly independent functions on a
+nonempty set $A$. There exist pairs $(y_j,k_j)\in A\times\{1,\ldots,D\}$,
+$1\leq j\leq s$, such that the matrix
+$(f_a(y_j)_{k_j})_{j,a}$ is nonsingular.
+\end{lemma}
+\begin{proof}
+Let $W$ be their $s$-dimensional span. Scalar point-coordinate evaluations
+are linear functionals on $W$. Their common kernel is zero: a function whose
+every coordinate vanishes everywhere is the zero function. Their span in
+$W^*$ must therefore have dimension $s$, since otherwise its annihilator
+in $W$ would be nonzero. Choose $s$ evaluations forming a basis of $W^*$.
+Their matrix on the given basis of $W$ is nonsingular.
+\end{proof}
+
+\begin{lemma}[Analytic determinant certificate]\label{lem:analytic}
+Let $\Theta$ be a connected open subset of a finite-dimensional Euclidean
+space, and let $f:\Theta\to\R$ be real analytic with $f(\theta_0)\ne0$
+at some point. Then $\{f\ne0\}$ is open, dense, and has full Lebesgue
+measure in $\Theta$.
+\end{lemma}
+\begin{proof}
+Continuity proves openness. At a zero of a nontrivial analytic function,
+some finite derivative is nonzero, by the analytic identity principle on a
+connected domain. A derivative of one lower order vanishes there and has
+nonzero gradient. The zero set is thus covered by the countably many
+regular zero sets of derivatives. Each is locally a smooth hypersurface by
+the implicit function theorem and is Lebesgue null. A countable chart cover
+gives nullity. A null set contains no open ball, proving density. This is
+the analytic zero-set theorem in the form of Mityagin \cite{Mityagin}.
+\end{proof}
+
+\begin{lemma}[Local analytic inverse]\label{lem:inverse}
+Let $F$ be real analytic near $0\in\R^s$ with nonsingular derivative
+$B=DF(0)$. There are neighborhoods of $0$ and $F(0)$ on which $F$ is a
+bijection with real-analytic inverse.
+\end{lemma}
+\begin{proof}
+Translate the image and multiply by $B^{-1}$ to write the map as
+$z+R(z)$ with $R(0)=DR(0)=0$. Its convergent real power series extends
+holomorphically to a small complex ball. Shrink that ball until
+$\sup\norm{DR}\leq1/2$. For sufficiently small $w$, the iteration
+$z_{j+1}=w-R(z_j)$ maps the closed ball into itself and is a contraction.
+It has a unique fixed point, which solves $z+R(z)=w$. The iterates are
+holomorphic in $w$ and converge uniformly on a smaller ball. The uniform
+limit theorem for holomorphic functions gives a holomorphic inverse there.
+Restricting to real $w$ gives the stated inverse; uniqueness also gives
+local injectivity. The neighborhood can depend on every coefficient of $F$.
+\end{proof}
+
+\subsection{The truncated observation and its linearization}
+\begin{definition}[Truncated response: Object B]
+For $z\in\R^{\nu_{d,L}}$, $y\in U$, and $r\in\R$, define
+\begin{equation}\label{eq:truncated}
+ F_y^{\leq L}(r;z)=y+\sum_{m=1}^L r^m
+ \Gamma\bigl(\pi_m\exp_\otimes\ell(z)\bigr)\Id(y).
+\end{equation}
+This is a finite polynomial in $z$ and $r$. A scalar observation selects
+one coordinate at a chosen state and scale.
+\end{definition}
+All products in this definition are first expanded and truncated by
+tensor word length, equivalently by Hall weighted degree. The resulting
+finite representative lies in the full tensor algebra, where $\Gamma$
+is defined; the nonlinear fields need not act on the truncated quotient.
+The empty word has known coefficient one and contributes $\Id(y)=y$.
+At zero it contributes zero, so it is not an additional unknown
+coordinate in any evaluation-rank claim.
+
+Differentiating \eqref{eq:truncated} at $z=0$ eliminates all products of
+two or more Lie factors. For a basis element $H_{m,a}$ its derivative is
+\begin{equation}\label{eq:zero_derivative}
+ \partial_{z_{m,a}}F_y^{\leq L}(r;0)_k
+ =r^m\rho(H_{m,a})(y)_k.
+\end{equation}
+This identity uses the coefficient one of the linear term in the tensor
+exponential. It introduces no additional factorial. The ideal normalized
+scale jets and the actual CDE response will be defined separately in
+\cref{sec:graded}.
+
+\section{Sharp Hall rank at initialization zero}
+\label{sec:hallrank}
+Fix integers $d,D,L\geq1$ and consider the full architecture
+\begin{equation}\label{eq:architecture}
+ V_i^\theta(x)=\tanh(A_ix+b_i),\qquad
+ \theta=((A_i,b_i))_{i=1}^d\in
+ \mathcal P_{d,D}:=\R^{d(D^2+D)},\quad x\in\R^D.
+\end{equation}
+Here $A_i\in\R^{D\times D}$, $b_i\in\R^D$, and tanh acts componentwise.
+Write $\nu=\nu_{d,L}$ and flatten the existing degree-ordered basis as
+$H_1,\ldots,H_\nu$, with $m_a=\deg H_a$. Let
+$\mathfrak g=\bigoplus_{m=1}^L\mathfrak g_m$ be the free step-$L$ Lie
+algebra. For the witness construction we write its generators as $e_i$,
+the images of the formal letters $X_i$. When evaluated on nonlinear
+fields, $H_a$ always means its canonical representative in the full
+free Lie algebra.
+
+\subsection{The grading-derived affine action}
+\begin{lemma}[Affine action from the grading]\label{lem:gradingaffine}
+Let $\mathfrak a$ be a finite positively graded real Lie algebra and
+$\mathcal E|_{\mathfrak a_m}=mI$. For $a\in\mathfrak a$ and $c\in\R$ set
+\[
+ \Lambda_a=\mathcal E^{-1}\operatorname{ad}_a\mathcal E,\qquad
+ W_a^c(x)=ca-\Lambda_ax.
+\]
+Here $\operatorname{ad}_a b=[a,b]$, and matrix brackets use
+$[\Lambda_a,\Lambda_b]=\Lambda_a\Lambda_b-\Lambda_b\Lambda_a$.
+Then $[\Lambda_a,\Lambda_b]=\Lambda_{[a,b]}$,
+$\Lambda_ab-\Lambda_ba=[a,b]$, and, with the convention of
+\eqref{eq:Lieoperator}, $[W_a^c,W_b^c]=W_{[a,b]}^c$.
+\end{lemma}
+\begin{proof}
+Positive grading makes $\mathcal E$ an invertible derivation. Conjugating
+the adjoint commutator proves the first identity. The derivation identity
+gives
+\[
+ \Lambda_ab-\Lambda_ba
+ =\mathcal E^{-1}\bigl([a,\mathcal Eb]+[\mathcal Ea,b]\bigr)=[a,b].
+\]
+As $DW_a^c=-\Lambda_a$, direct substitution gives
+\[
+ [W_a^c,W_b^c](x)
+ =c(\Lambda_ab-\Lambda_ba)
+   +(\Lambda_b\Lambda_a-\Lambda_a\Lambda_b)x
+ =c[a,b]-\Lambda_{[a,b]}x.
+\]
+Thus a Hall element $H$ acts as $W_H^c$ and evaluates to $cH$ at zero.
+For homogeneous $a,b$ of degrees $s,t$, respectively,
+$\Lambda_ab=t[a,b]/(s+t)$.
+\end{proof}
+This is the classical nonsingular-cocycle construction with adjoint
+module and cocycle $\mathcal E$; see Burde
+\cite[Section 3.1, Proposition 3.3, Corollaries 3.4--3.5]{BurdePreLie}.
+The calculation above fixes the vector-field sign used here.
+
+\subsection{A finite-parameter tanh witness}
+\begin{lemma}[Leading Hall blocks of the tanh witness]\label{lem:hallwitness}
+Identify $\mathfrak g$ with $\R^\nu$ in its ordered Hall basis. With
+$c=1/2$ and $q=\atanh(1/2)$, the admissible fields
+\begin{equation}\label{eq:hallwitness}
+ V_i(x)=\tanh(qe_i-\Lambda_{e_i}x)
+\end{equation}
+satisfy, for $H\in\mathfrak g_m$ and grade projection $P_k$,
+\[
+ P_k\rho_V(H)(0)=0\quad(k>m),\qquad
+ P_m\rho_V(H)(0)=cH.
+\]
+Their degree-ordered Hall matrix is block upper triangular with diagonal
+blocks $cI_{n_m}$ and determinant $2^{-\nu}$.
+For a positively graded quotient $\overline{\mathfrak g}$ with a retained
+Hall basis whose generator images are coordinate vectors or zero, the
+same leading-block identities hold on the retained columns, with
+determinant $2^{-\dim\overline{\mathfrak g}}$.
+\end{lemma}
+\begin{proof}
+Give each grade-$k$ coordinate weight $k$. The map $\Lambda_{e_i}$
+raises grade by one. Hence the grade-one field components are the
+constants $ce_i$. Each grade-$k$ component for $k\geq2$ is
+$\tanh(\ell_{i,a}(x))$, where
+$\ell_{i,a}=-(\Lambda_{e_i}x)_a$ is linear in grade-$(k-1)$ coordinates.
+Its linear term agrees with $W_{e_i}^c$.
+
+Only finite jets are needed. With $F_w=\Gamma(w)\Id$, the recursion
+$F_{iv}=DF_v\,V_i$ shows that $F_w(0)$ for $|w|=m$ uses ordinary
+generator derivatives through order $m-1$. Replace the fields by their
+Taylor polynomials through order $L$ at zero. All evaluations through
+length $L$ are unchanged. Apart from the affine terms, these polynomials
+contain only $\alpha_n\ell_{i,a}^{\,n}$ with odd $3\leq n\leq L$.
+No assertion about an infinite-radius Taylor series is needed.
+
+A monomial operator $p(x)\partial_{x_a}$ has weight shift $s-k$ when
+$p$ has weighted degree $s$ and $x_a$ has weight $k$; shifts add under
+composition. Every affine operator term has shift $-1$. Each nonlinear
+term has shift
+\[
+ n(k-1)-k=-1+(n-1)(k-1)\geq1.
+\]
+A length-$m$ word acting on a grade-$k$ coordinate therefore has an
+all-affine contribution of weight $k-m$; any contribution containing a
+nonlinear term has strictly larger weight. Evaluation at zero selects
+weight zero. The value vanishes if $k>m$ and agrees with the affine
+value if $k=m$. Expand a homogeneous Hall element into its length-$m$
+words and apply \cref{lem:gradingaffine} and \eqref{eq:Lieoperator}.
+This gives $cH$ in grade $m$, and the asserted determinant follows.
+The argument is unchanged in the stated graded quotient. Components in
+grades below $m$ can be nonzero; the full matrix need not equal $cI$.
+\end{proof}
+
+\subsection{The rank law in every state dimension}
+\begin{theorem}[Generic sharp fixed-state Hall rank]\label{thm:hallrank}
+For every choice of integers $d,D,L\geq1$, there is a nontrivial real-analytic function
+$f_{d,D,L}$ on the full parameter space $\mathcal P_{d,D}$ in
+\eqref{eq:architecture} such that
+\begin{equation}\label{eq:hallrank}
+ H_\theta=\bigl[\rho_\theta(H_1)(0)\ \cdots\
+                    \rho_\theta(H_\nu)(0)\bigr],\qquad
+ \rank H_\theta=\min(D,\nu)
+ \quad\text{if }f_{d,D,L}(\theta)\ne0.
+\end{equation}
+The function is a fixed maximal-size minor, and an explicit finite
+witness gives $f_{d,D,L}=2^{-\min(D,\nu)}$. Its zero set is Lebesgue
+null. The rank law therefore holds almost surely under any jointly
+absolutely continuous law on all weights and biases.
+\end{theorem}
+\begin{proof}
+For $D=\nu$, use \eqref{eq:hallwitness} and \cref{lem:hallwitness}.
+For $D<\nu$, let $s_p=\sum_{m=1}^p n_m$, with $s_0=0$, choose the
+least $p$ with $s_p\geq D$, and put $t=D-s_{p-1}$. Retain all Hall
+vectors below grade $p$ and the first $t$ in grade $p$. If $U_p$ spans
+the remaining grade-$p$ vectors, then
+\[
+ I=U_p\oplus\bigoplus_{k=p+1}^L\mathfrak g_k
+\]
+is a graded ideal: bracketing a discarded vector with any positive
+grade raises its degree above $p$, or gives zero. Thus
+$\overline{\mathfrak g}=\mathfrak g/I$ has dimension $D$ and the
+retained Hall images form its homogeneous basis.
+
+Construct $\overline{\mathcal E}$ and
+$\overline\Lambda_a=\overline{\mathcal E}^{-1}
+\operatorname{ad}_a\overline{\mathcal E}$ on this quotient and use the
+original $d$ generator labels in
+\[
+ V_i(x)=\tanh(q\overline e_i-
+                    \overline\Lambda_{\overline e_i}x).
+\]
+The retained $D$ Hall columns and all rows have determinant $2^{-D}$
+by \cref{lem:hallwitness}. If $D<d$, this construction retains the
+first $D$ generators and kills the others; the retained fields are
+constant $ce_i$ and the other fields are zero. Thus it also covers
+that case. This argument constructs an ideal quotient before evaluating
+fields, rather than arbitrarily deleting rows of a nonlinear witness.
+Only the selected columns are needed: discarded Hall elements may have
+nonzero nonlinear evaluations. The affine action respects the quotient;
+no such factorization is asserted for the tanh action.
+
+For $D>\nu$, embed \eqref{eq:hallwitness} in the first $\nu$ coordinates
+and set the remaining weights and biases to zero. Word differentiation
+preserves the inactive coordinates. The first $\nu$ rows and all Hall
+columns retain determinant $2^{-\nu}$.
+
+Fix these row and column selections and let $f_{d,D,L}$ be the resulting
+minor for arbitrary $\theta$, always at initial state zero. The fields
+are jointly real analytic in $(\theta,x)$; finite differentiation,
+Hall expansion, evaluation at zero, and a determinant preserve
+analyticity. The finite witnesses show that $f_{d,D,L}$ is nontrivial
+on the connected Euclidean parameter space.
+Lemma~\ref{lem:analytic} gives its open dense full-measure nonzero set.
+There the minor supplies the lower rank bound, and the matrix dimensions
+give the matching upper bound.
+\end{proof}
+The theorem does not automatically apply to bias-free, tied, sparse, or
+other singular parameter laws. Its exceptional set is obtained at the fixed state
+zero, not by taking a slice of a joint parameter--state genericity claim.
+
+\subsection{One-vector local recovery and sharp width}
+\begin{corollary}[Local inverse of the truncated response]\label{cor:hallinverse}
+Fix integers $d,D,L\geq1$ with $D\geq\nu_{d,L}$, and a parameter with
+$f_{d,D,L}(\theta)\ne0$ as in \cref{thm:hallrank}. For each fixed
+$r\ne0$, the map $z\mapsto F_0^{\leq L}(r;z)$ from
+\eqref{eq:truncated} permits local analytic recovery near $z=0$ of all
+$\nu_{d,L}$ Hall coordinates from one zero-initialized vector.
+For $D=\nu_{d,L}$ it has a local analytic inverse; for $D>\nu_{d,L}$
+the selected $\nu_{d,L}$ output-coordinate projection has such an inverse.
+\end{corollary}
+\begin{proof}
+Let $\delta_r\ell(z)=\sum_a r^{m_a}z_aH_a$. The observation is
+\[
+ F_0^{\leq L}(r;z)
+ =\left(\Gamma_\theta\left(
+   \pi_{\leq L}\sum_{j=0}^L
+          \frac{(\delta_r\ell(z))^j}{j!}\right)\Id\right)(0).
+\]
+This is a finite tensor representative and its empty-word contribution
+is zero. By \eqref{eq:zero_derivative},
+\begin{equation}\label{eq:halljacobian}
+ D_zF_0^{\leq L}(r;0)
+ =H_\theta\diag(r^{m_1},\ldots,r^{m_\nu}).
+\end{equation}
+Let $P$ select the rows used in $f_{d,D,L}$, with $P=I$ for $D=\nu$.
+The projected derivative has determinant
+$r^{\sum_a m_a}f_{d,D,L}(\theta)\ne0$.
+Lemma~\ref{lem:inverse} gives neighborhoods $U,\Omega$ of zero in
+$\R^\nu$ and an analytic map $g:\Omega\to U$ with
+$g(PF_0^{\leq L}(r;z))=z$ for $z\in U$.
+For $D>\nu$ this inverts a projection, not a map between open sets of
+unequal dimensions. The neighborhoods may depend on $\theta$ and $r$.
+\end{proof}
+The same nonzero-minor parameter set works for every $r\ne0$, but gives
+no uniform inverse neighborhood or quantitative constant. The conclusion
+concerns Object B; no exact inversion of an actual CDE endpoint or
+linear-readout approximation follows.
+
+\begin{proposition}[Lower bound on scalar outputs]\label{prop:dimension}
+Let $O\subset\R^{\nu_{d,L}}$ be open and nonempty. If a continuous map
+$F:O\to\R^s$ is injective on some nonempty open neighborhood, then
+$s\geq\nu_{d,L}$.
+\end{proposition}
+\begin{proof}
+The invariance-of-domain theorem states that a continuous injective map
+from an open subset of $\R^n$ to $\R^n$ has open image
+\cite[Theorem 2B.3]{Hatcher}. If $s<n=\nu_{d,L}$, restrict to the
+neighborhood of injectivity and append $n-s$ zero coordinates to $F$.
+This is a continuous injective map into $\R^n$. Its image lies in a
+proper linear subspace, which has empty interior, contradicting that
+theorem. All its hypotheses hold because the chosen domain is open and
+the original map is continuous there.
+\end{proof}
+
+Applying \cref{prop:dimension} with $s=D$ and combining it with
+\cref{cor:hallinverse} makes $D=\nu_{d,L}$ the sharp width for
+continuous local recovery of an open Hall-coordinate neighborhood from
+this one-vector truncated observation. This lower bound is not a
+minimum number of runs for multiple-query schemes or a statement about
+restricted path families.
+
+\section{An exact scalar homogeneous theorem}
+\label{sec:scalar}
+Consider two scalar fields
+\begin{equation}\label{eq:scalar}
+ V_i(x)=\tanh(a_ix+b_i),\quad i=1,2,\qquad
+ \theta=(a_1,b_1,a_2,b_2)\in\R^4.
+\end{equation}
+A scalar field is identified with its coefficient multiplying $\partial_x$.
+Set
+\begin{equation}\label{eq:witness}
+ q=\frac{\log3}{2}=\atanh(1/2),\quad
+ \theta_*=(1,0,0,q),\qquad V_1(x)=\tanh x,\quad V_2(x)=1/2.
+\end{equation}
+Up to exchanging generators and rescaling the constant field, this is
+the pair in Grong and Vega-Molino \cite[Remark 3.2]{GrongVegaMolino}.
+Their polynomial bracket argument gives landmark controllability.
+Here we determine homogeneous free-Lie injectivity through degree four
+and the exact mixed-degree relation for this pair; its use as a generator
+pair is not a new construction.
+The ordered Hall elements through degree four are
+\begin{align}\label{eq:Hall8}
+ H_1&=X_1,& H_2&=X_2,\nonumber\\
+ H_3&=[X_1,X_2],&H_4&=[X_1,[X_1,X_2]],\nonumber\\
+ H_5&=[[X_1,X_2],X_2],&H_6&=[X_1,[X_1,[X_1,X_2]]],\nonumber\\
+ H_7&=[X_1,[[X_1,X_2],X_2]],&H_8&=[[[X_1,X_2],X_2],X_2].
+\end{align}
+Their Lyndon words are $1,2,12,112,122,1112,1122,1222$.
+Their degrees are $(1,1,2,3,3,4,4,4)$. In \eqref{eq:Hall8} the aligned arrangement is
+only typographical; the column order is always the numerical subscript.
+
+\begin{theorem}[Scalar homogeneous injectivity through degree four]
+\label{thm:scalar}
+For the architecture \eqref{eq:scalar}, each map
+$\rho_m:\Lie_{2,m}\to\mathcal X(\R)$, $1\leq m\leq4$, is injective
+at \eqref{eq:witness}. There exists an open dense full-Lebesgue-measure
+subset of $\R^4$ on which all four homogeneous maps are injective
+separately. This does not assert injectivity on their direct sum.
+\end{theorem}
+\begin{proof}
+Evaluate the degree-one fields at $(0,q)$, degree two at $0$, degree three
+at $(-q,q)$, and degree four at $(-q,0,q)$. The exact matrices in the
+ordering \eqref{eq:Hall8} are
+\begin{align}\label{eq:Ms}
+ M_1&=\begin{pmatrix}0&1/2\\1/2&1/2\end{pmatrix},&
+ M_2&=\begin{pmatrix}-1/2\end{pmatrix},\nonumber\\
+ M_3&=\begin{pmatrix}15/32&3/16\\15/32&-3/16\end{pmatrix},&
+ M_4&=\begin{pmatrix}
+ -57/128&-3/32&3/64\\-1/2&0&1/4\\-57/128&3/32&3/64
+ \end{pmatrix}.
+\end{align}
+Their entries can be checked by the polynomial bracket recurrence in
+\cref{sec:cross}. Direct determinant expansion gives
+\begin{equation}\label{eq:dets}
+ \begin{gathered}
+ \det M_1=-\frac14,\quad\det M_2=-\frac12,\quad
+ \det M_3=-\frac{45}{256},\quad\det M_4=\frac{135}{8192},\\[4pt]
+ \prod_{m=1}^4\det M_m=-\frac{6075}{16777216}.
+ \end{gathered}
+\end{equation}
+A linear relation among fields in one degree would vanish at its selected
+points, so its coefficient vector would be in the kernel of a nonsingular
+matrix. Thus each homogeneous map is injective at the witness.
+
+For general $\theta$, use the same fixed initial points and the same Hall
+columns to define $M_m(\theta)$. The map $(\theta,x)\mapsto V_i^\theta(x)$
+is real analytic. Finite differentiation and the bracket formula preserve
+joint real analyticity; hence the determinant product is analytic on
+$\R^4$. Its value in \eqref{eq:dets} is nonzero. Apply
+\cref{lem:analytic} to the product. On its nonzero locus all four matrices
+are nonsingular, proving the stated simultaneous homogeneous conclusion.
+\end{proof}
+
+All entries in \eqref{eq:Ms} are rational because $\tanh(0)=0$ and
+$\tanh(\pm q)=\pm1/2$. The points need not be rational to obtain a
+rational certificate. Floating-point conditioning can aid witness discovery
+but plays no role in this proof.
+
+\section{The exact cross-degree obstruction}
+\label{sec:cross}
+Put $u=\tanh x$. If fields have scalar coefficients $P(u)$ and $Q(u)$,
+then $du/dx=1-u^2$ and the bracket coefficient is
+\begin{equation}\label{eq:polybracket}
+ \mathcal B(P,Q)=(1-u^2)(P Q'-P'Q),
+\end{equation}
+where the primes on the right differentiate polynomials in $u$.
+Applying this recurrence to $P_1=u$ and $P_2=1/2$ gives
+\begin{align}\label{eq:P8}
+ P_1&=u,&P_2&=\tfrac12,&P_3&=\tfrac12(u^2-1),\nonumber\\
+ P_4&=\tfrac12(1-u^4),&P_5&=\tfrac12(u^3-u),\nonumber\\
+ P_6&=\tfrac12(3u^6-3u^4+u^2-1),&
+ P_7&=u^3-u^5,&P_8&=\tfrac14(1-4u^2+3u^4).
+\end{align}
+These satisfy $\rho_{\theta_*}(H_j)(x)=P_j(\tanh x)$.
+For example, $\mathcal B(u,1/2)=-(1-u^2)/2$,
+$\mathcal B(u,P_3)=(1-u^4)/2$, and
+$\mathcal B(P_3,1/2)=(u^3-u)/2$. The remaining three brackets are
+$\mathcal B(u,P_4)$, $\mathcal B(u,P_5)$, and
+$\mathcal B(P_5,1/2)$, yielding precisely \eqref{eq:P8}. This gives all
+eight fields and an exact degree bound of six.
+
+\begin{proposition}[Joint rank and complete kernel]\label{prop:cross}
+At $\theta_*$ the map $\rho:\Lie_2^{\leq4}\to\mathcal X(\R)$ has
+rank seven. In the ordering \eqref{eq:Hall8} its kernel is
+\begin{equation}\label{eq:kernel8}
+ \ker\rho|_{\Lie_2^{\leq4}}=
+ \spanop\{4H_3+3H_4+2H_8\}.
+\end{equation}
+\end{proposition}
+\begin{proof}
+The coefficient matrix of \eqref{eq:P8}, with rows indexed by
+$1,u,\ldots,u^6$, is
+\begin{equation}\label{eq:coeffmatrix}
+ C=\begin{pmatrix}
+ 0&1/2&-1/2&1/2&0&-1/2&0&1/4\\
+ 1&0&0&0&-1/2&0&0&0\\
+ 0&0&1/2&0&0&1/2&0&-1\\
+ 0&0&0&0&1/2&0&1&0\\
+ 0&0&0&-1/2&0&-3/2&0&3/4\\
+ 0&0&0&0&0&0&-1&0\\
+ 0&0&0&0&0&3/2&0&0
+ \end{pmatrix}.
+\end{equation}
+The determinant of its first seven columns is $-3/32$, so its rank is
+seven. Multiplication by $(0,0,4,3,0,0,0,2)^\top$ gives zero. The kernel
+is one dimensional by rank-nullity, proving completeness of the relation.
+A polynomial vanishing after substitution $u=\tanh x$ vanishes on
+$(-1,1)$ and is zero. Thus polynomial rank equals function rank.
+\end{proof}
+
+The relation uses degrees two, three, and four. It is consistent with the
+four nonsingular homogeneous matrices. At a common nonzero input scale
+$r$, the linearized Hall response fields are $r^{\deg H_j}P_j(\tanh x)$.
+Their joint rank remains seven, since this multiplies columns by nonzero
+constants. No number of initial-state evaluations at that one scale yields
+a rank-eight zero-coordinate Jacobian. This obstructs a local analytic
+inverse at zero with a nonsingular derivative. A singular derivative alone
+does not prove failure of nonlinear local injectivity.
+
+\section{Graded recovery from ideal scale jets}
+\label{sec:graded}
+\subsection{The observation object and its coefficient formula}
+\begin{assumption}[Smooth fields and BV inputs]\label{ass:smooth}
+The vector fields $V_1,\ldots,V_d$ are known and $C^\infty$ on a nonempty
+open set $U\subseteq\R^D$. The input $X:[0,T]\to\R^d$ is continuous
+and of bounded variation. Observations at an initial state $y\in U$ can
+access input scaling in a neighborhood of zero.
+\end{assumption}
+For sufficiently small real $r$, consider
+\begin{equation}\label{eq:CDE}
+ dY_t^{y,r}=r\sum_{i=1}^dV_i(Y_t^{y,r})\,dX_t^i,
+ \qquad Y_0^{y,r}=y.
+\end{equation}
+The scale changes the input to $rX$, or equivalently multiplies all fields
+by $r$. It is not a rescaling of the solution state with unchanged fields.
+
+\begin{definition}[Ideal normalized scale jets: Object A]
+At an initial state $y$, the degree-$m$ ideal observation is
+\begin{equation}\label{eq:jetdef}
+ J_m(y;X)=\frac1{m!}\left.\partial_r^mY_T^{y,r}(X)\right|_{r=0}.
+\end{equation}
+One scalar jet observation selects one coordinate of this vector.
+\end{definition}
+
+\begin{proposition}[Finite Chen--Fliess coefficient identity]\label{prop:jets}
+Under \cref{ass:smooth}, for each $y\in U$ and finite $L$, the solution
+of \eqref{eq:CDE} exists for all sufficiently small $|r|$ through time $T$,
+depends smoothly on $r$ near zero, and satisfies
+\begin{equation}\label{eq:jets}
+ Y_T^{y,r}=y+\sum_{m=1}^L r^m\Gamma(S_m(X))\Id(y)
+ +O(|r|^{L+1}),\qquad
+ J_m(y;X)=\Gamma(S_m(X))\Id(y).
+\end{equation}
+The solution neighborhood and remainder bound may depend on $y$, $X$, the
+fields, and $L$.
+\end{proposition}
+\begin{proof}
+Choose a closed ball $K=\overline B(y,a)\subset U$. On it all fields are
+bounded by a common $M$ and Lipschitz with a common constant $K_1$ in a
+fixed vector norm. Let $\omega=\sum_i\Var(X^i;[0,T])$. If $\omega=0$
+the solution is constant and the assertion holds. Otherwise choose $|r|$
+so that $|r|M\omega<a$ and $|r|K_1\omega<1$. The integral-equation map
+\[
+ Z\longmapsto y+r\sum_i\int_0^{\cdot}V_i(Z_t)\,dX_t^i
+\]
+maps the closed sup-norm ball of continuous paths centered at $y$ into
+itself and is a contraction. Its fixed point remains in $K$. Shrinking
+the scale interval gives a uniform contraction constant below one.
+The integral map is smooth in the path and scale on a slightly smaller
+ball: each derivative is the integral of a finite derivative of $V_i$
+applied to continuous perturbations, bounded by a compact-state bound
+times $\omega$. Difference quotients of the fixed-point equation converge
+because its linearized operator has inverse given by the uniformly
+convergent Neumann series. Repeating this argument for successive
+derivatives, whose inhomogeneous terms involve only derivatives already
+constructed, proves smooth dependence on $r$ to every fixed finite order.
+
+For a smooth scalar function $f$, the BV chain rule gives
+\[
+ f(Y_t^{y,r})=f(y)+r\sum_i\int_0^t(\Dop_{V_i}f)(Y_s^{y,r})\,dX_s^i.
+\]
+Here the solution has bounded variation because its defining integral is
+bounded by $|r|M\omega$. The chain rule follows by summing the first-order
+Taylor formula along partitions: its error is bounded by a constant times
+the largest oscillation of $Y$ on a partition interval times its total
+variation, and hence tends to zero. This also verifies the chain rule's
+continuity and finite-variation hypotheses in the present setting.
+Substitute this identity successively for the functions
+$\Dop_{V_i}f$. At length $m$, the earliest differential acts on the
+outside, giving the operator ordering in \eqref{eq:Gamma}. After $L$
+substitutions, the remainder is $r^{L+1}$ times a sum over words of length
+$L+1$ of simplex integrals whose integrand is
+$(\Gamma(i_1\cdots i_{L+1})f)(Y_{t_1}^{y,r})$. It is uniformly bounded
+on $K$ for each of the finitely many words. If $C_f$ is their maximum
+absolute bound, the absolute remainder is at most
+\[
+ |r|^{L+1}C_f\frac{\omega^{L+1}}{(L+1)!}.
+\]
+Indeed the sum of total-variation product measures over the ordered simplex
+is $\omega^{L+1}/(L+1)!$; the variation measure is nonatomic because $X$
+is continuous. Apply this calculation to each coordinate of $f=\Id$.
+Smooth scale dependence and uniqueness of finite Taylor coefficients yield
+\eqref{eq:jets}. The factor $1/m!$ in \eqref{eq:jetdef} is exactly the
+Taylor normalization; the iterated integrals already contain their own
+simplex factors.
+\end{proof}
+
+No convergence of an infinite Chen--Fliess series is needed. In particular,
+the estimate proves a finite expansion at zero scale without making the
+higher-degree terms available from a fixed nonzero-scale observation.
+
+\subsection{Triangularity of tensor exponentiation}
+For $\ell=\ell_1+\cdots+\ell_L\in\Lie_d^{\leq L}$ define
+\begin{equation}\label{eq:Psidef}
+ \Psi_m(y;\ell_1,\ldots,\ell_{m-1})=
+ \sum_{k=2}^m\frac1{k!}
+ \sum_{\substack{j_1+\cdots+j_k=m\\j_a\geq1}}
+ \Gamma(\ell_{j_1}\cdots\ell_{j_k})\Id(y),
+ \qquad\Psi_1=0.
+\end{equation}
+Every $j_a$ in this formula is at most $m-1$. We also define the formal
+graded observation at $z$ by
+$J_m^{\rm form}(y;z)=\Gamma(\pi_m\exp_\otimes\ell(z))\Id(y)$.
+
+\begin{lemma}[Homogeneous tensor triangularity]\label{lem:triangular}
+For $1\leq m\leq L$,
+\begin{equation}\label{eq:expgraded}
+ \pi_m\exp_\otimes(\ell)
+ =\sum_{k=1}^m\frac1{k!}
+ \sum_{\substack{j_1+\cdots+j_k=m\\j_a\geq1}}
+ \ell_{j_1}\cdots\ell_{j_k}.
+\end{equation}
+Consequently
+\begin{equation}\label{eq:triangular}
+ J_m^{\rm form}(y;z)
+ =\rho(\ell_m(z))(y)+\Psi_m(y;\ell_1(z),\ldots,\ell_{m-1}(z)).
+\end{equation}
+For actual paths, $J_m^{\rm form}(y;z(X))=J_m(y;X)$.
+\end{lemma}
+\begin{proof}
+Expand each ordered product in $\ell^k=(\sum_j\ell_j)^k$. A term has
+degree $j_1+\cdots+j_k$; positivity of all degrees makes $k\leq m$
+necessary for a degree-$m$ term. This proves \eqref{eq:expgraded}, without
+commuting its factors. The $k=1$ term is $\ell_m$. Apply $\Gamma$ and
+$\Id$, use \eqref{eq:Lieoperator}, and collect $k\geq2$ terms into
+\eqref{eq:Psidef}. The path assertion follows from
+$S^{\leq L}(X)=\exp_\otimes\ell(X)$ and \cref{prop:jets}.
+\end{proof}
+
+For orientation, the positive-degree tensor components through four are
+\begin{align}\label{eq:exp4}
+ S_1&=\ell_1,\nonumber\\
+ S_2&=\ell_2+\tfrac12\ell_1^2,\nonumber\\
+ S_3&=\ell_3+\tfrac12(\ell_1\ell_2+\ell_2\ell_1)
+       +\tfrac16\ell_1^3,\nonumber\\
+ S_4&=\ell_4+\tfrac12(\ell_1\ell_3+\ell_2^2+\ell_3\ell_1)
+ +\tfrac16(\ell_1^2\ell_2+\ell_1\ell_2\ell_1+\ell_2\ell_1^2)
+ +\tfrac1{24}\ell_1^4.
+\end{align}
+These identities also specify the lower-order corrections in the scalar
+decoder without choosing a second tensor convention.
+
+\begin{assumption}[Homogeneous injectivity on the observation domain]
+\label{ass:injective}
+For every $1\leq m\leq L$, the map
+$\rho_m:\Lie_{d,m}\to\mathcal X(U)$ is injective.
+\end{assumption}
+For general smooth fields this hypothesis concerns their restrictions to
+$U$. Independence on a larger domain does not imply independence on every
+smaller open set without an additional continuation property.
+
+\begin{theorem}[Conditional graded Hall reconstruction]\label{thm:graded}
+Under \cref{ass:injective}, there are $n_m$ point-coordinate pairs
+$(y_{m,j},k_{m,j})$ in each nonzero degree $m$ such that the corresponding
+scalar formal observations $J_m^{\rm form}(y_{m,j};z)_{k_{m,j}}$ recover
+every $z\in\R^{\nu_{d,L}}$ recursively and exactly. Thus
+$\nu_{d,L}$ scalar graded observations suffice. Under
+\cref{ass:smooth} the same decoder recovers the truncated log-signature
+of a BV path from its ideal scale jets.
+\end{theorem}
+\begin{proof}
+The represented basis fields in degree $m$ are independent on $U$.
+By \cref{lem:evaluation}, choose the stated pairs so that
+\[
+ E_m=\bigl(\rho(H_{m,a})(y_{m,j})_{k_{m,j}}\bigr)_{j,a=1}^{n_m}
+\]
+is nonsingular. Let $j_m$ collect the observed degree-$m$ scalars, and
+let $\psi_m$ collect the same evaluations of \eqref{eq:Psidef}.
+With $z_m=(z_{m,a})_a$, \eqref{eq:triangular} gives
+\begin{equation}\label{eq:recursive}
+ z_1=E_1^{-1}j_1,\qquad
+ z_m=E_m^{-1}\bigl(j_m-\psi_m(z_1,\ldots,z_{m-1})\bigr).
+\end{equation}
+The right side uses only previously recovered blocks. Induction proves
+existence of the exact decoder and uniqueness of its output for every
+formal coordinate vector. When $n_m=0$ there is no block or observation
+in that degree. Applying the actual-path coefficient identity proves the
+last assertion. No smallness of the formal coordinates is required for
+this algebraic recursion, although the definition of the actual jets uses
+a scale neighborhood that may depend on the path.
+\end{proof}
+
+In the scalar case $E_m=M_m$. Their exact inverses and three rational
+round-trip checks appear in \cref{app:graded}. The recursion separates the
+mixed-degree relation in \eqref{eq:kernel8} by keeping its components in
+different jet orders.
+
+\begin{proposition}[A homogeneous kernel is formally invisible]
+\label{prop:kernel}
+Suppose a nonzero $H\in\Lie_{d,m}$, $m\leq L$, satisfies
+$\rho(H)=0$ on $U$. For every $\ell\in\Lie_d^{\leq L}$ and $t\in\R$,
+replacing $\ell$ by $\ell+tH$ leaves all formal graded observations
+through $L$ unchanged, and leaves every degree-$L$ truncated response
+unchanged. There are piecewise-linear paths with these respective
+truncated log-signatures. Equality of their actual full CDE responses is
+not asserted.
+\end{proposition}
+\begin{proof}
+By \eqref{eq:Lieoperator}, $\Gamma(H)=\Dop_{\rho(H)}$ is the zero
+operator on $U$. Expand the difference of the two tensor exponentials
+into ordered products of homogeneous Lie factors. Every product contains
+at least one factor $H$. Since $\Gamma$ is a homomorphism, its image
+is a composition containing a zero operator and is zero on $U$.
+The vanishing is on an open set, so differentiation by operators to its
+left does not introduce a nonzero term. Homogeneity ensures that each
+such product has a definite total degree: truncation retains or discards
+the entire product, preserving the argument in every degree. Applying
+the resulting operators to $\Id$ proves the observation assertions.
+The realization input in \cref{sec:prelim} supplies piecewise-linear
+paths for both exponentials. Their higher signature levels need not
+coincide, so no conclusion about full responses follows.
+\end{proof}
+This is a necessity statement for the unrestricted formal graded model
+and, with realization, for truncated path information. It does not supply
+a continuous selection of realizing paths. It also does not apply to the
+mixed-degree scalar relation by treating it as a homogeneous element.
+
+\section{Finite state-scale observations of the truncated model}
+\label{sec:finite}
+The actual terminal solution $Y_T^{y,r}(X)$ is \emph{Object C}. For actual
+path coordinates it agrees with \eqref{eq:truncated} up to the local
+remainder in \eqref{eq:jets}. This estimate does not identify the
+truncated polynomial from finitely many values of Object C. Object A
+instead differentiates Object C ideally at zero scale, where the
+coefficient identity is exact.
+
+\begin{theorem}[Conditional finite truncated observation and inverse]
+\label{thm:finite}
+Assume \cref{ass:injective}. Let $I\subset\R\setminus\{0\}$ be any
+nonempty open interval. There exist $\nu_{d,L}$ triples
+$(r_j,y_j,k_j)\in I\times U\times\{1,\ldots,D\}$ such that the map
+\[
+ \Phi(z)=\bigl(F_{y_j}^{\leq L}(r_j;z)_{k_j}-(y_j)_{k_j}\bigr)
+ _{j=1}^{\nu_{d,L}}:\R^{\nu_{d,L}}\longrightarrow\R^{\nu_{d,L}}
+\]
+has nonsingular derivative at zero and a local analytic inverse there.
+The inverse concerns Object B and a neighborhood of zero coordinates.
+\end{theorem}
+\begin{proof}
+By \eqref{eq:zero_derivative}, the derivative functions are
+$r^m\rho(H_{m,a})(y)_k$.
+Suppose a real linear combination of these functions vanishes on all
+$(r,y,k)$. Grouping the coefficients by degree gives
+$\sum_m r^m f_m(y)_k=0$. For fixed $y,k$ this is a polynomial vanishing
+on an open interval, so every coefficient is zero. Thus $f_m=0$ on $U$
+for every $m$. Homogeneous injectivity forces every original Hall
+coefficient to vanish. The derivative functions are jointly independent.
+Apply \cref{lem:evaluation}, or its scalar version on the set of triples,
+to obtain a square nonsingular evaluation matrix. It is $D\Phi(0)$ by
+\eqref{eq:zero_derivative}. The map $\Phi$ is polynomial in $z$ even
+when the fields are only smooth in $y$, so \cref{lem:inverse} applies.
+\end{proof}
+
+The design can use several coordinates in a single run, or repeated
+scales and states. The theorem only counts real outputs.
+Thus \cref{thm:finite} matches an intrinsic scalar-output dimension bound.
+It is not a universal minimum number of reservoir runs. It also does not
+make the map globally invertible. The fixed-zero, one-vector conclusion
+of \cref{cor:hallinverse} instead uses the stronger Hall evaluation rank
+available in the stated architecture at $D\geq\nu_{d,L}$.
+
+\section{An explicit eight-output scalar decoder}
+\label{sec:eight}
+Use the scalar witness \eqref{eq:witness} and the eight coordinates in
+\eqref{eq:Hall8}. Let the ordered state-scale design be
+\begin{equation}\label{eq:design}
+ \mathcal D_*=\bigl((-q,1),(-q,2),(-q,3),(0,2),(0,3),
+ (q,1),(q,2),(q,3)\bigr).
+\end{equation}
+For its pairs $(y_j,r_j)$ define the centered polynomial map
+\begin{equation}\label{eq:Phi}
+ \Phi_*(z)=\bigl(F_{y_j}^{\leq4}(r_j;z)-y_j\bigr)_{j=1}^8.
+\end{equation}
+The literal responses equal this vector plus the known initial-state
+vector. Centering changes neither the derivative nor any reconstruction
+difference. In particular it is not an approximation replacing $q$ by a
+rational number.
+
+\begin{theorem}[Fixed eight-output truncated inverse]\label{thm:eight}
+At $\theta_*$, the zero-coordinate Jacobian $B=D\Phi_*(0)$ satisfies
+\begin{equation}\label{eq:detB}
+ \det B=-\frac{258733035}{524288}\ne0.
+\end{equation}
+Consequently \eqref{eq:Phi} has a local analytic inverse at zero. Keeping
+the same ordered design, the corresponding truncated map for
+\eqref{eq:scalar} has a local analytic inverse at zero on an open dense
+full-Lebesgue-measure certificate set of parameters $\theta\in\R^4$.
+\end{theorem}
+\begin{proof}
+By \eqref{eq:zero_derivative}, the $j,a$ entry of the actual derivative
+of \eqref{eq:Phi} is $r_j^{\deg H_a}P_a(\tanh y_j)$. Substitution into
+\eqref{eq:P8} gives the exact matrix in \cref{eq:Bfull}. Exact elimination,
+or multiplication by the inverse displayed in \cref{app:inverse}, gives
+\eqref{eq:detB}; all arithmetic is rational. This is a derivative of the
+nonlinear truncated map, rather than an unrelated field-evaluation matrix.
+\Cref{lem:inverse} proves the first inverse statement.
+
+For arbitrary $\theta$, leave $y_j,r_j$ fixed and replace only the fields.
+Finite differentiation of the jointly analytic fields makes every entry
+of the zero-coordinate Jacobian analytic in $\theta$. Its determinant
+is nonzero at $\theta_*$ by \eqref{eq:detB}. Apply
+\cref{lem:analytic}, followed by \cref{lem:inverse} for each parameter
+in the nonzero locus. No uniform inverse neighborhood is obtained.
+\end{proof}
+
+The intrinsic count is $\nu_{2,4}=2+1+2+3=8$. It explains why eight
+scalar outputs are used. As a finite computational check of the design
+search, the prescribed candidate grid used states $-q,0,q$ and scales
+$1,2,3,4$. Of its $\binom{12}{8}=495$ eight-row subsets, 486 were exactly
+nonsingular. The selected design was chosen deterministically by the
+prescribed preferences and a numerical conditioning tie-break; nonsingularity
+was certified exactly afterward. Each one-row deletion of $B$ has rank
+seven. None of these search counts is needed to prove the inverse once
+the single exact matrix is supplied.
+
+\section{Quantitative local stability at the scalar witness}
+\label{sec:stability}
+For vectors use the maximum norm and for matrices its induced row-sum
+norm. Define $K=\norm{B^{-1}}_\infty$. Every component of $\Phi_*$ is a
+polynomial of ordinary coordinate degree at most four. Hence write
+\begin{equation}\label{eq:derivative_poly}
+ (D\Phi_*(z)-B)_{ja}
+ =\sum_{1\leq|\alpha|\leq3} c_{ja,\alpha}z^\alpha,
+\end{equation}
+where $\alpha=(\alpha_1,\ldots,\alpha_8)$ is a nonnegative integer
+multiindex, $|\alpha|=\sum_a\alpha_a$, and
+$z^\alpha=\prod_a z_a^{\alpha_a}$. Put
+\begin{equation}\label{eq:Delta}
+ a_{j,p}=\sum_{a=1}^8\sum_{|\alpha|=p}|c_{ja,\alpha}|,
+ \qquad
+ \Delta(R)=\max_{1\leq j\leq8}\sum_{p=1}^3a_{j,p}R^p\quad(R>0).
+\end{equation}
+This is an upper majorant, not a claim to equal the supremum of the
+Jacobian difference. Coefficientwise triangle inequalities give
+\begin{equation}\label{eq:majorant}
+ \sup_{\norm{z}_\infty\leq R}\norm{D\Phi_*(z)-B}_\infty\leq\Delta(R).
+\end{equation}
+The exact row sums are recorded in \cref{tab:majorant}; the full
+polynomial coefficient specification appears in \cref{app:polynomial}.
+
+\begin{theorem}[Exact local inverse-Lipschitz certificate]
+\label{thm:stability}
+At the fixed witness and design \eqref{eq:design}, set
+\begin{align}\label{eq:stabilityvalues}
+ K&=\frac{23812}{2151},& R_*&=\frac1{2048},\nonumber\\
+ \Delta_*&=\frac{2643019857}{68719476736},&
+ \eta_*:=K\Delta_*&=\frac{1748210800969}{4105988734976}<\frac12,\nonumber\\
+ c_*&=\frac{21220001406063}{409087045009408},&
+ C_*&=\frac{409087045009408}{21220001406063}.
+\end{align}
+For all $z,z'$ in the closed cube
+$\mathcal C_*=[-R_*,R_*]^8$,
+\begin{equation}\label{eq:stability}
+ \norm{\Phi_*(z)-\Phi_*(z')}_\infty\geq
+ c_*\norm{z-z'}_\infty,
+ \qquad
+ \norm{z-z'}_\infty\leq C_*\norm{\Phi_*(z)-\Phi_*(z')}_\infty.
+\end{equation}
+In particular $\Phi_*$ is injective on that cube, and the inverse on its
+image is Lipschitz. A simpler valid upper bound for the inverse constant
+is $2K=47624/2151$.
+\end{theorem}
+\begin{proof}
+The exact inverse rows in \cref{app:inverse} give the displayed $K$.
+The polynomial coefficients in \cref{app:polynomial}, differentiated as
+in \eqref{eq:derivative_poly}, give \cref{tab:majorant}. Evaluating
+\eqref{eq:Delta} at $R_*$ yields $\Delta_*$. Exact multiplication gives
+$\eta_*$ and
+\[
+ \frac12-\eta_*=\frac{304783566519}{4105988734976}>0.
+\]
+Let $v=z-z'$ and $\gamma(t)=z'+tv$ for $0\leq t\leq1$.
+Convexity puts the entire segment in $\mathcal C_*$. The fundamental
+theorem of calculus, preconditioned by the fixed matrix $B^{-1}$, gives
+\[
+ B^{-1}(\Phi_*(z)-\Phi_*(z'))
+ =v+\int_0^1B^{-1}(D\Phi_*(\gamma(t))-B)v\,dt.
+\]
+The integral term has norm at most $K\Delta_*\norm{v}_\infty$ by
+\eqref{eq:majorant}. The reverse triangle inequality around the fixed
+vector $v$, followed by submultiplicativity, gives
+\[
+ K\norm{\Phi_*(z)-\Phi_*(z')}_\infty
+ \geq(1-K\Delta_*)\norm{v}_\infty.
+\]
+Thus the lower constant is $1/K-\Delta_*=c_*>0$ and its reciprocal is
+$C_*$. The inequality $\eta_*<1/2$ gives $C_*\leq2K$. This argument
+does not take a lower bound inside the norm of a vector integral.
+\end{proof}
+
+The radius is the largest passing value among the sixteen prescribed
+candidates $2^{-1},\ldots,2^{-16}$ for the test $K\Delta(R)\leq1/2$;
+it is not asserted to be the largest possible invertibility radius.
+\Cref{tab:radii} gives the complete rational search table. If $z$ and a
+decoded $\widehat z$ both belong to $\mathcal C_*$ and
+$\Phi_*(\widehat z)=\Phi_*(z)+e$, then
+$\norm{\widehat z-z}_\infty\leq C_*\norm e_\infty$.
+Existence of such a preimage for arbitrary noisy data is an additional
+condition. The certificate supplies no parameter-uniform neighborhood.
+
+\begin{proposition}[Common-scale determinant and amplification laws]
+\label{prop:scales}
+Let $h\ne0$ multiply every scale in \eqref{eq:design}, and let $B(h)$
+be the resulting zero-coordinate Jacobian. With
+$\mathbf d=(1,1,2,3,3,4,4,4)$,
+\begin{equation}\label{eq:scaleB}
+ B(h)=B\diag(h^{d_1},\ldots,h^{d_8}),\qquad
+ \det B(h)=h^{22}\det B.
+\end{equation}
+Its exact inverse amplification in the maximum norm is
+\begin{equation}\label{eq:scalenorm}
+ \norm{B(h)^{-1}}_\infty=\max\left\{
+ \frac{4547}{717}|h|^{-1},\frac{23812}{2151}|h|^{-2},
+ \frac{824}{99}|h|^{-3},\frac{160}{33}|h|^{-4}\right\}.
+\end{equation}
+For $0<|h|\leq1$ this lies between
+$(160/33)|h|^{-4}$ and $(23812/2151)|h|^{-4}$.
+\end{proposition}
+\begin{proof}
+Equation \eqref{eq:zero_derivative} multiplies column $a$ by $h^{d_a}$.
+The degrees sum to $1+1+2+3+3+4+4+4=22$, proving the determinant law.
+Inverting \eqref{eq:scaleB} multiplies row $a$ of $B^{-1}$ by
+$h^{-d_a}$. Take the exact row sums in \cref{eq:invrows} and maximize
+within each degree to obtain \eqref{eq:scalenorm}. The last bounds follow
+because $|h|^{-p}\leq|h|^{-4}$ for $p\leq4$ and the largest unscaled
+row sum is $K$.
+\end{proof}
+This is a law for the inverse linearization, not for the product of
+forward and inverse norms called a condition number. The nonlinear
+variation majorant changes with the design, so the same cube and constant
+in \cref{thm:stability} are not asserted after rescaling.
+
+\subsection{Approximate recovery from actual responses}
+\label{sec:actual}
+The following result uses the fixed scalar witness and all eight designed
+experiments. Write $\Phi=\Phi_*$, $R=R_*$ and $Q_R=\mathcal C_*$, with
+$B,K,\Delta_*$ from \cref{thm:stability}. All matrix infinity norms below
+are induced row-sum norms. In particular, put
+\[
+ \kappa=K\Delta_*=\eta_*<\tfrac12,\qquad
+ C=\frac{K}{1-\kappa}=C_*.
+\]
+
+\begin{theorem}[Approximate Hall recovery from eight actual responses]
+\label{thm:actual}
+Use $V_1(y)=\tanh y$, $V_2(y)=1/2$ and exactly the pairs
+$(y_j,r_j)$ in \eqref{eq:design}. Let $X:[0,T]\to\R^2$ be continuous,
+of bounded variation, with $X_0=0$ and
+$\operatorname{TV}(X^1)+\operatorname{TV}(X^2)\leq M$, where $M\geq0$.
+Let $z(X)$ be its Hall coordinates through degree four in
+\eqref{eq:Hall8}. Set
+\[
+ D_h=\diag(h,h,h^2,h^3,h^3,h^4,h^4,h^4),\qquad
+ (c_1,c_2,c_3,c_4)=(1,1,1,13/12),\qquad A=3402.
+\]
+Choose $0<h\leq1$ such that $c_m(hM)^m\leq R$ for $m=1,\ldots,4$.
+A sufficient choice for $M>0$ is $h\leq\min(1,R/M)$; if $M=0$, any
+$0<h\leq1$ is allowed. The full CDE solutions exist, and their centered
+observations
+\[
+ b_h(X)_j=Y_T^{y_j,hr_j}(X)-y_j
+\]
+satisfy $D_hz(X)\in Q_R$ and
+\begin{equation}\label{eq:actualremainder}
+ \norm{b_h(X)-\Phi(D_hz(X))}_\infty\leq Ah^5M^5.
+\end{equation}
+For any $b\in\R^8$, let $\Pi_{Q_R}$ be coordinatewise clipping onto $Q_R$
+and define
+\begin{equation}\label{eq:clippeddecoder}
+ T_b(u)=\Pi_{Q_R}\bigl[u+B^{-1}(b-\Phi(u))\bigr],\qquad u\in Q_R.
+\end{equation}
+This is a contraction with constant at most $\kappa$. Its unique fixed
+point $G(b)$ exists for every $b$, satisfies $G(\Phi(u))=u$ for $u\in Q_R$,
+and obeys
+\[
+ \norm{G(b)-G(b')}_\infty\leq C\norm{b-b'}_\infty.
+\]
+If $b=b_h(X)+e$, with $\norm e_\infty\leq\delta$, then
+$\widehat z_h=D_h^{-1}G(b)$ satisfies
+\begin{equation}\label{eq:actualerror}
+ \norm{\widehat z_h-z(X)}_\infty
+ \leq C\bigl(AM^5h+\delta h^{-4}\bigr).
+\end{equation}
+More generally, for $u_n\in Q_R$, put
+$r_n=\norm{u_n-T_b(u_n)}_\infty$. Then
+\begin{equation}\label{eq:iterationerror}
+ \norm{D_h^{-1}u_n-z(X)}_\infty
+ \leq C\bigl(AM^5h+\delta h^{-4}\bigr)
+       +\frac{h^{-4}r_n}{1-\kappa}.
+\end{equation}
+Here $\delta$ bounds response-observation error and is unrelated to the
+financial observation-noise parameter.
+\end{theorem}
+\begin{proof}
+The truncation in \eqref{eq:truncated} is by tensor word length.
+In \eqref{eq:polyfull}, a Hall monomial $z^\alpha$ has weight
+$\mathrm{wt}(\alpha)=\sum_a d_a\alpha_a$, with
+$\mathbf d=(1,1,2,3,3,4,4,4)$, and carries the scale factor
+$r^{\mathrm{wt}(\alpha)}$. All weights are at most four. Thus replacing
+every design scale by $hr_j$ gives the full polynomial identity
+\begin{equation}\label{eq:fullpolyscaling}
+ \Phi_h(z)=\Phi(D_hz),
+\end{equation}
+including every nonlinear term.
+
+Let $\mu=|dX^1|+|dX^2|$ and let $|\,\cdot\,|_1$ denote the sum of
+absolute tensor-word coefficients. The signature simplex formula gives
+$|S_m(X)|_1\leq M^m/m!$, and concatenation is submultiplicative in this
+norm. The finite tensor logarithm therefore gives
+\[
+ |\ell_m(X)|_1\leq
+ M^m\sum_{k=1}^m\frac1k
+ \sum_{\substack{j_1+\cdots+j_k=m\\j_a\geq1}}
+ \frac1{j_1!\cdots j_k!}=c_mM^m\qquad(m\leq4).
+\]
+In the Hall order \eqref{eq:Hall8}, the word-expansion submatrices on
+rows $(1,2)$, $(12)$, $(112,122)$ and $(1112,1122,1222)$ are respectively
+identity matrices. Each Hall coordinate is consequently the corresponding
+word coefficient of $\ell_m$. Hence
+$\norm{z_m(X)}_\infty\leq c_mM^m$, proving the required scaled domain
+condition without a restriction $z(X)\in Q_R$. Since $R=1/2048$,
+$c_mR^m\leq R$ for all four degrees, which proves the simpler sufficient
+scale condition.
+
+Both fields are globally bounded and globally Lipschitz. At any finite
+scale $a$, the CDE integral map is a contraction on successive intervals
+of sufficiently small $\mu$-mass. Such a finite partition exists because
+$\mu$ is finite and nonatomic. Moreover
+$\sup_t|Y_t-y|\leq |a|M$, so these local solutions extend uniquely through
+$T$. Set $s=\tanh y$, $v_1(s)=s$, $v_2(s)=1/2$. The word convention
+\eqref{eq:Gamma} gives
+\[
+ P_i=v_i,\qquad P_{iv}=v_i(s)(1-s^2)P_v'(s),\qquad
+ (\Gamma(w)\Id)(y)=P_w(\tanh y).
+\]
+For the polynomial coefficient norm $a(P)=\sum_k|[s^k]P|$,
+$\deg P_v\leq2n-1$ when $|v|=n$, and
+$a(P_{iv})\leq2(2n-1)a(P_v)$. Starting from
+$\max_i a(P_i)=1$, four steps give the exact upper bound
+\[
+ \max_{|w|=5}\sup_y|(\Gamma(w)\Id)(y)|
+ \leq 2^4(1\cdot3\cdot5\cdot7)=:K_5=1680.
+\]
+Apply the finite BV chain-rule expansion from \cref{prop:jets} through
+word length four. At scale $a$, its remainder is
+\[
+ a^5\sum_{i_1,\ldots,i_5}
+ \int_{0<t_1<\cdots<t_5<T}
+ P_{i_1\cdots i_5}(\tanh Y_{t_1})
+ \,dX^{i_1}_{t_1}\cdots dX^{i_5}_{t_5}.
+\]
+Taking absolute values and summing over words gives the product measure
+$\mu^{\otimes5}$, whose ordered simplex has mass $\mu([0,T])^5/5!$.
+There is no additional word-count factor. Thus the remainder is bounded
+by $K_5|a|^5M^5/5!$. Since $\max_j|r_j|=3$,
+$A=3^5K_5/5!=3402$, proving \eqref{eq:actualremainder}.
+This finite expansion needs no infinite-series convergence. Its bound is
+uniform in the initial state. The constants $A,R,K,\kappa,C$ depend only on
+the fixed witness, design and certificate, and not on $h$, $M$, $X$ or $T$.
+
+By \eqref{eq:majorant}, the derivative of
+$u\mapsto u+B^{-1}(b-\Phi(u))$ has induced norm at most
+$K\Delta_*=\kappa$ on the convex cube. Clipping is nonexpansive in the
+maximum norm, so $T_b$ is a contraction of the complete space $Q_R$.
+The contraction theorem supplies its unique fixed point for every $b$.
+If $b=\Phi(u)$, then $T_b(u)=u$, even on the boundary, proving exactness
+there. Nonexpansiveness also gives
+\[
+ \norm{T_b(u)-T_{b'}(v)}_\infty
+ \leq\kappa\norm{u-v}_\infty+K\norm{b-b'}_\infty.
+\]
+Apply this to the two fixed points and rearrange to obtain the claimed
+Lipschitz bound. With $u=D_hz(X)\in Q_R$, it follows that
+\[
+ \norm{G(b)-u}_\infty\leq C(Ah^5M^5+\delta).
+\]
+Finally $\norm{D_h^{-1}}_\infty=h^{-4}$ for $0<h\leq1$, proving
+\eqref{eq:actualerror}. The contraction estimate also implies
+$\norm{u_n-G(b)}_\infty\leq r_n/(1-\kappa)$, which gives
+\eqref{eq:iterationerror}.
+\end{proof}
+
+The map $G$ extends the inverse on $\Phi(Q_R)$ to all observation vectors;
+it is not a global inverse of $\Phi$ or a least-squares decoder. A clipped
+fixed point may have zero fixed-point residual and nonzero response-fit
+residual $\norm{\Phi(u)-b}_\infty$. To keep the iteration contribution
+below an unscaled coordinate tolerance $\tau$, the mathematical stopping
+criterion is $r_n\leq(1-\kappa)h^4\tau$. A numerically computed residual
+also contains roundoff and is not by itself a certified exact residual.
+The result gives approximate recovery from the eight designed actual
+responses, not exact recovery at fixed nonzero scale or recovery from one
+zero-initialized scalar reservoir.
+
+For $M=1$ and $h=1/2048$, the noiseless term in
+\eqref{eq:actualerror} is approximately $32.0239$, and the coefficient
+of absolute response error $\delta$ is approximately
+$3.39149\times10^{14}$. These are conservative upper bounds, not observed
+errors or evidence of numerical failure. The asymptotic consistency
+statement does not by itself certify useful finite-precision accuracy at
+a specified scale; response error, iteration error and roundoff still
+require control.
+
+For deterministic axis-aligned piecewise-linear paths, the actual responses
+can be evaluated using the exact segment flows
+\[
+ F_a(y)=\operatorname{arsinh}(e^a\sinh y),\qquad H_b(y)=y+b/2.
+\]
+They satisfy $\partial_aF_a(y)=\tanh(F_a(y))$ and
+$\partial_bH_b(y)=1/2$, with identity initial maps. Compose them in path
+order, using signed increments multiplied by $hr_j$; the last segment acts
+outermost on the state. The reference signature instead concatenates the
+segment tensor exponentials on the right, as in \eqref{eq:signature}.
+The validation command in \cref{app:reproduce} compares these independently
+constructed responses and Hall coordinates at two arbitrary precisions.
+
+\section{Lifting the scalar witness in state dimension}
+\label{sec:lift}
+\begin{corollary}[Inactive-coordinate scalar embedding]\label{cor:lift}
+For every $D\geq1$, the two-channel shallow componentwise-tanh family on
+$\R^D$ has a witness with homogeneous free-Lie injectivity through degree
+four obtained from \eqref{eq:witness}. At that witness the mixed-degree
+kernel relation \eqref{eq:kernel8} also persists. First-coordinate
+observations at embedded initial states reproduce \eqref{eq:Phi} exactly,
+including the stability certificate. Fixed lifted homogeneous minors give
+an open dense full-measure certificate set for separate homogeneous
+injectivity in the full parameter space $\R^{2(D^2+D)}$.
+\end{corollary}
+\begin{proof}
+Define $E(f)(x)=f(x_1)e_1$, where $e_1$ is the first coordinate vector.
+Differentiating shows $[E(f),E(g)]=E(fg'-f'g)$. Thus $E$ is an injective
+Lie homomorphism. Choose $A_1$ with sole nonzero entry $(A_1)_{11}=1$,
+$b_1=0$, $A_2=0$, and $b_2=qe_1$. The fields are exactly
+$E(\tanh)$ and $E(1/2)$, because $\tanh(0)=0$ in inactive coordinates.
+For a nonempty word, induction using
+$F_{iv}=DF_v\,V_i$ shows that its response equals its scalar response
+in coordinate one and zero in the other coordinates, globally in $x$.
+Consequently every term of the truncated response has this property.
+Initial states $y e_1$ therefore reproduce the scalar centered map, not
+just its derivative. The homogeneous certificates, mixed-degree relation,
+and quantitative constants at this witness follow.
+
+For arbitrary full weights and biases, evaluate the same homogeneous
+Hall fields at the same embedded states and select coordinate one.
+Their determinant product is analytic in every parameter and equals
+\eqref{eq:dets} at the embedding. \Cref{lem:analytic} proves generic
+separate homogeneous injectivity. No stability constant is propagated
+to that generic parameter set.
+\end{proof}
+The embedding is a corollary of an existing witness. It is not a statement
+that increasing state dimension improves every reservoir or every
+conditioning measure.
+
+\section{A general sufficient-width shallow-tanh theorem}
+\label{sec:width}
+For the full architecture \eqref{eq:architecture}, we now seek
+independence of all nonempty word-response fields through length $L$.
+This is a different linear-family requirement from the Hall evaluation
+rank in \cref{thm:hallrank}. No tree-indexed independence condition is
+introduced.
+
+\subsection{A transfer lemma for finite word-response minors}
+\begin{lemma}[Normalized linear-to-tanh transfer]\label{lem:transfer}
+Let $W_i(x)=A_ix$ be linear fields on $\R^D$. Suppose a finite family
+of nonempty words $w_1,\ldots,w_s$ has a nonsingular square matrix under
+fixed scalar point-coordinate evaluations $\lambda_1,\ldots,\lambda_s$:
+\[
+ M_0=(\lambda_j(\Gamma_W(w_a)\Id))_{j,a}.
+\]
+For $V_i^\epsilon(x)=\tanh(\epsilon A_ix)$, the same evaluated word
+matrix is nonsingular for all sufficiently small nonzero $\epsilon$.
+The conclusion asserts existence of a punctured neighborhood, not a
+certified explicit value of $\epsilon$.
+\end{lemma}
+\begin{proof}
+Introduce the auxiliary fields
+\begin{equation}\label{eq:normalized}
+ \widetilde V_i^\epsilon(x)=
+ \begin{cases}\epsilon^{-1}\tanh(\epsilon A_ix),&\epsilon\ne0,\\
+ A_ix,&\epsilon=0.
+ \end{cases}
+\end{equation}
+The Taylor series of $\tanh s$ at zero is odd, begins with $s$, and has
+positive convergence radius. After division by $\epsilon$ it is a
+convergent series in even powers of $\epsilon$, with polynomial
+coefficients in $x$. On a neighborhood of each of the finitely many
+evaluation states it defines a jointly real-analytic extension at
+$\epsilon=0$. All finite state derivatives required by the chosen words
+are therefore real analytic there. Induction using
+$F_{iv}=DF_v\,V_i$ proves that
+\[
+ A(\epsilon)_{j,a}:=\lambda_j
+ (\Gamma_{\widetilde V^\epsilon}(w_a)\Id)
+\]
+is analytic near zero and $A(0)=M_0$.
+
+For $\epsilon\ne0$, the scalar factor is independent of state, so
+$\Dop_{V_i^\epsilon}=\epsilon\Dop_{\widetilde V_i^\epsilon}$.
+Every word therefore obeys the exact factorization
+\begin{equation}\label{eq:epsfactor}
+ \Gamma_{V^\epsilon}(w)\Id
+ =\epsilon^{|w|}\Gamma_{\widetilde V^\epsilon}(w)\Id.
+\end{equation}
+The raw evaluated determinant is
+$\epsilon^{\sum_a|w_a|}\det A(\epsilon)$.
+Since $\det A(0)=\det M_0\ne0$, continuity makes
+$\det A(\epsilon)\ne0$ for $|\epsilon|$ sufficiently small. Removing
+zero also makes the prefactor nonzero, proving the claim.
+\end{proof}
+
+The raw fields at $\epsilon=0$ are zero; their evaluated word matrix is
+not $M_0$. Only the normalized auxiliary matrix has that limit. The
+argument uses a local determinant limit, without an all-$\epsilon$
+triangularity or determinant formula.
+
+\subsection{The classical tensor system in chronological convention}
+Let
+\begin{equation}\label{eq:D0}
+ D_0=D_0(d,L)=\sum_{m=0}^Ld^m,\qquad
+ Q_{d,L}=\sum_{m=1}^Ld^m=D_0-1.
+\end{equation}
+Use the truncated tensor-word space as $\R^{D_0}$, with basis $e_w$
+ordered first by word length and then lexicographically, including
+$e_{\varnothing}$. Define right-concatenation matrices
+\begin{equation}\label{eq:Rconcat}
+ R_i e_w=\begin{cases}e_{wi},&|w|<L,\\0,&|w|=L,
+ \end{cases}
+ \qquad W_i(x)=R_ix,\qquad x_0=e_{\varnothing}.
+\end{equation}
+This is the classical truncated tensor system; related formulations occur
+in \cite{FrizVictoir,AkyildirimAnomaly}. Its action orientation must be
+checked against \eqref{eq:Gamma}.
+
+For a linear map $A$, $\Dop_{W_i}(Ax)=AR_ix$. Induction therefore gives
+\begin{equation}\label{eq:linearwords}
+ \Gamma_W(i_1\cdots i_m)\Id(x)=R_{i_m}\cdots R_{i_1}x,
+ \qquad
+ \Gamma_W(w)\Id(x_0)=e_w\quad(1\leq|w|\leq L).
+\end{equation}
+The rightmost matrix acts first and appends the earliest letter first.
+Thus no word reversal is inserted into the chronological signature.
+Select all nonempty-word coordinates as rows and all nonempty words
+through $L$ as columns. Equation \eqref{eq:linearwords} gives the exact
+square matrix
+\begin{equation}\label{eq:A0}
+ A_0=(\Gamma_W(w)\Id(x_0)_u)_{u,w}=I_{Q_{d,L}}.
+\end{equation}
+
+Products of $L+1$ right-concatenation matrices vanish. For a segment with
+increment $a$, the linear flow at $x_0$ is
+$\exp(\sum_i a_iR_i)x_0=\sum_{m=0}^L a^{\otimes m}/m!$.
+Two segment flows apply the second exponential on the left of the first
+matrix exponential; on tensor states this appends the second tensor
+signature on the right of the first, producing the Chen product in
+\eqref{eq:signature}. These identities also explain the exact checks in
+\cref{app:reproduce}.
+
+\subsection{The strongest conclusion and full parameter genericity}
+\begin{theorem}[Finite-degree word-response independence at sufficient width]
+\label{thm:width}
+For every finite $d,L\geq1$ and every integer $D\geq D_0(d,L)$, there
+exists an open dense full-Lebesgue-measure subset
+$\mathcal G_{d,L,D}^{\rm cert}\subset\mathcal P_{d,D}$ such that the
+finite family of vector-valued functions on $\R^D$
+\begin{equation}\label{eq:wordfamily}
+ \{\Gamma_\theta(w)\Id:1\leq|w|\leq L\}
+\end{equation}
+is jointly linearly independent for every
+$\theta\in\mathcal G_{d,L,D}^{\rm cert}$. Consequently
+$\rho_\theta:\Lie_d^{\leq L}\to\mathcal X(\R^D)$ is injective as a
+linear map on the truncated free-Lie vector space and on every homogeneous
+component separately. The certificate uses a fixed initial state and
+$Q_{d,L}$ fixed output-coordinate evaluations of the word-response fields.
+\end{theorem}
+\begin{proof}
+First take $D=D_0$. Apply \cref{lem:transfer} to \eqref{eq:Rconcat} and
+the identity matrix \eqref{eq:A0}. Equivalently, let
+$V_i^\epsilon=\tanh(\epsilon R_ix)$ and define the normalized matrix
+at $x_0$ with the nonempty-word rows and columns. It is real analytic
+near zero and has value $I_{Q_{d,L}}$ there. In this case the raw
+determinant is exactly
+\begin{equation}\label{eq:rawdet}
+ \epsilon^{\kappa_{d,L}}\det A(\epsilon),\qquad
+ \kappa_{d,L}=\sum_{m=1}^L m d^m,
+ \qquad \det A(0)=1.
+\end{equation}
+Choose existentially one sufficiently small nonzero $\epsilon$.
+The corresponding weights $A_i=\epsilon R_i$, biases $b_i=0$, give
+a nonzero evaluated word determinant in the actual architecture.
+If a linear combination of the word-response fields vanished globally,
+evaluating the chosen coordinates at $x_0$ would put its coefficients
+in the kernel of this nonsingular matrix. Thus they are independent.
+
+For an arbitrary parameter $\theta\in\mathcal P_{d,D_0}$ define the
+fixed determinant
+\begin{equation}\label{eq:genericminor}
+ \Delta_{d,L,D_0}(\theta)=
+ \det\bigl(\Gamma_\theta(w)\Id(x_0)_u\bigr)_{u,w}.
+\end{equation}
+The map $(\theta,x)\mapsto\tanh(A_ix+b_i)$ is jointly real analytic
+for all real parameters and states. Recursing by
+$F_{iv}^\theta=D_xF_v^\theta V_i^\theta$ proves joint analyticity
+of each finite word-response field. Evaluation and a finite determinant
+preserve analyticity. Thus \eqref{eq:genericminor} is analytic on the
+entire connected Euclidean parameter space and is not identically zero
+by the constructed point. Its nonzero set has the claimed topological
+and measure properties by \cref{lem:analytic}.
+
+For $D>D_0$, embed $x_0$ in the first $D_0$ coordinates, put the
+constructed matrices in the upper-left block, and set all other weights
+and biases to zero. Writing $x=(x^{\rm act},x^{\rm inact})$, the fields
+are $(V_i^{\rm act}(x^{\rm act}),0)$ globally, independent of the
+inactive variables. The recursion for word responses preserves this
+form, so the selected active-coordinate minor is exactly the smaller
+one. Define its determinant for arbitrary full $D$-dimensional weights
+and biases using the same embedded state and rows. The preceding
+analyticity and nonzero-witness argument applies to every entry of
+the full parameter vector, proving the result for this $D$.
+
+Finally let $0\ne H\in\Lie_d^{\leq L}$. Its tensor expansion is a
+nonzero real combination of the word basis through $L$. By
+\eqref{eq:Lieoperator}, its represented field is the same combination
+of \eqref{eq:wordfamily}. Word-response independence prevents it from
+vanishing. This proves joint Lie injectivity, and restriction proves
+the homogeneous conclusions.
+\end{proof}
+
+The nonzero locus is a certificate set; a parameter where this particular
+minor vanishes might still admit another independence certificate.
+An absolutely continuous parameter law assigns probability one to the
+certificate set. This does not cover a randomization supported on an
+exceptional lower-dimensional set.
+
+The theorem concerns lengths at most $L$ and constant real linear
+relations among word-response fields. It does not prove tree-level
+independence, all-degree independence, or factorization of the tanh
+action through the free step-$L$ nilpotent quotient. The explicit
+dimension $D_0$ is a conservative sufficient width, with no lower-bound,
+minimality, compressed-width, or monotonic-performance claim. The proof
+provides no certified explicit nonzero $\epsilon$, conditioning estimate,
+parameter-uniform stability constant, or quantitative inverse theorem
+for these large witnesses. A field-evaluation determinant at one state
+is not reconstruction of a path from one terminal state. Full-CDE
+reconstruction, discrete-time transfer, and finance consequences remain
+outside the theorem.
+
+\begin{corollary}[Fixed zero initialization]\label{cor:zero}
+Let $d,L\geq1$ and $D\geq D_0(d,L)=\sum_{m=0}^L d^m$. In the full
+biased architecture \eqref{eq:architecture}, fix the initial state $h_0=0$.
+For Lebesgue-almost-every $\theta\in\mathcal P_{d,D}$, the vectors
+\[
+ \{(\Gamma_\theta(w)\Id)(0):1\leq|w|\leq L\}
+\]
+are jointly linearly independent. Consequently the finite-degree
+word-response fields are jointly independent, and $\rho_\theta$ is
+injective on $\Lie_d^{\leq L}$ and on each homogeneous component, as in
+\cref{thm:width}.
+\end{corollary}
+\begin{proof}
+Put $c=e_{\varnothing}$ in the first $D_0$ coordinates of $\R^D$,
+with zero inactive coordinates. For any fields
+$V_i(x)=\tanh(A_ix+b_i)$, let $\tau_c(z)=z+c$ and set
+$W_i(z)=\tanh(A_iz+b_i+A_ic)$.
+For every coordinate $k$,
+$(W_i(z))_k=\tanh((A_i(z+c)+b_i)_k)=(V_i(z+c))_k$.
+Thus translation stays in the same architecture, with weights $A_i$
+and biases $b_i+A_ic$.
+
+The chain rule gives
+$\Dop_{W_i}(f\circ\tau_c)=(\Dop_{V_i}f)\circ\tau_c$.
+Prepending letters and using the outermost-first convention
+\eqref{eq:Gamma} proves by induction that
+\[
+ \Gamma_W(w)(f\circ\tau_c)=(\Gamma_V(w)f)\circ\tau_c.
+\]
+Since $\Id\circ\tau_c=\Id+c$, take $f=\Id$. Every nonempty word
+operator kills the constant vector $c$: its rightmost first-order
+operator differentiates that constant to zero. Hence
+\[
+ (\Gamma_W(w)\Id)(0)=(\Gamma_V(w)\Id)(c),
+ \qquad 1\leq|w|\leq L.
+\]
+
+Use precisely the $Q_{d,L}\times Q_{d,L}$ minor in \eqref{eq:A0}:
+rows are the active coordinates indexed by nonempty words $u$ through
+$L$, and columns are the nonempty words $w$ through $L$, both in
+degree-then-lexicographic order. No empty-word or inactive row is used.
+The preceding identity preserves this minor entry by entry.
+At $D=D_0$, the proof of \cref{thm:width} gives its raw determinant
+$\epsilon^{\kappa_{d,L}}\det A(\epsilon)$, where $A(0)=I_{Q_{d,L}}$.
+Continuity therefore permits a finite, sufficiently small nonzero
+$\epsilon$ with nonzero determinant. Translating these actual tanh
+fields gives admissible weights $A_i=\epsilon R_i$ and biases
+$b_i=\epsilon R_ic$. The normalized limit at $\epsilon=0$ is only the
+existence argument, not the witness. For $D>D_0$, embed these weights
+and biases in the active block and set all other entries to zero;
+the same minor is unchanged.
+
+With the rows and columns just fixed, define on the full parameter space
+\[
+ \Delta^0_{d,L,D}(\theta)
+ =\det\bigl((\Gamma_\theta(w)\Id)(0)_u\bigr)_{u,w}.
+\]
+Finite differentiation of the jointly real-analytic tanh fields makes
+this a real-analytic function of all entries of $(A_i,b_i)_{i=1}^d$,
+with the state held at zero. The translated witness makes it nontrivial,
+so \cref{lem:analytic} gives a null zero set. Nonsingularity proves the
+stated independence; the tensor embedding and \eqref{eq:Lieoperator}
+give the Lie conclusions.
+
+The empty word is excluded throughout: $\Gamma(1)\Id(0)=0$, so adding
+its column would destroy injectivity of the evaluation map. Its signature
+coefficient is the known value $S_0(X)=1$ and is treated separately.
+\end{proof}
+
+\section{Relationship between the architecture results}
+\label{sec:comparison}
+The fixed-state rank theorem, the scalar certificates, and the word
+theorem address different observations and different families.
+For $d=2,L=4$, \cref{thm:hallrank,cor:hallinverse} give full Hall rank
+and local recovery of eight truncated Hall coordinates from one
+zero-initialized vector at width $\nu_{2,4}=8$. The scalar witness at
+$D=1$ instead has joint function rank seven, despite homogeneous
+injectivity through degree four. Its eight selected state-scale
+observations admit the explicit inverse and stability bound of
+\cref{sec:eight,sec:stability}, and its actual CDE responses admit
+the approximate decoder of \cref{thm:actual}.
+
+At the larger width $D_0(2,4)=31$, \cref{thm:width} proves independence
+of all $Q_{2,4}=30$ nonempty word-response fields.
+Corollary~\ref{cor:zero} also gives their independent evaluations at zero.
+The Hall-width construction does not assert independence of all these
+word directions in eight linear features.
+
+The reconstruction implications are
+\begin{align*}
+ \text{full fixed-state Hall rank}
+ &\ \Longrightarrow\ \text{one-vector truncated local inverse},\\
+ \text{homogeneous field injectivity}
+ &\ \Longrightarrow\ \text{ideal graded Hall recovery},\\
+ \text{homogeneous field injectivity}
+ &\ \Longrightarrow\ \text{finite state-scale truncated inverse}.
+\end{align*}
+Independent Hall evaluations imply joint field independence and hence
+homogeneous injectivity. Function-level independence alone need not give
+independent evaluations at one state. Word-response field independence
+implies joint Hall field independence by the tensor embedding, but is a
+larger linear-family requirement.
+
+The scalar inverse becomes quantitative only through its separate exact
+Jacobian and variation bounds. Its extension to actual responses also
+uses a uniform remainder and a clipped contraction on the certified
+cube. None of those constants, scale exponents, or remainder estimates
+is transferred to the Hall-width or word-width construction.
+
+\section{Financial motivation and the information constraint}
+\label{sec:finance}
+The finance statements in this section are classical probability and
+projection facts. They explain why predictable history features are useful;
+they make no claim that a finite-degree identifiability theorem determines a
+trained model's financial risk.
+
+\subsection{Predictable martingale controls for a discrete pricing target}
+Let $(\Omega,\mathcal F,\mathbb Q)$ be a probability space, and let
+$0=t_0<\cdots<t_N=T$ be a simulation grid. Let $G_N\in L^2(\mathbb Q)$ be
+the discounted payoff computed on that grid. The target is
+$p_N=\E_{\mathbb Q}G_N$. Write $\mathcal F_k^{\rm sim}$ for simulator
+information through time $t_k$. A simulator martingale innovation
+$\Delta M_{k+1}\in\R^b$ satisfies
+$\E[\Delta M_{k+1}\mid\mathcal F_k^{\rm sim}]=0$, where $b$ is the number
+of innovation components. Brownian simulation increments are an example.
+They need not be increments of traded assets.
+
+Let $\mathcal T$ contain the reservoir draw, preprocessing, training data,
+fitting, and validation selection. Evaluation paths are independent of
+$\mathcal T$. A frozen predictor $Z_k\in\R^b$ is measurable with respect
+to $\mathcal T\vee\mathcal F_k^{\rm sim}$ and uses only a path prefix. Its
+control is
+\begin{equation}\label{eq:control}
+ C(Z)=\sum_{k=0}^{N-1}Z_k\cdot\Delta M_{k+1}.
+\end{equation}
+The innovation assumption below is stated conditional on the enlarged
+filtration so that the role of sample splitting is explicit.
+
+\begin{proposition}[Sample-split unbiasedness]\label{prop:unbiased}
+Let $G_N\in L^2(\mathbb Q)$ and $p_N=\E_{\mathbb Q}G_N$. Assume that
+each evaluation path has the prescribed simulation law and is independent
+of the training sigma-field $\mathcal T$. For every $k=0,\ldots,N-1$,
+assume that $Z_k$ is $\mathcal T\vee\mathcal F_k^{\rm sim}$-measurable,
+that $\Delta M_{k+1}$ is integrable with
+$\E[\Delta M_{k+1}\mid\mathcal T\vee\mathcal F_k^{\rm sim}]=0$, and
+that every product in \eqref{eq:control} is integrable. For $P$ evaluation
+paths that are independent conditional on $\mathcal T$, the estimator
+\[
+ \widehat p_N=\frac1P\sum_{j=1}^P\bigl(G_N^{(j)}-C^{(j)}(Z)\bigr)
+\]
+satisfies $\E[\widehat p_N\mid\mathcal T]=p_N$.
+\end{proposition}
+\begin{proof}
+Predictability and conditional centering give
+\[
+ \E[Z_k\cdot\Delta M_{k+1}\mid\mathcal T]
+ =\E\!\left[Z_k\cdot
+ \E[\Delta M_{k+1}\mid\mathcal T\vee\mathcal F_k^{\rm sim}]
+ \mid\mathcal T\right]=0.
+\]
+Sum over $k$. Independence of the evaluation path from $\mathcal T$ gives
+$\E[G_N\mid\mathcal T]=p_N$, and linearity proves the assertion.
+\end{proof}
+
+This proves unbiasedness for the discretized target only. It also explains
+two implementation details: a fitted intercept is not subtracted as a
+martingale control, and training standardization must be converted back to
+coefficients of the original predictable control features before evaluation.
+Centering controls by an evaluation-dependent fit is not part of this
+argument. Martingale control variates in stochastic-volatility pricing have
+well-established precedents, including Fouque and Han \cite{FouqueHan}.
+
+\begin{proposition}[Finite-dimensional control projection]\label{prop:projection}
+Let $G_N\in L^2(\mathbb Q)$, put $p_N=\E_{\mathbb Q}G_N$, and let
+$Q\in L^2(\mathbb Q;\R^p)$ be a centered vector of terminal controls.
+Set $g=G_N-p_N$, $\Sigma=\E[QQ^\top]$, and $c=\E[Qg]$.
+Let $\Sigma^\dagger$ be the Moore--Penrose inverse. Then
+$c\in\range(\Sigma)$, and for every $\beta\in\R^p$,
+\begin{align}\label{eq:projection}
+ \Var(G_N-\beta^\top Q)
+ &=\Var(G_N)-c^\top\Sigma^\dagger c\nonumber\\
+ &\quad +(\beta-\Sigma^\dagger c)^\top
+ \Sigma(\beta-\Sigma^\dagger c).
+\end{align}
+The minimizing coefficients are $\Sigma^\dagger c+\ker\Sigma$.
+\end{proposition}
+\begin{proof}
+For $v\in\ker\Sigma$, $\E[(v^\top Q)^2]=0$, so $v^\top Q=0$ almost
+surely and $v^\top c=0$. Symmetry of $\Sigma$ gives
+$c\in(\ker\Sigma)^\perp=\range(\Sigma)$. Expanding the variance gives
+$\E[g^2]-2\beta^\top c+\beta^\top\Sigma\beta$. Completing the square
+with $\Sigma\Sigma^\dagger c=c$ gives \eqref{eq:projection}.
+\end{proof}
+The same identity holds conditionally on $\mathcal T$ when
+$\E[Q\mid\mathcal T]=0$ and the relevant conditional second moments are
+finite, using the conditional payoff mean and conditional moments in
+place of $p_N,\Sigma,c$. It is a population identity. Finite-sample
+ridge coefficients need not attain it. No retained-variance perturbation
+bound relative to a finite-signature benchmark is assumed here.
+
+\subsection{Partial-information quadratic hedging}
+Let $\widetilde S_k\in\R^a$ be discounted prices of the $a$ traded risky
+assets. To describe the Heston experiments, write $v_k$ for the latent
+variance vector and $O_k=v_k+\eta\xi_k$ for its noisy signal at positive
+grid times, where $\xi_k$ are independent standard Gaussian observation
+errors. The known initial signal equals the prescribed initial variance.
+Set
+\[
+ \mathcal G_k=\sigma(\widetilde S_j,O_j:0\leq j\leq k),\qquad
+ \mathcal F_k^{\rm state}=\mathcal G_k\vee\sigma(v_j:0\leq j\leq k).
+\]
+The simulator filtration additionally contains the shocks used through $k$;
+thus $\mathcal G_k\subseteq\mathcal F_k^{\rm state}
+\subseteq\mathcal F_k^{\rm sim}$. Completed filtrations can be used without
+changing the statements. Let $H\in L^2(\mathcal G_N,\mathbb Q)$ be the
+discounted target payoff. An admissible observed-information strategy
+$\vartheta_k\in\R^a$ is $\mathcal G_k$-measurable and satisfies
+\[
+ \sum_{k=0}^{N-1}\E\bigl[(\vartheta_k\cdot
+ (\widetilde S_{k+1}-\widetilde S_k))^2\bigr]<\infty.
+\]
+Its terminal wealth and risk are
+\begin{equation}\label{eq:hedging}
+ W_N(c,\vartheta)=c+\sum_{k=0}^{N-1}\vartheta_k\cdot
+ \Delta\widetilde S_{k+1},\qquad
+ \mathcal R(c,\vartheta)=\E[(H-W_N(c,\vartheta))^2].
+\end{equation}
+Here $c\in\R$ is deterministic initial capital. If a simulation law or
+payoff lacks these second moments, the following $L^2$ statements require
+an explicit integrability restriction.
+
+For the risk-neutral log-price Euler step used in the experiment, each
+discounted asset has conditional multiplicative increment
+$\exp(-v_k\Delta t/2+\sqrt{v_k\Delta t}\,\zeta_{k+1})$, with the
+nonnegative variance used by the scheme and a standard normal next price
+shock conditional on simulator history. Its conditional expectation is one.
+Under integrability the discounted price is a simulator martingale and,
+by the tower property, a martingale in both smaller filtrations. Correlation
+with the next variance shock does not change the conditional Gaussian
+marginal of this price shock.
+
+\begin{proposition}[Nested population information spaces]\label{prop:hedging}
+Let $H\in L^2(\mathcal G_N,\mathbb Q)$, and suppose $\widetilde S$ is an
+adapted square-integrable martingale in the simulator filtration and is
+adapted to each of the nested filtrations above. For each such filtration
+$\mathcal H$, a strategy is admissible when every $\vartheta_k$ is
+$\mathcal H_k$-measurable and
+$\sum_{k=0}^{N-1}\E[(\vartheta_k\cdot\Delta\widetilde S_{k+1})^2]<\infty$.
+Form the closure $\mathcal K_{\mathcal H}$ in $L^2(\mathbb Q)$ of
+constants plus terminal gains of these strategies. Let
+$P_{\mathcal H}$ denote orthogonal projection onto this closed subspace.
+Then the infimum of \eqref{eq:hedging} for information $\mathcal H$ is
+$\norm{H-P_{\mathcal H}H}_2^2$. If
+$\mathcal K_1\subseteq\mathcal K_2$, then
+\begin{equation}\label{eq:nesting}
+ \norm{H-P_1H}_2^2-\norm{H-P_2H}_2^2
+ =\norm{P_2H-P_1H}_2^2\geq0.
+\end{equation}
+In particular the observed-information population risk cannot be below the
+state-information population risk. The same statement applies to a closed
+linear space of gains generated by fixed observed features contained in
+$\mathcal K_{\mathcal G}$.
+\end{proposition}
+\begin{proof}
+Predictable strategies for a smaller filtration are predictable for a larger
+one, with the same traded gains and integrability criterion. This proves
+inclusion before and after closure. For completeness, projection onto a
+closed subspace exists because the parallelogram identity makes a
+distance-minimizing sequence Cauchy; its limit lies in the subspace.
+Differentiating the squared distance along each subspace direction makes
+the residual orthogonal to that subspace and proves uniqueness. For nested
+subspaces, $P_1H=P_1P_2H$. Decompose
+$H-P_1H=(H-P_2H)+(P_2H-P_1H)$ into orthogonal terms to obtain
+\eqref{eq:nesting}.
+\end{proof}
+Closure makes the infimum precise without asserting that it is attained by
+a particular finite readout or predictable integrand. This is the projection
+setting underlying martingale quadratic hedging and GKW decompositions.
+Here GKW abbreviates Galtchouk--Kunita--Watanabe.
+Restricted-information formulations are developed in
+\cite{Schweizer,Mania,FreyRunggaldier}; their trading and observation models
+are not all the fixed-grid model used here. Simulator innovations in
+\eqref{eq:control} are not added to the traded-gain spaces in
+\eqref{eq:nesting}. In particular hidden Brownian shocks are not available
+to an admissible observed-information hedge.
+
+\subsection{Preliminary experiments and the resulting question}
+The implemented reservoir processes a causally available path $U_k$ using
+fixed random matrices and biases:
+\begin{equation}\label{eq:discrete}
+ R_{k+1}=R_k+\sum_{i=1}^d\tanh(A_iR_k+b_i)\Delta U_{k+1}^i,
+ \qquad R_0=0.
+\end{equation}
+The activation acts componentwise. Readouts use time and reservoir state;
+hedging features also retain the current observed quantities. Reservoir and
+preprocessing choices are fixed before independent test evaluation. This
+discrete recurrence motivates the continuous architecture studied in this paper,
+but no theorem transferring identifiability to \eqref{eq:discrete} is proved.
+
+For an independent test sample, let $\widehat{\mathcal R}$ be the sample
+mean of squared terminal hedging errors in \eqref{eq:hedging}. Its square
+root is the reported root mean squared error (RMSE); the sample mean
+itself is the mean squared error (MSE).
+
+\begin{table}[htbp]
+\centering
+\caption{Preliminary independent-test hedging RMSE, quoted from the June
+2026 experiment note \cite{JuneNote}. Noise $\eta=0.02$; 10,000/3,000/10,000
+training/validation/test paths; validation-only model selection; $N=252$;
+one seed. The particle filter was available only in the one-asset case.}
+\label{tab:finance}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Features/model & One-asset Asian & Three-asset basket Asian \\
+\midrule
+Raw & 2.4037 & 2.0981 \\
+Reservoir & 1.0167 & 1.0573 \\
+Finite signature & 1.1026 & 1.2486 \\
+Particle filter, quadratic readout & 2.2579 & unavailable \\
+Causal Transformer & 0.8102 & 0.8684 \\
+Fitted true-state model & 0.7921 & 0.8496 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The values in \cref{tab:finance} are quoted from the June 2026 experiment
+note. Finance code and a text extraction of the note are available locally,
+but no run-specific data or fitted-model artifact establishing these exact
+measurements was located. They were not regenerated for this paper.
+The note reports
+similar ordering at $N=52$ and descriptive reservoir gap closures of
+$92.1\%$ and $89.2\%$ in the two $N=252$ problems. Gap closure is defined,
+when its denominator is positive, by
+\[
+ \frac{\widehat{\mathcal R}_{\rm raw}-\widehat{\mathcal R}_{\rm reservoir}}
+ {\widehat{\mathcal R}_{\rm raw}-\widehat{\mathcal R}_{\rm fitted\ state}}.
+\]
+The risks here are empirical MSEs, not RMSE differences. Recalculation from
+the displayed RMSEs agrees with both percentages to the stated precision;
+this checks arithmetic, not experimental reproduction. These percentages
+are descriptive and are not an instance of \eqref{eq:nesting}: the
+validation-selected fitted true-state model is neither the population
+state-information optimum nor assumed to belong to a nested fitted class.
+Missing uncertainty intervals are not supplied retrospectively.
+
+The note also reports qualitative variance reduction in preliminary pricing
+experiments. Both sets of experiments remain single-seed evidence requiring
+further replication before a benchmark conclusion. In the displayed hedging
+results the reservoir improves on raw features and finite signatures but has
+larger RMSE than the causal Transformer. Improvement over raw features
+suggested useful path-history information. It prompted the intrinsic
+representation question; the mathematical results in this paper do not explain
+these empirical inequalities.
+
+\section{Related work and the contribution boundary}
+\label{sec:related}
+\subsection{Classical algebra, signatures, and reconstruction}
+Free-Lie tensor embedding, Hall coordinates, and the Witt dimensions are
+classical \cite{Reutenauer}. The truncated tensor system is also classical
+\cite{FrizVictoir,AkyildirimAnomaly}. Finite-dimensional actions of
+nilpotent Lie algebras can be constructed from weighted quotients of
+universal enveloping algebras; Burde, Eick, and de Graaf review this route
+in their Section 2, Theorem 2.1 \cite{Burde}. Their action is expressed
+using left multiplication and the usual matrix commutator. Our
+right-concatenation orientation is checked directly in
+\eqref{eq:linearwords}, including the reversal of matrix composition
+caused by the vector-field convention. The existence of the linear
+module is not the shallow-tanh transfer argument.
+
+The grading-derived affine action in \cref{lem:gradingaffine} is
+classical pre-Lie machinery. Burde's nonsingular-cocycle construction
+and its invertible-derivation and positive-grading corollaries
+\cite[Section 3.1, Proposition 3.3, Corollaries 3.4--3.5]{BurdePreLie}
+supply $\mathcal E^{-1}\operatorname{ad}_a\mathcal E$.
+The finite-jet realization by shallow tanh and the resulting fixed-state
+Hall minor are proved separately in \cref{sec:hallrank}.
+
+Qualitative rank existence also follows by rescaling this affine action.
+At width $\nu$, take $c=1/2$ and
+$V_i^\epsilon(x)=\tanh(\epsilon ce_i-\Lambda_{e_i}x)$.
+Under $x=\epsilon y$, the pulled-back fields are
+$\epsilon^{-1}\tanh(\epsilon W_{e_i}^c(y))$, which converge to
+$W_{e_i}^c$ in every fixed finite jet on compact neighborhoods.
+Naturality of brackets gives a Hall matrix at zero of the form
+$\epsilon(cI_\nu+o(1))$; thus sufficiently small
+finite $\epsilon>0$ already gives full rank. This is a direct scaling
+observation, not an identified prior publication. The explicit witness
+in \cref{lem:hallwitness} additionally fixes $q$, preserves the graded
+blocks exactly and supplies the exact selected minors.
+
+Cuchiero, Larsson, and Teichmann
+\cite[Theorem 5.1 and Lemma 6.1]{CuchieroLarssonTeichmann} consider
+state dimension at least two and at least five vector fields on a bounded
+open connected domain. For jointly analytic families with a parameter law
+having a density and a specialization whose Lie algebra contains all
+polynomial vector fields, they prove interpolation of generic training
+inputs with distinct targets, using trained controls and a rescaled
+displacement readout. Their proof constructs nonzero
+minors of iterated-bracket evaluations and uses analytic zero sets.
+Corollary 5.4 and Example 5.5 give seven fields with randomized analytic activations
+with linear and quadratic specializations, including mixtures with tanh.
+They do not give a prescribed-degree maximal Hall-rank law for fixed
+componentwise tanh. The analytic-minor method and the use of a witness
+are established tools; our task is to construct the particular finite
+tanh minor.
+
+Finite evaluation and local inverse methods also predate this work.
+Bailleul and Diehl's Theorem 6 \cite[p.~7]{BailleulDiehl} uses a
+reconstruction matrix of generator and degree-two bracket evaluations
+at a collection of initial states, including the one-state case.
+Their conclusion concerns small-time rough-flow reconstruction in a
+specified roughness regime. It does not supply an all-$L$ shallow-tanh
+rank witness. Our main observation is the degree-$L$ truncated
+polynomial at zero; the separate scalar approximate result concerns
+eight actual BV-driven CDE responses. These observation models are
+not identified with their rough-flow inverse problem.
+
+\subsection{Randomized signatures and the shallow architecture}
+Monzio Compagnoni et al.\ \cite[Definition II.5]{MonzioCompagnoni} use
+the same fields $\sigma(A_i x+b_i)$. Their Theorem IV.1 (PDF p.~4)
+states a density result in state dimension at least two for
+Brownian-driven responses, for almost every initial state, under analytic
+activation and i.i.d.\ weights and shifts with absolutely continuous laws; its
+proof asserts generic H\"ormander bracket generation. This is a direct
+rank antecedent. Unrestricted bracket generation does not determine
+the rank at each prescribed degree cutoff or give the minor used here.
+We do not use the theorem in its full stated generality as a premise:
+analyticity alone allows constant activations, which cannot span a
+state space of dimension greater than one. This qualification supplies
+no evidence of novelty for the present result.
+
+Grong and Vega-Molino \cite[Remark 3.2]{GrongVegaMolino} use
+$\partial_x$ and $\tanh(x)\partial_x$, generate polynomial fields in
+$\tanh x$ by brackets, and use Vandermonde evaluations to obtain
+controllability of any finite ordered scalar landmark configuration.
+Thus both the scalar pair and its polynomial reduction have a precedent.
+Their unrestricted Lie spanning does not specify the homogeneous
+degree-four Hall maps, their rank-seven mixed-degree relation, or the
+eight state-scale decoder studied here. Those are the additional scalar
+statements proved in \cref{sec:scalar,sec:cross,sec:eight,sec:stability}.
+
+Cuchiero, Gonon, Grigoryeva, Ortega, and Teichmann develop discrete-time
+signature state-affine systems and their random projections as reservoir
+approximators \cite{Cuchiero}. Their approximation results for a different
+discrete system do not establish the fixed finite word determinant of
+\cref{thm:width}. Akyildirim, Gambara, Teichmann, and Zhou use randomized
+signature features in market anomaly detection and portfolio selection
+\cite{AkyildirimAnomaly,AkyildirimPortfolio}. These works provide
+architectural and application antecedents.
+
+Biagini, Gonon, and Walter \cite{BiaginiGononWalter} use a structured
+discrete-time randomized-signature construction. Under Sampling
+Scheme 4 and Assumption 6, their Lemma 7 gives an almost-sure
+continuous injective encoding of a finite datastream in a designated
+memory block. Their Proposition 9 gives uniform approximation of continuous
+functions of the preterminal history $(x_1,\ldots,x_{T-1})$ by linear
+readouts of the terminal increment at sufficient width and prescribed
+confidence; it does not allow unrestricted dependence on $x_T$.
+These locators refer to the cited PDF version.
+The activation assumptions include tanh, but the structured recurrence
+and sampling family differ from the full biased-tanh CDE parameter
+space in \cref{thm:hallrank}. Their injective encoding does not supply
+our Hall evaluation minor; conversely, our local nonlinear inverse
+does not establish their linear-readout approximation conclusion.
+
+The market-anomaly paper records the linear tensor system in Proposition
+2.10 and states a broad reconstruction claim in Theorem 2.13. Its
+analytic-genericity sketch does not supply the specific nonzero witness
+needed here. Its activation assumptions also do not directly give a
+tanh theorem: the complex Taylor series of tanh does not have infinite
+radius of convergence. We therefore use neither that broad claim nor
+an all-degree interpretation as a premise of this paper.
+
+Gl\"uckstad, Mu\c{c}a Cirone, and Teichmann \cite{Gluckstad} analyze
+iterated-field independence through tree expansions. Their Lemma 3.4 and
+Proposition 3.6 give a conditional route from per-degree independence of
+complete tree fields to per-degree independence of iterated word operators.
+Section 3.3 presents a depth-two nested-exponential construction and claims
+that its tree condition holds at state dimension at least $L-1$, with
+positive state dimension understood. The intermediate independence
+assertion for direction-resolved projected tree terms in version 1 requires
+qualification. Dependence among those individual projected terms does not,
+by itself, decide independence of the complete summed tree fields. We
+therefore do not treat the claimed depth-two width as an independently
+verified comparison bound or use that argument as a premise.
+
+Remark 3.10 concerns direction-resolved tree terms for shallow bias-free
+fields. Dependence at that level does not imply dependence of the
+word-response fields studied here. Section 5 discusses direct
+Lie-coordinate recovery. The proof of their Theorem 4.1 uses scale
+derivatives and multiple initial states, although scale access is not
+explicit in its statement. We keep access to input scaling explicit
+where it is used and prove the coefficient formula independently;
+no inference from unscaled flows to scale jets is imported. No ranking of the architectures or
+refutation of the complete depth-two reconstruction theorem is claimed.
+
+The remaining contribution is an explicit finite-parameter tanh
+realization with exact maximal Hall minors at every prescribed finite
+degree and width, and the resulting local inverse of the truncated
+response at its dimension threshold. The cited rank and interpolation
+results do not supply this specified finite-degree matrix. Fixing the
+state alone is not the contribution, and affine actions, analytic
+genericity, finite evaluation and local inversion are established methods.
+The scalar certificates and quantitative decoder, and the larger-width
+word transfer, remain separate results with their own assumptions.
+Absence of a matching statement in the sources checked, or a qualification
+of another proof, does not establish worldwide priority.
+
+\subsection{Financial antecedents}
+Martingale control variates, including stochastic-volatility pricing
+applications, are established in work such as Fouque and Han
+\cite{FouqueHan}. Restricted-information quadratic hedging is studied by
+Mania, Tevzadze, and Toronjadze \cite{Mania}. Schweizer \cite{Schweizer}
+develops restricted-information risk minimization using GKW and projection
+methods. Frey and Runggaldier \cite{FreyRunggaldier} treat stochastic
+volatility observed at discrete random times and the associated filtering
+problem. Local risk minimization, general mean-variance hedging, and the
+fixed-grid martingale projection in \cref{sec:finance} should not be
+identified without checking their assumptions. These references establish
+the financial background; neither the pricing nor the hedging projection
+facts in this paper are presented as a contribution to that theory.
+
+\section{Scope and limitations}
+\label{sec:limitations}
+The main theorem fixes initialization at zero and concerns Hall-field
+evaluations in the full biased parameter space. Its inverse is local
+and applies to the degree-$L$ truncated polynomial response.
+The sharp width $\nu_{d,L}$ is specific to continuous local recovery
+of an open Hall-coordinate neighborhood from one vector.
+Neither the rank law nor the local inverse gives global recovery,
+a trained linear-readout theorem, or practical conditioning of randomly
+sampled parameters. The inverse neighborhood can depend on the
+parameters and the nonzero scale.
+
+The three observation objects remain distinct. Ideal scale derivatives
+yield exact graded coefficients. For the original scalar witness,
+the eight truncated observations have a rational stability certificate,
+and \cref{thm:actual} controls the full-CDE remainder and extends its
+decoder to perturbed observations by clipping. Its conclusion is
+approximate. The stated estimate guarantees consistency as $h$ tends to
+zero when the observation error and exact iteration residual are $o(h^4)$.
+Exact recovery from actual
+responses at a fixed nonzero scale is not established. No corresponding
+actual-response bound is asserted for the new Hall-width construction.
+
+The larger width $D_0$ belongs to the all-word independence theorem.
+Its all-word field-independence conclusion is not replaced by the Hall-width
+result. Neither construction inherits the old scalar radius or inverse
+constants. BV signature realization is used for unrestricted paths;
+restricted path families, such as a prescribed monotone time channel,
+are not covered by the dimensional sharpness statement without their
+own open-coordinate-domain argument.
+
+The implemented recurrence \eqref{eq:discrete} is another distinct
+object. Its path-feature behavior is not proved by the continuous-field
+arguments. In particular, the preliminary hedging improvement is not
+a consequence of the Hall-rank theorem.
+
+\section{Conclusion}
+Shallow biased tanh attains the maximal fixed-zero Hall evaluation rank
+$\min(D,\nu_{d,L})$ generically, with an explicit finite witness.
+This gives local analytic recovery of the truncated Hall coordinates
+from one zero-initialized vector at the sharp width
+$D=\nu_{d,L}$. The specific content is the prescribed-degree tanh
+realization, its exact minors and its truncated observation model.
+The proof uses classical grading-derived affine actions and the
+established analytic-minor method, with a finite-jet argument supplying
+the exact tanh blocks. Prior bracket-generation, interpolation and
+landmark-control results supply the relevant antecedents
+\cite{MonzioCompagnoni,CuchieroLarssonTeichmann,GrongVegaMolino}.
+The scalar homogeneous and cross-degree certificates, the ideal
+scale-jet decoder, the quantitative eight-observation scalar inverse
+and its approximate actual-response extension, and the larger-width
+word-independence theorem retain their separate roles and assumptions.
+
+\appendix
+\section{Exact scalar graded certificates and reconstruction checks}
+\label{app:graded}
+The homogeneous matrices and determinants are \eqref{eq:Ms} and
+\eqref{eq:dets}. Their columns follow the deterministic Lyndon order in
+\eqref{eq:Hall8}; their rows are the stated ordered initial points.
+The code uses zero-based generator indices, so internal word $(0,0,1)$
+is displayed as $112$, with the same chronological ordering. Exact jets
+are normalized Taylor coefficients. The following inverse matrices are
+transcribed from the reproduced graded certificate.
+
+\[
+M_1^{-1}=\begin{pmatrix}
+-2 & 2 \\
+2 & 0
+\end{pmatrix}.
+\]
+\[
+M_2^{-1}=\begin{pmatrix}
+-2
+\end{pmatrix}.
+\]
+\begingroup
+\renewcommand{\arraystretch}{1.6}
+\[
+M_3^{-1}=\begin{pmatrix}
+\frac{16}{15} & \frac{16}{15} \\
+\frac{8}{3} & -\frac{8}{3}
+\end{pmatrix}.
+\]
+\[
+M_4^{-1}=\begin{pmatrix}
+-\frac{64}{45} & \frac{8}{15} & -\frac{64}{45} \\
+-\frac{16}{3} & 0 & \frac{16}{3} \\
+-\frac{128}{45} & \frac{76}{15} & -\frac{128}{45}
+\end{pmatrix}.
+\]
+\endgroup
+
+These inverses implement \eqref{eq:recursive}, with the ordered tensor
+corrections in \eqref{eq:exp4}. The first exact check uses
+\[
+ z=((1,-1),(2),(3,-2),(-1,2,-3)).
+\]
+Its observations, corrections, and recovered coordinates are shown below.
+No signature simulation or floating-point matrix inverse is used in these
+checks: each formal tensor exponential and jet evaluation is rational.
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{@{}rllll@{}}
+\toprule
+$m$ & $j_m$ & $\psi_m$ & $j_m-\psi_m$ & $z_m$ \\
+\midrule
+1 & $\bigl(-\frac{1}{2},0\bigr)$ & $\bigl(0,0\bigr)$ & $\bigl(-\frac{1}{2},0\bigr)$ & $\bigl(1,-1\bigr)$ \\
+2 & $\bigl(-\frac{5}{4}\bigr)$ & $\bigl(-\frac{1}{4}\bigr)$ & $\bigl(-1\bigr)$ & $\bigl(2\bigr)$ \\
+3 & $\bigl(\frac{37}{32},\frac{3}{2}\bigr)$ & $\bigl(\frac{1}{8},-\frac{9}{32}\bigr)$ & $\bigl(\frac{33}{32},\frac{57}{32}\bigr)$ & $\bigl(3,-2\bigr)$ \\
+4 & $\bigl(\frac{445}{512},\frac{5}{32},\frac{207}{256}\bigr)$ & $\bigl(\frac{385}{512},\frac{13}{32},\frac{81}{256}\bigr)$ & $\bigl(\frac{15}{128},-\frac{1}{4},\frac{63}{128}\bigr)$ & $\bigl(-1,2,-3\bigr)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Two further nonzero rational inputs and their observed jets follow. Each
+was reconstructed to exactly its input vector. They test the lower-degree
+corrections, rather than only the zero-coordinate linearization.
+
+\paragraph{Exact check 2.}
+\begin{align*}
+z_1&=\bigl(\frac{1}{2},-\frac{2}{3}\bigr),&j_1&=\bigl(-\frac{1}{3},-\frac{1}{12}\bigr),\\
+z_2&=\bigl(\frac{5}{7}\bigr),&j_2&=\bigl(-\frac{37}{84}\bigr),\\
+z_3&=\bigl(-\frac{3}{5},\frac{4}{9}\bigr),&j_3&=\bigl(-\frac{5239}{32256},-\frac{13817}{32256}\bigr),\\
+z_4&=\bigl(\frac{7}{11},-\frac{8}{13},\frac{9}{14}\bigr),&j_4&=\bigl(-\frac{1599438283}{15498362880},-\frac{393733}{1995840},-\frac{6666901981}{15498362880}\bigr).
+\end{align*}
+\paragraph{Exact check 3.}
+\begin{align*}
+z_1&=\bigl(-\frac{5}{3},\frac{2}{7}\bigr),&j_1&=\bigl(\frac{1}{7},-\frac{29}{42}\bigr),\\
+z_2&=\bigl(-\frac{11}{4}\bigr),&j_2&=\bigl(\frac{211}{168}\bigr),\\
+z_3&=\bigl(\frac{13}{8},-\frac{17}{9}\bigr),&j_3&=\bigl(\frac{27269}{84672},\frac{63241}{84672}\bigr),\\
+z_4&=\bigl(\frac{19}{10},-\frac{23}{12},\frac{29}{15}\bigr),&j_4&=\bigl(-\frac{74384759}{142248960},-\frac{2116939}{4445280},-\frac{45565913}{17781120}\bigr).
+\end{align*}
+
+The cross-degree polynomial recurrence \eqref{eq:polybracket} gives
+\eqref{eq:P8} and the complete coefficient matrix \eqref{eq:coeffmatrix}.
+As an independent exact convention check, their Taylor expansions after
+$u=\tanh x$ through order six agree with the existing recursive bracket-jet
+implementation. Because all displayed polynomials have degree at most six
+and $\tanh$ has nonzero linear coefficient, this comparison is consistent
+with the exact polynomial rank proof. The rank itself is certified by the
+nonzero rational minor and explicit kernel vector, not by floating-point
+Taylor evaluation.
+
+\section{The complete state-scale Jacobian and inverse}
+\label{app:inverse}
+With design rows in \eqref{eq:design} and Hall columns in
+\eqref{eq:Hall8}, the full derivative of the nonlinear truncated map is
+the following rational matrix.
+
+\begingroup\small\setlength{\arraycolsep}{3pt}
+\renewcommand{\arraystretch}{1.7}
+\begin{equation}\label{eq:Bfull}
+B=\begin{pmatrix}
+-\frac{1}{2} & \frac{1}{2} & -\frac{3}{8} & \frac{15}{32} & \frac{3}{16} & -\frac{57}{128} & -\frac{3}{32} & \frac{3}{64} \\
+-1 & 1 & -\frac{3}{2} & \frac{15}{4} & \frac{3}{2} & -\frac{57}{8} & -\frac{3}{2} & \frac{3}{4} \\
+-\frac{3}{2} & \frac{3}{2} & -\frac{27}{8} & \frac{405}{32} & \frac{81}{16} & -\frac{4617}{128} & -\frac{243}{32} & \frac{243}{64} \\
+0 & 1 & -2 & 4 & 0 & -8 & 0 & 4 \\
+0 & \frac{3}{2} & -\frac{9}{2} & \frac{27}{2} & 0 & -\frac{81}{2} & 0 & \frac{81}{4} \\
+\frac{1}{2} & \frac{1}{2} & -\frac{3}{8} & \frac{15}{32} & -\frac{3}{16} & -\frac{57}{128} & \frac{3}{32} & \frac{3}{64} \\
+1 & 1 & -\frac{3}{2} & \frac{15}{4} & -\frac{3}{2} & -\frac{57}{8} & \frac{3}{2} & \frac{3}{4} \\
+\frac{3}{2} & \frac{3}{2} & -\frac{27}{8} & \frac{405}{32} & -\frac{81}{16} & -\frac{4617}{128} & \frac{243}{32} & \frac{243}{64}
+\end{pmatrix}.
+\end{equation}
+\endgroup
+
+For an additional elimination certificate, ordinary exact LU elimination
+swaps the second and fourth rows and has diagonal pivots
+\[
+ -\frac12,\quad 1,\quad-\frac94,\quad-\frac{15}{16},\quad-3,
+ \quad\frac{4863}{1280},\quad-\frac{9339}{3242},
+ \quad-\frac{32265}{2264}.
+\]
+The negative of their product is $-258733035/524288$, agreeing with
+\eqref{eq:detB}. The row-scaled integer display below specifies the entire
+inverse without rounding: if $\mathbf s$ is its positive denominator
+vector and $T_B$ the displayed integer matrix, then
+$B^{-1}=\diag(1/s_1,\ldots,1/s_8)T_B$. Direct multiplication on either
+side gives the identity.
+
+\[
+\mathbf s=\bigl(66,717,2151,2151,99,32265,33,32265\bigr).
+\]
+\begingroup\small\setlength{\arraycolsep}{3pt}
+\[
+T_B=\begin{pmatrix}
+-108 & 27 & -4 & 0 & 0 & 108 & -27 & 4 \\
+1080 & 378 & -88 & -1215 & 240 & 1080 & 378 & -88 \\
+-684 & 4923 & -964 & -8910 & 1760 & -684 & 4923 & -964 \\
+-2280 & 3504 & -664 & -3888 & 768 & -2280 & 3504 & -664 \\
+-228 & 156 & -28 & 0 & 0 & 228 & -156 & 28 \\
+-9168 & 12852 & -2992 & -11196 & 2424 & -9168 & 12852 & -2992 \\
+-40 & 32 & -8 & 0 & 0 & 40 & -32 & 8 \\
+-1416 & 5814 & -2264 & -9162 & 3828 & -1416 & 5814 & -2264
+\end{pmatrix}.
+\]
+\endgroup
+
+In the same row order its exact absolute row sums are
+\begin{equation}\label{eq:invrows}
+ \left(\frac{139}{33},\frac{4547}{717},\frac{23812}{2151},
+ \frac{17552}{2151},\frac{824}{99},\frac{63644}{32265},
+ \frac{160}{33},\frac{31978}{32265}\right).
+\end{equation}
+Their maximum is $K=23812/2151$. This exact infinity norm is distinct
+from a numerical two-norm condition number.
+
+\section{Complete polynomial specification and stability arithmetic}
+\label{app:polynomial}
+The coefficient calculation can be stated without any opaque polynomial
+oracle. Let $\mathbf d=(1,1,2,3,3,4,4,4)$, and for a multiindex $\alpha$
+put $\mathrm{wt}(\alpha)=\sum_a d_a\alpha_a$. For an initial point $y$,
+write
+\begin{equation}\label{eq:polyfull}
+ F_y^{\leq4}(r;z)-y
+ =\sum_{\substack{1\leq|\alpha|\leq4\\\mathrm{wt}(\alpha)\leq4}}
+ c_{y,\alpha}\,r^{\mathrm{wt}(\alpha)}z^\alpha.
+\end{equation}
+Each coefficient has the finite expression
+\begin{equation}\label{eq:coeffalgorithm}
+ c_{y,\alpha}=\frac1{|\alpha|!}
+ \sum_{\substack{(a_1,\ldots,a_{|\alpha|})\\
+ \#\{j:a_j=b\}=\alpha_b\ \text{for every }b}}
+ \bigl(\Gamma(H_{a_1})\cdots\Gamma(H_{a_{|\alpha|}})\Id\bigr)(y).
+\end{equation}
+This sums ordered tuples, preserving noncommuting operators even though
+the coordinate monomials commute. By \eqref{eq:Lieoperator}, each
+$\Gamma(H_a)$ is the scalar operator
+$P_a(u)(1-u^2)\,d/du$ on functions of $u$. When the rightmost operator
+acts on $\Id(x)=x$, it gives $P_a(u)$; all remaining actions use that
+displayed polynomial derivative. Hence \eqref{eq:P8} and
+\eqref{eq:coeffalgorithm} determine every entry by rational operations
+at $u=-1/2,0,1/2$.
+
+\Cref{tab:responsecoeff} lists all 27 monomials with a nonzero coefficient
+at at least one of these states. Unlisted monomials have zero coefficient
+at all three states. Substitute each design scale in \eqref{eq:polyfull}
+to recover the eight complete observation polynomials; their total number
+of nonzero output terms is 190. Differentiating a term contributes
+$\alpha_a c_{y,\alpha}r^{\mathrm{wt}(\alpha)}z^{\alpha-e_a}$ to column
+$a$ of the Jacobian, where $e_a$ is the coordinate multiindex. This
+specifies all coefficients in \eqref{eq:derivative_poly} and directly
+connects the majorant to the implemented nonlinear map.
+
+\begingroup
+\renewcommand{\arraystretch}{1.7}
+\begin{longtable}{@{}lrrrr@{}}
+\caption{Complete nonzero coefficient support in \eqref{eq:polyfull}. The scale power is the weight.}\label{tab:responsecoeff}\\
+\toprule
+$z^\alpha$ & $\mathrm{wt}(\alpha)$ & $c_{-q,\alpha}$ & $c_{0,\alpha}$ & $c_{q,\alpha}$ \\
+\midrule
+\endfirsthead
+\toprule
+$z^\alpha$ & $\mathrm{wt}(\alpha)$ & $c_{-q,\alpha}$ & $c_{0,\alpha}$ & $c_{q,\alpha}$ \\
+\midrule
+\endhead
+$z_{2}$ & 1 & $\frac{1}{2}$ & $\frac{1}{2}$ & $\frac{1}{2}$ \\
+$z_{1}$ & 1 & $-\frac{1}{2}$ & $0$ & $\frac{1}{2}$ \\
+$z_{3}$ & 2 & $-\frac{3}{8}$ & $-\frac{1}{2}$ & $-\frac{3}{8}$ \\
+$z_{1}z_{2}$ & 2 & $\frac{3}{16}$ & $\frac{1}{4}$ & $\frac{3}{16}$ \\
+$z_{1}^{2}$ & 2 & $-\frac{3}{16}$ & $0$ & $\frac{3}{16}$ \\
+$z_{5}$ & 3 & $\frac{3}{16}$ & $0$ & $-\frac{3}{16}$ \\
+$z_{4}$ & 3 & $\frac{15}{32}$ & $\frac{1}{2}$ & $\frac{15}{32}$ \\
+$z_{2}z_{3}$ & 3 & $-\frac{3}{32}$ & $0$ & $\frac{3}{32}$ \\
+$z_{1}z_{3}$ & 3 & $-\frac{3}{64}$ & $-\frac{1}{4}$ & $-\frac{3}{64}$ \\
+$z_{1}z_{2}^{2}$ & 3 & $\frac{1}{32}$ & $0$ & $-\frac{1}{32}$ \\
+$z_{1}^{2}z_{2}$ & 3 & $-\frac{1}{64}$ & $\frac{1}{12}$ & $-\frac{1}{64}$ \\
+$z_{1}^{3}$ & 3 & $-\frac{1}{64}$ & $0$ & $\frac{1}{64}$ \\
+$z_{8}$ & 4 & $\frac{3}{64}$ & $\frac{1}{4}$ & $\frac{3}{64}$ \\
+$z_{7}$ & 4 & $-\frac{3}{32}$ & $0$ & $\frac{3}{32}$ \\
+$z_{6}$ & 4 & $-\frac{57}{128}$ & $-\frac{1}{2}$ & $-\frac{57}{128}$ \\
+$z_{3}^{2}$ & 4 & $\frac{9}{128}$ & $0$ & $-\frac{9}{128}$ \\
+$z_{2}z_{5}$ & 4 & $-\frac{3}{128}$ & $-\frac{1}{8}$ & $-\frac{3}{128}$ \\
+$z_{2}z_{4}$ & 4 & $\frac{3}{64}$ & $0$ & $-\frac{3}{64}$ \\
+$z_{1}z_{5}$ & 4 & $\frac{3}{32}$ & $0$ & $-\frac{3}{32}$ \\
+$z_{1}z_{4}$ & 4 & $\frac{33}{256}$ & $\frac{1}{4}$ & $\frac{33}{256}$ \\
+$z_{2}^{2}z_{3}$ & 4 & $\frac{1}{128}$ & $\frac{1}{24}$ & $\frac{1}{128}$ \\
+$z_{1}z_{2}z_{3}$ & 4 & $-\frac{7}{64}$ & $0$ & $\frac{7}{64}$ \\
+$z_{1}^{2}z_{3}$ & 4 & $\frac{17}{256}$ & $-\frac{1}{12}$ & $\frac{17}{256}$ \\
+$z_{1}z_{2}^{3}$ & 4 & $-\frac{1}{512}$ & $-\frac{1}{96}$ & $-\frac{1}{512}$ \\
+$z_{1}^{2}z_{2}^{2}$ & 4 & $\frac{15}{512}$ & $0$ & $-\frac{15}{512}$ \\
+$z_{1}^{3}z_{2}$ & 4 & $-\frac{45}{1024}$ & $\frac{1}{48}$ & $-\frac{45}{1024}$ \\
+$z_{1}^{4}$ & 4 & $\frac{17}{1024}$ & $0$ & $-\frac{17}{1024}$ \\
+\bottomrule
+\end{longtable}
+\endgroup
+
+\begin{table}[htbp]
+\centering
+\caption{Exact absolute row coefficient sums in \eqref{eq:Delta}.}\label{tab:majorant}
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Row $j$ & $a_{j,1}$ & $a_{j,2}$ & $a_{j,3}$ \\
+\midrule
+1,6 & $\frac{225}{128}$ & $\frac{189}{256}$ & $\frac{47}{128}$ \\
+2,7 & $\frac{135}{8}$ & $\frac{165}{16}$ & $\frac{47}{8}$ \\
+3,8 & $\frac{9369}{128}$ & $\frac{12717}{256}$ & $\frac{3807}{128}$ \\
+4 & $18$ & $8$ & $2$ \\
+5 & $\frac{315}{4}$ & $\frac{297}{8}$ & $\frac{81}{8}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The sixteen radii below use the same coefficient-sum bound, with no
+floating-point acceptance threshold. The rule selects the largest listed
+radius for which the final column is at most $1/2$. Every entry is an
+exact rational value; the pass/fail flag is a rational comparison.
+
+\begingroup\small
+\renewcommand{\arraystretch}{1.7}
+\begin{longtable}{@{}lrrl@{}}
+\caption{Complete prescribed exact radius search.}\label{tab:radii}\\
+\toprule
+$R$ & $\Delta(R)$ & $K\Delta(R)$ & $K\Delta(R)\leq1/2$ \\
+\midrule
+\endfirsthead
+\toprule
+$R$ & $\Delta(R)$ & $K\Delta(R)$ & $K\Delta(R)\leq1/2$ \\
+\midrule
+\endhead
+$\frac{1}{2}$ & $\frac{3375}{64}$ & $\frac{2232375}{3824}$ & no \\
+$\frac{1}{4}$ & $\frac{11349}{512}$ & $\frac{7506733}{30592}$ & no \\
+$\frac{1}{8}$ & $\frac{42777}{4096}$ & $\frac{28294609}{244736}$ & no \\
+$\frac{1}{16}$ & $\frac{166113}{32768}$ & $\frac{109874521}{1957888}$ & no \\
+$\frac{1}{32}$ & $\frac{654705}{262144}$ & $\frac{433050985}{15663104}$ & no \\
+$\frac{1}{64}$ & $\frac{2599569}{2097152}$ & $\frac{1719470473}{125304832}$ & no \\
+$\frac{1}{128}$ & $\frac{10360017}{16777216}$ & $\frac{6852575689}{1002438656}$ & no \\
+$\frac{1}{256}$ & $\frac{41363793}{134217728}$ & $\frac{27359851081}{8019509248}$ & no \\
+$\frac{1}{512}$ & $\frac{165302865}{1073741824}$ & $\frac{109338661705}{64156073984}$ & no \\
+$\frac{1}{1024}$ & $\frac{660907089}{8589934592}$ & $\frac{437153322313}{513248591872}$ & no \\
+$\frac{1}{2048}$ & $\frac{2643019857}{68719476736}$ & $\frac{1748210800969}{4105988734976}$ & yes \\
+$\frac{1}{4096}$ & $\frac{10570862673}{549755813888}$ & $\frac{6992038388041}{32847909879808}$ & yes \\
+$\frac{1}{8192}$ & $\frac{42281017425}{4398046511104}$ & $\frac{27966544081225}{262783279038464}$ & yes \\
+$\frac{1}{16384}$ & $\frac{169119203409}{35184372088832}$ & $\frac{111862957543753}{2102266232307712}$ & yes \\
+$\frac{1}{32768}$ & $\frac{676467081297}{281474976710656}$ & $\frac{447445392773449}{16818129858461696}$ & yes \\
+$\frac{1}{65536}$ & $\frac{2705848860753}{2251799813685248}$ & $\frac{1789768696451401}{134545038867693568}$ & yes \\
+\bottomrule
+\end{longtable}
+\endgroup
+
+The value of $c_*$ is exactly $1/K-\Delta(R_*)$ and $C_*=1/c_*$.
+The half-margin and the simple bound $2K$ in \cref{thm:stability} are
+therefore consequences of the displayed arithmetic. They do not depend
+on numerical estimates of a smallest singular value.
+
+\section{Computational verification and reproducibility}
+\label{app:reproduce}
+\subsection{Authority and exact arithmetic}
+The paper's exact scalar data come from the following artifacts:
+\begin{itemize}[nosep]
+\item \file{research_output/certificate.json}
+\item \file{research_output/graded_reconstruction_certificate.json}
+\item \file{research_output/finite_observation_certificate.json}
+\item \file{research_output/local_stability_certificate.json}
+\end{itemize}
+Their default reproducers recompute and compare the certificate payloads.
+They do not write new artifacts by default. The mathematical results
+are proved in \cref{sec:hallrank,sec:graded,sec:finite,sec:width}; a finite computational
+test is not substituted for any universal quantifier in those proofs.
+
+The implementation uses the existing deterministic free-Lie words and
+Lyndon brackets, exact activation jets, tensor products, and rational
+matrix operations. No second free-Lie implementation or tensor convention
+is introduced for this paper. The scalar certificate status is
+\file{exact_nonzero}, with method
+\file{exact_symbolic_determinant_simplification}. The original numerical
+candidate remains \file{numerical_candidate_only}.
+
+The separate tensor-system structural harness has the following scope.
+\begin{center}
+\begin{tabular}{@{}rrrrr@{}}
+\toprule
+$d$ & $L$ & $D_0$ & $Q_{d,L}$ & Exact Hall rank \\
+\midrule
+2&2&7&6&3\\
+2&3&15&14&5\\
+2&4&31&30&8\\
+3&2&13&12&6\\
+\bottomrule
+\end{tabular}
+\end{center}
+For these cases it verifies the exact identity word matrix, vanishing at
+length $L+1$ in the linear system, the one-segment tensor exponential,
+the two-segment chronological Chen product, and agreement of Hall
+expansions with word responses. Smaller cases also check block embeddings
+and report a normalized-tanh limit diagnostic. It extracts exact symbolic
+coefficients of orders $\epsilon^0$ and $\epsilon^1$ and represents them
+as exact rational values. It certifies no particular nonzero epsilon.
+The analytic transfer proof remains the basis for the arbitrary-$d,L$
+conclusion.
+
+\subsection{Exact checks of the Hall-rank construction}
+The authoritative proof note is
+\file{research_output/intrinsic_hall_rank_theorem.md}.
+The exact artifact
+\file{research_output/intrinsic_hall_rank_certificate.json}
+is recomputed from actual finite tanh jets by
+\file{research_output/reproduce_intrinsic_hall_rank.py}.
+The computations reuse the existing Hall basis and tensor convention.
+They construct adjoints, grading operators and ideal quotients exactly;
+tanh coefficients are generated recursively from $T'=1-T^2$, with
+$\tanh(q)=1/2$ represented exactly. Brackets of length at most $L$
+need generator jets through order $L-1$.
+
+For $(d,L,D)=(2,4,8)$, in the order
+$(1,2,12,112,122,1112,1122,1222)$, the computed matrix is
+\begin{equation}\label{eq:hallregression}
+ H_\theta=\frac12 I_8-\frac1{32}(E_{3,6}+E_{3,8}),
+ \qquad \det H_\theta=\frac1{256},
+\end{equation}
+where $E_{a,b}$ has its only nonzero entry, one, in row $a$, column $b$
+with one-based indices. This specifies every entry, including the two
+nonlinear off-diagonal terms. The calculation generates these entries
+from the jets; the displayed matrix is a regression fixture.
+
+The 17 persisted cases include the full-width references
+\[
+ (d,L,\nu)=(2,2,3),(2,3,5),(2,4,8),(2,5,14),
+              (3,3,14),(3,4,32),
+\]
+as well as widths below $d$, quotients cutting a homogeneous level,
+padded widths, and $d=1$ or $L=1$ edge cases. Each selected minor is
+exactly $2^{-\min(D,\nu)}$. The finite harness supports
+$d\leq3$, $L\leq5$, $d^L\leq128$, and $D\leq40$; these are resource
+limits of this implementation, not hypotheses of \cref{thm:hallrank}.
+Genericity comes from its proof, not from the finite cases or determinant
+sizes. Independent checks include a small complete truncated-map
+Jacobian, nonzero rational scale factors and the degenerate zero scale,
+direct bracket signs, and the degree-seven tanh coefficient $-17/315$.
+
+\subsection{Non-certifying numerical diagnostics}
+The rounded two-norm condition numbers attached to the homogeneous
+matrices $M_1,\ldots,M_4$ are respectively
+$2.618034$, $1.0$, $2.5$, and $6.2704558$. The certificate's binary64
+conversion of the exact determinant product is
+$-0.00036209821701049805$. These are diagnostics of exact matrices,
+not certificates. The associated numerical ranks are $2,1,2,3$.
+
+The original degree-four numerical discovery candidate used 42 points,
+weight seed 1729, point seed 2719, and extension point seed 1000002719.
+Its zero-based selected rows were $(18,32,22)$ and columns $(0,1,2)$;
+its floating determinant was $-5.041803997872895$ and floating condition
+number $1.9857803041316449$. It is a different candidate from the exact
+scalar witness. These historical values are preserved as numerical
+provenance only.
+
+For the selected eight-output design the binary64 two-norm condition
+number reported to twelve significant digits is $468.626825569$.
+The reported singular values, in descending order, are
+\begin{align*}
+ &(72.8678806904,\ 13.4576527068,\ 12.4585453832,\ 2.9110008089,\\
+ &\hspace{8mm}1.23631176424,\ 0.365987026873,\ 0.197225996535,
+ \ 0.155492337857).
+\end{align*}
+The deterministic design search first required an exact nonzero
+determinant, then preferred fewer distinct absolute scales, a
+lexicographically smaller set of absolute scales, a lower numerical
+condition number, and finally the lexicographic ordered-pair list.
+The numerical tie-break does not enter the determinant or stability proof.
+
+\subsection{Commands and results}
+The following commands reproduce the six exact/structural checks:
+\begin{verbatim}
+python research_output/reproduce_certificate.py
+python research_output/reproduce_graded_reconstruction.py
+python research_output/reproduce_finite_observation.py
+python research_output/reproduce_local_stability.py
+python research_output/reproduce_tensor_witness.py
+python research_output/reproduce_intrinsic_hall_rank.py
+\end{verbatim}
+The first five completed successfully in the original manuscript audit.
+The Hall reproducer checks all 17 persisted cases without writing by
+default. Focused tests are
+\begin{verbatim}
+python -m pytest tests/test_certificates.py -q
+python -m pytest tests/test_graded_reconstruction.py -q
+python -m pytest tests/test_finite_observation.py -q
+python -m pytest tests/test_local_stability.py -q
+python -m pytest tests/test_tensor_witness.py -q
+python -m pytest tests/test_intrinsic_hall_rank.py -q
+python -m pytest -q
+git diff --check
+\end{verbatim}
+The original 5 September audit recorded respectively 7, 28, 21, 18,
+and 40 passing tests for the first five focused commands, and 233
+passing tests in 118.74 seconds for its full suite. Those counts are
+historical. Actual test
+invocations added \texttt{-p no:cacheprovider} and set
+\file{PYTHONDONTWRITEBYTECODE=1} to avoid cache artifacts. The environment
+used Python 3.13.3, NumPy 2.3.1, SymPy 1.14.0, pytest 9.1.1, and
+PyTorch 2.12.1 on Windows.
+
+The completed Hall implementation stage recorded 38 new focused tests,
+135 affected existing tests, and a full-suite result of 271 passed.
+Its exact commands, timings and environment are retained in the
+authoritative theorem note. The Stage 3 document integration reran
+the Hall and scalar certificate reproducers and checked document
+consistency without repeating the full computational campaign.
+The final independent audit reran all six reproducers and the repository
+gate \texttt{python -B -m pytest -q -p no:cacheprovider}: all 271 tests
+passed in 127.32 seconds. Its additional direct symbolic bracket check
+recovered the complete width-eight Hall matrix, and a corrupted payload
+with unchanged rank and determinant was rejected by the read-only verifier.
+
+At that audit, the worktree already had unrelated finance and line-ending
+changes. Global whitespace checking reported 804 pre-existing
+trailing-whitespace instances in \file{rsmc/__init__.py},
+\file{rsmc/hedging.py}, and \file{tests/test_hedging.py}.
+Those files were not changed during paper preparation. The companion
+\file{research_output/paper_mathematical_audit.md} records the source
+hierarchy, theorem classifications, and final preservation checks.
+The subsequent actual-response validation uses the existing tensor and
+polynomial utilities and writes no artifacts. Run
+\begin{verbatim}
+python research_output/validate_actual_response_recovery.py
+\end{verbatim}
+It checks exact polynomial scaling and reference Hall conversion, then
+compares the axis-flow responses and clipped decoder at 80 and 120 decimal
+digits. The existing research report records the paths, perturbations,
+remainder, coordinate error and the two distinct residuals. These numerical
+flow evaluations and computed residuals are not exact certificates.
+
+Neither a Windows nor an Ubuntu-on-WSL LaTeX engine was available at the
+Stage 3 integration check on 13 September; its static checks did not
+verify PDF layout. The final independent audit used a portable Tectonic
+0.17.0 executable, verified against the official release checksum, to
+compile the canonical source. The companion audit records the resulting
+diagnostics and visual checks. With Tectonic available on the executable
+path, ensure \file{paper/build} exists and run:
+\begin{verbatim}
+tectonic --keep-logs --keep-intermediates --outdir paper/build \
+         paper/randomized_signature_identifiability.tex
+\end{verbatim}
+Tectonic reruns TeX until the references settle; repeat the command after
+any source change.
+
+\begin{thebibliography}{99}
+
+\bibitem{Cuchiero}
+C. Cuchiero, L. Gonon, L. Grigoryeva, J.-P. Ortega, and J. Teichmann.
+Discrete-time signatures and randomness in reservoir computing.
+\emph{IEEE Transactions on Neural Networks and Learning Systems},
+33(11):6321--6330, 2022.
+\url{https://arxiv.org/abs/2010.14615}.
+
+\bibitem{AkyildirimAnomaly}
+E. Akyildirim, M. Gambara, J. Teichmann, and S. Zhou.
+Applications of signature methods to market anomaly detection.
+Preprint, 2022. \url{https://arxiv.org/abs/2201.02441}.
+
+\bibitem{AkyildirimPortfolio}
+E. Akyildirim, M. Gambara, J. Teichmann, and S. Zhou.
+Randomized signature methods in optimal portfolio selection.
+\emph{Quantitative Finance}, 25(2):197--216, 2025.
+\url{https://doi.org/10.1080/14697688.2025.2458613}.
+
+\bibitem{MonzioCompagnoni}
+E. Monzio Compagnoni, A. Scampicchio, L. Biggio, A. Orvieto,
+T. Hofmann, and J. Teichmann.
+On the effectiveness of Randomized Signatures as Reservoir for Learning
+Rough Dynamics. \emph{International Joint Conference on Neural Networks
+(IJCNN)}, 2023.
+Numbered locators refer to arXiv version 3, 26 April 2023:
+\url{https://arxiv.org/pdf/2201.00384v3}.
+
+\bibitem{CuchieroLarssonTeichmann}
+C. Cuchiero, M. Larsson, and J. Teichmann.
+Deep neural networks, generic universal interpolation, and controlled ODEs.
+\emph{SIAM Journal on Mathematics of Data Science}, 2(3):901--919, 2020.
+\url{https://doi.org/10.1137/19M1284117}.
+Numbered locators refer to arXiv version 2:
+\url{https://arxiv.org/pdf/1908.07838v2}.
+
+\bibitem{GrongVegaMolino}
+E. Grong and S. Vega-Molino.
+Controllability on landmark manifolds for shapes and neural ODEs.
+\emph{Mathematics of Control, Signals, and Systems}, 38:275--289, 2026.
+\url{https://doi.org/10.1007/s00498-026-00435-1}.
+Numbered locators refer to arXiv version 3, 31 July 2025:
+\url{https://arxiv.org/html/2403.08090v3}.
+
+\bibitem{Gluckstad}
+M. Gl\"uckstad, N. Mu\c{c}a Cirone, and J. Teichmann.
+Signature reconstruction from randomized signatures.
+Preprint, version 1, 2025.
+\url{https://arxiv.org/abs/2502.03163v1}.
+
+\bibitem{BailleulDiehl}
+I. Bailleul and J. Diehl.
+The inverse problem for rough controlled differential equations.
+Preprint, version 3, 14 November 2014.
+\url{https://arxiv.org/pdf/1407.2768v3}.
+
+\bibitem{BiaginiGononWalter}
+F. Biagini, L. Gonon, and N. Walter.
+Universal randomised signatures for generative time series modelling.
+Preprint, version 2, 6 September 2024.
+Numbered locators refer to the PDF:
+\url{https://arxiv.org/pdf/2406.10214v2}.
+
+\bibitem{Reutenauer}
+C. Reutenauer. \emph{Free Lie Algebras}.
+London Mathematical Society Monographs, New Series 7.
+Oxford University Press, 1993.
+\url{https://academic.oup.com/book/53911}.
+
+\bibitem{FrizVictoir}
+P. K. Friz and N. B. Victoir.
+\emph{Multidimensional Stochastic Processes as Rough Paths: Theory and
+Applications}. Cambridge University Press, 2010.
+Numbered locators here refer to the authors' May 2009 draft:
+\url{https://page.math.tu-berlin.de/~friz/master4_May6th.pdf}.
+
+\bibitem{Burde}
+D. Burde, B. Eick, and W. de Graaf.
+Computing faithful representations for nilpotent Lie algebras.
+\emph{Journal of Algebra}, 322:602--612, 2009.
+\url{https://arxiv.org/abs/0807.2345}.
+
+\bibitem{BurdePreLie}
+D. Burde.
+Left-symmetric algebras, or pre-Lie algebras in geometry and physics.
+\emph{Central European Journal of Mathematics}, 4(3):323--357, 2006.
+Numbered locators refer to the author's PDF dated 1 March 2011:
+\url{https://homepage.univie.ac.at/dietrich.burde/papers/burde_24_pre_lie.pdf}.
+
+\bibitem{Mityagin}
+B. S. Mityagin. The zero set of a real analytic function.
+Preprint, 2015. \url{https://arxiv.org/abs/1512.07276}.
+
+\bibitem{FouqueHan}
+J.-P. Fouque and C.-H. Han.
+A martingale control variate method for option pricing with stochastic
+volatility. \emph{ESAIM: Probability and Statistics}, 11:40--54, 2007.
+\url{https://www.numdam.org/item/10.1051/ps:2007005.pdf}.
+
+\bibitem{Mania}
+M. Mania, R. Tevzadze, and T. Toronjadze.
+Mean-variance hedging under partial information.
+Preprint, 2007. \url{https://arxiv.org/abs/math/0703424}.
+
+\bibitem{Schweizer}
+M. Schweizer. Risk-minimizing hedging strategies under restricted
+information. \emph{Mathematical Finance}, 4:327--342, 1994.
+\url{https://people.math.ethz.ch/~mschweiz/Files/restrinf.pdf}.
+
+\bibitem{FreyRunggaldier}
+R. Frey and W. J. Runggaldier.
+Risk-minimizing hedging strategies under restricted information:
+The case of stochastic volatility models observable only at discrete
+random times. \emph{Mathematical Methods of Operations Research},
+50:339--350, 1999.
+\url{https://doi.org/10.1007/s001860050101}.
+
+\bibitem{Hatcher}
+A. Hatcher. \emph{Algebraic Topology}.
+Cambridge University Press, 2002.
+\url{https://pi.math.cornell.edu/~hatcher/AT/AT.pdf}.
+
+\bibitem{JuneNote}
+P. Stojkovi\'{c}. \emph{Updated Research Note: Randomized-Signature
+Reservoirs for Partial-Information Hedging}.
+Subtitle: Causal State Representations for Observed-Filtration GKW Hedging.
+Internal experiment note, June 2026.
+Repository text extraction:
+\file{research_output/sources/research_notes_innovation_project_6.txt}.
+The displayed financial measurements are quoted from this note.
+
+\end{thebibliography}
+\end{document}

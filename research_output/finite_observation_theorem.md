@@ -6,6 +6,15 @@ This note concerns only the degree-four truncated response (observation object
 B). It does not identify that polynomial with the actual full CDE response
 (object C), whose expansion contains levels at least five.
 
+The separate [fixed-state Hall-rank theorem](intrinsic_hall_rank_theorem.md)
+gives generic rank \(\min(D,\nu_{d,L})\) at zero for the full biased
+shallow-tanh family, where \(\nu_{d,L}\) is the total Hall dimension through
+degree \(L\). At \(D\geq\nu_{d,L}\), one truncated terminal vector
+at a fixed nonzero scale locally recovers the Hall coordinates near zero,
+with a sharp dimension threshold for that model. The eight scalar
+state-scale observations below remain a separate certified design. Their
+scale-count constraints and exact constants do not apply to that vector map.
+
 Let
 \[
 q=\frac{\log 3}{2},\qquad V_1(x)=\tanh x,\qquad V_2(x)=\frac12.
@@ -223,6 +232,14 @@ conditioning of the degree-four truncated observation map.  It was not
 selected to approximate the actual full CDE response: degree-five and higher
 terms of that response can be large at these scales.
 
+The later actual-response theorem in the
+[canonical manuscript](../paper/randomized_signature_identifiability.tex)
+(“Approximate recovery from actual responses”, `thm:actual`) uses these same
+eight pairs after a sufficiently small common rescaling. With a known BV
+total-variation bound, it proves approximate Hall recovery using an explicit
+fifth-order remainder and clipped decoder. This leaves the exact truncated
+design and its constants below unchanged.
+
 In the Hall order of Section 1, its exact zero Jacobian is
 \[
 B_*=
@@ -353,9 +370,10 @@ c_*=\frac{21220001406063}{409087045009408}.
 \]
 
 The radius \(1/2048\) is a conservative coefficient-majorant certificate, not
-a claim of the largest possible stable radius.  The result remains confined
-to object B, is not parameter-uniform, and does not transfer to the actual
-full CDE object C.
+a claim of the largest possible stable radius. The local stability theorem
+is for object B and is not parameter-uniform. Applying it to actual responses
+requires the separate remainder and decoder argument cited in Section 4;
+the local inverse alone does not establish that approximation result.
 
 ## 7. Dimension lower bound
 
@@ -383,6 +401,11 @@ reservoir-run minimality, unrestricted or universal scale minimality, or a
 statement about terminal observations of the full CDE.  The only scale-count
 optimality claimed is for the restricted three-state scalar model in Section
 4.
+
+For one \(D\)-dimensional truncated terminal vector, the fixed-state
+Hall-rank theorem attains the same scalar codomain bound at \(D=8\), with
+zero initialization and one fixed nonzero scale. This does not change the
+restricted scalar design's scale-count statement.
 
 ## 8. Common scale rescaling
 
@@ -514,9 +537,11 @@ The established result is:
   downstream zero-linearization inverse norm has
   \(\Theta(|h|^{-4})\) amplification.
 
-No claim is made about global inversion, a sharp or maximal stability radius,
-parameter-uniform stability, finite-difference reconstruction, the full CDE
-response, levels at least five, discrete-time or finance consequences, or
-universal measurement minimality.
+This finite-observation theorem makes no claim about global inversion, a sharp
+or maximal stability radius, parameter-uniform stability, finite-difference
+reconstruction, exact full-CDE recovery, recovery of levels at least five,
+discrete-time or finance consequences, or universal measurement minimality.
+The separate approximate object-C result and the one-vector local object-B
+result have the respective scope described above.
 
 **Final status: PROVED.**
