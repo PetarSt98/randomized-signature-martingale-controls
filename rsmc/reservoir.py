@@ -104,6 +104,10 @@ class RandomizedSignatureReservoir:
         """Number of input channels d."""
         return self.weights.shape[0]
 
+    def vector_field(self, h: np.ndarray, channel: int) -> np.ndarray:
+        """Evaluate the frozen channel vector field at the current state."""
+        return self.activation(h @ self.weights[channel].T + self.biases[channel])
+
     def run(self, features: PathFeatures) -> np.ndarray:
         """Compute reservoir states h_k along every path.
 
@@ -132,13 +136,55 @@ class RandomizedSignatureReservoir:
         for k in range(n_steps):
             step = np.zeros((n_paths, self.dim))
             for r in range(self.n_channels):
-                pre_activation = h @ self.weights[r].T + self.biases[r]   # (n, D)
                 channel_increment = increments[:, k, r][:, None]          # (n, 1)
-                step += self.activation(pre_activation) * channel_increment
+                step += self.vector_field(h, r) * channel_increment
             h = h + step
             states[:, k + 1, :] = h
 
         return states
+
+
+@dataclass(frozen=True, kw_only=True)
+class DepthTwoSignatureReservoir(RandomizedSignatureReservoir):
+    """Frozen ``tanh(B_r tanh(A_r h + b_r) + c_r)`` vector fields.
+
+    The inherited weights/biases are A/b; inner width equals state dimension D.
+    The zero initial state, increment update and readout are inherited unchanged.
+    Both matrix layers use Gaussian scale ``weight_scale / sqrt(D)`` and both
+    bias layers use Gaussian scale ``bias_scale``, avoiding a dead zero state.
+    """
+
+    outer_weights: np.ndarray
+    outer_biases: np.ndarray
+
+    @classmethod
+    def draw(
+        cls,
+        n_channels: int,
+        dim: int = 64,
+        rng: np.random.Generator | None = None,
+        weight_scale: float = 1.0,
+        bias_scale: float = 1.0,
+    ) -> "DepthTwoSignatureReservoir":
+        if n_channels <= 0 or dim <= 0:
+            raise ValueError("n_channels and dim must be positive.")
+        if rng is None:
+            rng = np.random.default_rng()
+        matrix_scale = weight_scale / np.sqrt(dim)
+        weights = rng.standard_normal((n_channels, dim, dim)) * matrix_scale
+        biases = rng.standard_normal((n_channels, dim)) * bias_scale
+        outer_weights = rng.standard_normal((n_channels, dim, dim)) * matrix_scale
+        outer_biases = rng.standard_normal((n_channels, dim)) * bias_scale
+        return cls(
+            weights=weights,
+            biases=biases,
+            outer_weights=outer_weights,
+            outer_biases=outer_biases,
+        )
+
+    def vector_field(self, h: np.ndarray, channel: int) -> np.ndarray:
+        inner = np.tanh(h @ self.weights[channel].T + self.biases[channel])
+        return np.tanh(inner @ self.outer_weights[channel].T + self.outer_biases[channel])
 
 
 def readout_features(reservoir_states: np.ndarray, times: np.ndarray) -> np.ndarray:

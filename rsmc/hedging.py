@@ -515,6 +515,47 @@ def evaluate_hedge(
     )
 
 
+def fit_fixed_premium_hedge(
+    psi_train: np.ndarray,
+    payoff_train: np.ndarray,
+    premium: float,
+    lam: float,
+) -> RidgeMartingaleControl:
+    """Fit a readout for fixed capital, with training-only RMS column scaling.
+
+    With ``s_j = RMS(Psi_train[:, j])`` and ``Z = Psi_train / s``, solve
+    ``min_theta ||H_train - premium - Z theta||^2 + lam ||theta||^2``.
+    No design centering or fitted intercept is used: either would change the
+    declared premium. Returned coefficients ``beta = theta / s`` act on raw
+    rows, so validation/test never estimate preprocessing statistics.
+    """
+    psi_train = np.asarray(psi_train, dtype=float)
+    payoff_train = np.asarray(payoff_train, dtype=float)
+    if psi_train.ndim != 2 or payoff_train.shape != (psi_train.shape[0],):
+        raise ValueError("Expected a two-dimensional design and one payoff per row.")
+    if psi_train.shape[0] == 0 or psi_train.shape[1] == 0:
+        raise ValueError("The training design must be nonempty.")
+    if not np.isfinite(lam) or lam < 0 or not np.isfinite(premium):
+        raise ValueError("lam must be finite and non-negative; premium must be finite.")
+    if not np.all(np.isfinite(psi_train)) or not np.all(np.isfinite(payoff_train)):
+        raise ValueError("Training design and payoffs must be finite.")
+    scale = np.sqrt(np.mean(psi_train**2, axis=0))
+    scale = np.where(scale < 1e-12, 1.0, scale)
+    design = psi_train / scale
+    target = payoff_train - premium
+    n_paths, n_features = design.shape
+    if n_features <= n_paths:
+        augmented = np.vstack([design, np.sqrt(lam) * np.eye(n_features)])
+        augmented_target = np.concatenate([target, np.zeros(n_features)])
+        theta, *_ = np.linalg.lstsq(augmented, augmented_target, rcond=None)
+    elif lam == 0:
+        theta, *_ = np.linalg.lstsq(design, target, rcond=None)
+    else:
+        gram = design @ design.T
+        theta = design.T @ np.linalg.solve(gram + lam * np.eye(n_paths), target)
+    return RidgeMartingaleControl(beta=theta / scale, intercept=float(premium), lam=lam)
+
+
 def fit_hedge(
     psi_train: np.ndarray,
     payoff_train: np.ndarray,
