@@ -1,0 +1,8 @@
+{
+  "original_path": "rsmc/cost_hedging.py",
+  "reference_results": "results/cas_costs/results.json",
+  "reference_hash_key": "source_sha256['rsmc/cost_hedging.py']",
+  "sha256": "61d135aafb1036306732718ea1bf976d98719ce7201897bae1983470633e75b4",
+  "verification": "Exact bytes reconstructed by reversing only the transfer extension; SHA256 matches recorded cost study source hash.",
+  "current_source_unchanged_by_snapshot": true
+}

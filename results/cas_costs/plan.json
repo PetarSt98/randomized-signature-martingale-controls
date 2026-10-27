@@ -1,0 +1,201 @@
+{
+  "reference": {
+    "model": {
+      "s0": 100.0,
+      "v0": 0.04,
+      "r": 0.03,
+      "kappa": 1.5,
+      "theta": 0.04,
+      "xi": 0.3,
+      "rho": -0.7,
+      "T": 1.0
+    },
+    "strike": 100.0,
+    "n_steps": 50,
+    "sizes": {
+      "train": 4000,
+      "val": 2000,
+      "test": 8000
+    },
+    "dataset_seed": 20261027,
+    "information": [
+      "time",
+      "log_price",
+      "running_average"
+    ],
+    "premium_rule": "float32-rounded discounted training payoff mean; same frozen value on every split and method; reuse for later costs",
+    "validation_draw_seeds": [
+      31001,
+      31002,
+      31003
+    ],
+    "fresh_draw_seeds": [
+      41001,
+      41002,
+      41003
+    ],
+    "candidates": [
+      {
+        "architecture": "shallow",
+        "dim": 16,
+        "weight_scale": 0.5,
+        "bias_scale": 1.0,
+        "lam": 0.1
+      },
+      {
+        "architecture": "shallow",
+        "dim": 16,
+        "weight_scale": 1.0,
+        "bias_scale": 1.0,
+        "lam": 10.0
+      },
+      {
+        "architecture": "shallow",
+        "dim": 32,
+        "weight_scale": 0.5,
+        "bias_scale": 1.0,
+        "lam": 10.0
+      },
+      {
+        "architecture": "shallow",
+        "dim": 32,
+        "weight_scale": 1.0,
+        "bias_scale": 1.0,
+        "lam": 0.1
+      },
+      {
+        "architecture": "shallow",
+        "dim": 64,
+        "weight_scale": 0.5,
+        "bias_scale": 1.0,
+        "lam": 0.1
+      },
+      {
+        "architecture": "shallow",
+        "dim": 64,
+        "weight_scale": 1.0,
+        "bias_scale": 1.0,
+        "lam": 10.0
+      },
+      {
+        "architecture": "depth_two",
+        "dim": 16,
+        "weight_scale": 0.5,
+        "bias_scale": 1.0,
+        "lam": 0.1
+      },
+      {
+        "architecture": "depth_two",
+        "dim": 16,
+        "weight_scale": 1.0,
+        "bias_scale": 1.0,
+        "lam": 10.0
+      },
+      {
+        "architecture": "depth_two",
+        "dim": 32,
+        "weight_scale": 0.5,
+        "bias_scale": 1.0,
+        "lam": 10.0
+      },
+      {
+        "architecture": "depth_two",
+        "dim": 32,
+        "weight_scale": 1.0,
+        "bias_scale": 1.0,
+        "lam": 0.1
+      },
+      {
+        "architecture": "depth_two",
+        "dim": 64,
+        "weight_scale": 0.5,
+        "bias_scale": 1.0,
+        "lam": 0.1
+      },
+      {
+        "architecture": "depth_two",
+        "dim": 64,
+        "weight_scale": 1.0,
+        "bias_scale": 1.0,
+        "lam": 10.0
+      }
+    ],
+    "selection": "lowest average unpenalized validation MSE over all three draws; first tuple breaks ties; incomplete tuples ineligible",
+    "simple_hedge_lambda": 0.1,
+    "transformer": {
+      "d_model": 64,
+      "n_heads": 4,
+      "n_layers": 2,
+      "window": 16,
+      "dropout": 0.0,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "epochs": 20,
+      "batch_size": 256,
+      "seed": 51001,
+      "device": "cpu"
+    },
+    "fit_budget": {
+      "reservoir_tuning": 36,
+      "fresh_reservoir": 6,
+      "simple_hedge": 1,
+      "transformer_training_runs": 1,
+      "total": 44
+    },
+    "test_policy": "selected configurations only, fresh reservoir draws fitted on training paths; test paths independent of train/validation; no recentering"
+  },
+  "premium": 5.27387809753418,
+  "conditions": {
+    "zero": {
+      "kappa": 0.0,
+      "eta": 0.0,
+      "q_ref": 1.0
+    },
+    "proportional": {
+      "kappa": 0.0005,
+      "eta": 0.0,
+      "q_ref": 1.0
+    },
+    "combined": {
+      "kappa": 0.0005,
+      "eta": 0.0005,
+      "q_ref": 1.0
+    }
+  },
+  "cost_units": "Illustrative uncalibrated dimensionless per-execution rates; q_ref=1 share; costs in discounted price units. q=(theta0,diff(theta),-theta_last); sum exp(-rt)*S*(kappa*abs(q)+eta*q^2/q_ref). No dt divisor; no price impact on future market paths.",
+  "readout_optimizer": {
+    "steps": 120,
+    "lr": 0.01,
+    "grad_tol": 1e-05
+  },
+  "readout_restarts": [
+    "new zero-cost ridge initializer",
+    "same initializer plus N(0,0.01^2) in RMS-scaled coordinates"
+  ],
+  "restart_seed_rule": "61000 + reservoir_draw_seed + 100*candidate_index (simple uses index 12)",
+  "penalty": "net MSE + lambda/n_train * squared RMS-scaled readout coefficients; Transformer lambda=0.1 on head weights+bias; AdamW weight_decay=0 throughout",
+  "selection": "minimum unpenalized validation net MSE across checkpoints and two starts, averaged across the three validation reservoir draws; first tuple breaks ties",
+  "transformer_seeds": {
+    "zero": [
+      51001
+    ],
+    "proportional": [
+      51001,
+      51002
+    ],
+    "combined": [
+      51001,
+      51002
+    ]
+  },
+  "budget": {
+    "ridge_solves_max": 55,
+    "positive_reservoir_tuning": 144,
+    "positive_reservoir_final_max": 48,
+    "positive_simple": 4,
+    "transformer_runs": 5,
+    "total_max": 256
+  },
+  "comparison_policy": "For each architecture and positive cost, compare zero-selected and cost-selected tuples, retraining both on that cost with three fresh reservoir draws and two starts. Identical tuples alias the same fits explicitly. Recompute all zero results; no historical metric substitution.",
+  "scope": "Implemented policy classes only; no global optimum, price feedback, new input, or new architecture."
+}

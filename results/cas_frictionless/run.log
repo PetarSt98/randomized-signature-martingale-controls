@@ -1,0 +1,56 @@
+ 1/44 tune_00_31001: completed (0.13s)
+ 2/44 tune_00_31002: completed (0.14s)
+ 3/44 tune_00_31003: completed (0.14s)
+ 4/44 tune_01_31001: completed (0.14s)
+ 5/44 tune_01_31002: completed (0.15s)
+ 6/44 tune_01_31003: completed (0.14s)
+ 7/44 tune_02_31001: completed (0.28s)
+ 8/44 tune_02_31002: completed (0.27s)
+ 9/44 tune_02_31003: completed (0.26s)
+10/44 tune_03_31001: completed (0.26s)
+11/44 tune_03_31002: completed (0.28s)
+12/44 tune_03_31003: completed (0.27s)
+13/44 tune_04_31001: completed (0.69s)
+14/44 tune_04_31002: completed (0.72s)
+15/44 tune_04_31003: completed (0.99s)
+16/44 tune_05_31001: completed (0.84s)
+17/44 tune_05_31002: completed (0.70s)
+18/44 tune_05_31003: completed (0.55s)
+19/44 tune_06_31001: completed (0.18s)
+20/44 tune_06_31002: completed (0.18s)
+21/44 tune_06_31003: completed (0.18s)
+22/44 tune_07_31001: completed (0.17s)
+23/44 tune_07_31002: completed (0.18s)
+24/44 tune_07_31003: completed (0.18s)
+25/44 tune_08_31001: completed (0.42s)
+26/44 tune_08_31002: completed (0.44s)
+27/44 tune_08_31003: completed (0.38s)
+28/44 tune_09_31001: completed (0.38s)
+29/44 tune_09_31002: completed (0.39s)
+30/44 tune_09_31003: completed (0.38s)
+31/44 tune_10_31001: completed (0.84s)
+32/44 tune_10_31002: completed (0.84s)
+33/44 tune_10_31003: completed (0.85s)
+34/44 tune_11_31001: completed (0.91s)
+35/44 tune_11_31002: completed (0.90s)
+36/44 tune_11_31003: completed (0.84s)
+37/44 final_shallow_41001: completed (1.54s)
+38/44 final_shallow_41002: completed (0.59s)
+39/44 final_shallow_41003: completed (1.24s)
+40/44 final_depth_two_41001: completed (0.74s)
+41/44 final_depth_two_41002: completed (0.75s)
+42/44 final_depth_two_41003: completed (0.75s)
+43/44 final_simple: completed (0.01s)
+44/44 final_transformer: completed (54.79s)
+Fontconfig error: No writable cache directories
+# Bounded frictionless Heston comparison
+
+Status: completed; fit attempts: 44/44; failures: 0.
+Frozen premium: 5.273878098; training estimate SE: 0.102559.
+
+| Method | Fresh draws | Test MSE (units²) | RMSE (units) | Mean error (units) | Tuning (s) | Final features / fit / evaluation (s) |
+|---|---:|---:|---:|---:|---:|---|
+| Simple state hedge | 1 | 6.106359 | 2.471105 | +0.045524 | 0.00 | 0.01 / 0.00 / 0.00 |
+| Shallow tanh | 3 | 1.975913 | 1.405672 | +0.041689 | 6.95 | 3.35 / 0.02 / 0.00 |
+| Depth-two tanh | 3 | 2.062985 | 1.436310 | +0.043316 | 8.63 | 2.21 / 0.02 / 0.00 |
+| Transformer | 1 | 1.150670 | 1.072693 | +0.038839 | 0.00 | 0.00 / 52.29 / 2.50 |

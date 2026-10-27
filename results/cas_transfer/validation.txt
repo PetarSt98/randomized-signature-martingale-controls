@@ -1,0 +1,31 @@
+Validation before declared study
+
+Command:
+OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 MPLBACKEND=Agg MPLCONFIGDIR=/workspace/.cache/rsmc-matplotlib XDG_CACHE_HOME=/workspace/.cache /workspace/.venvs/rsmc/bin/python -m pytest -q
+Result: 91 passed in 29.59s.
+
+Compile: /workspace/.venvs/rsmc/bin/python -m py_compile scripts/cas_transfer.py rsmc/transfer_tasks.py
+Result: passed.
+Whitespace: git -c core.whitespace=cr-at-eol diff --check
+Result: passed before declaration.
+
+Declaration:
+/workspace/.venvs/rsmc/bin/python scripts/cas_transfer.py --declare
+
+Execution:
+OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 MPLBACKEND=Agg MPLCONFIGDIR=/workspace/.cache/rsmc-matplotlib XDG_CACHE_HOME=/workspace/.cache /workspace/.venvs/rsmc/bin/python -u scripts/cas_transfer.py
+Output captured in run.log using tee with pipefail.
+
+Study source/declaration hashes saved before first fit; final dataset generation follows all three task selections. Historical cost module archived with matching reference SHA256 under provenance/.
+
+Final experiment: exit code 0; 360 counted fits (cap468), 132 unique evaluations, 186 role comparisons; zero fit failures.
+Optimizer outcomes:117 exact_ridge,1 stationary,242 budget_exhausted.
+Experiment invocation1796.649146742s excludes subsequent audit/render; reporting timings saved separately.
+Built-in source/checkpoint/selection/cash-flow/aggregation audit passed.
+Independent audit command:
+OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 /workspace/.venvs/rsmc/bin/python results/cas_transfer/provenance/independent_audit.py
+Result: exit0, 2.7881s. All12 dataset partitions/36pathsets regenerated; all NPZ->CSV aggregation and premium/hash identities passed; see independent_audit.json.
+Whitespace check after final README update: passed.
+Historical studies/results retained; exact original cost module snapshot matches prior saved SHA256. Nothing staged or committed.
+Final visual review: all3figures inspected; tuple labels and log ticks made readable in report-only rerender; no additional fits.
+Final source/aggregation audit and CRLF-aware whitespace check passed.

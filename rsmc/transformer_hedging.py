@@ -143,8 +143,15 @@ def fit_transformer_hedge(
     increments_val: np.ndarray,
     payoff_val: np.ndarray,
     config: TransformerHedgeConfig,
+    *,
+    initial_capital: float | None = None,
 ) -> FittedTransformerHedge:
-    """Train the small causal Transformer hedge and select by validation MSE."""
+    """Train the causal hedge and select by unpenalised validation MSE.
+
+    ``initial_capital`` is fixed throughout training and evaluation. If omitted,
+    retain the historical convention of using the training payoff mean. Supply
+    the same premium to every method for a fixed-premium comparison.
+    """
     torch, nn, DataLoader, TensorDataset = _torch_modules()
     torch.manual_seed(config.seed)
     if config.d_model % config.n_heads != 0:
@@ -165,7 +172,9 @@ def fit_transformer_hedge(
     y_val = torch.as_tensor(payoff_val.astype(np.float32), dtype=torch.float32, device=config.device)
 
     output_dim = inc_train.shape[2]
-    initial_capital = float(np.mean(payoff_train))
+    initial_capital = float(np.mean(payoff_train)) if initial_capital is None else float(initial_capital)
+    if not np.isfinite(initial_capital):
+        raise ValueError("initial_capital must be finite.")
     model = _build_model(
         torch,
         nn,
