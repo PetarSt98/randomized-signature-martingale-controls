@@ -1,8 +1,0 @@
-{
-  "command": "OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 /workspace/.venvs/rsmc/bin/python results/cas_transfer/provenance/independent_audit.py",
-  "working_directory": "/workspace/randomized-signature-martingale-controls",
-  "exit_code": 0,
-  "wall_s": 2.788082642000063,
-  "measurement": "Python perf_counter around subprocess, includes interpreter startup and audit output serialization",
-  "note": "A preceding timing-wrapper attempt could not execute because /usr/bin/time is absent; no audit or fit ran in that attempt."
-}
