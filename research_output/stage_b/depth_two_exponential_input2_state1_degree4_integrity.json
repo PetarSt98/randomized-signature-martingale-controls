@@ -1,0 +1,18 @@
+{
+  "artifacts": {
+    "csv": {
+      "name": "depth_two_exponential_input2_state1_degree4.csv",
+      "sha256": "fb8340cafc630bfb5576fea268dbe7d16b5566363b18894add41e81ab8064e9d"
+    },
+    "json": {
+      "name": "depth_two_exponential_input2_state1_degree4.json",
+      "sha256": "a50d466ca865c45a4b67d0cf0ec8406e33fa9facfd94cfff0d564098c13fc99e"
+    },
+    "matrices": {
+      "name": "depth_two_exponential_input2_state1_degree4_matrices.pt",
+      "sha256": "a59e328e9d2c1fc1c6545bd6bbf2dd3c280944199ffea00751f37163866359f9"
+    }
+  },
+  "group_stem": "depth_two_exponential_input2_state1_degree4",
+  "schema_version": 1
+}

@@ -1,0 +1,454 @@
+{
+  "activation_identities": [
+    "exp(2*q) = 3",
+    "tanh(q) = (3 - 1)/(3 + 1) = 1/2",
+    "tanh(-q) = -1/2"
+  ],
+  "analytic_implication": {
+    "analyticity": "each selected homogeneous minor determinant D_m is real analytic because tanh of affine forms is real analytic on R, and state differentiation, Lie brackets, fixed-point evaluation, and determinants preserve real analyticity",
+    "excluded_laws": "singular or fixed-bias laws and the literal finite-support law of a finite-precision seeded PRNG",
+    "fixed_evaluation_points_by_degree": {
+      "1": [
+        "0",
+        "log(3)/2"
+      ],
+      "2": [
+        "0"
+      ],
+      "3": [
+        "-log(3)/2",
+        "log(3)/2"
+      ],
+      "4": [
+        "-log(3)/2",
+        "0",
+        "log(3)/2"
+      ]
+    },
+    "nonidentity_witness": "P(1,0,0,log(3)/2) = -6075/16777216 != 0",
+    "parameter_domain": "(a1,b1,a2,b2) in the connected open set R^4",
+    "probability_conclusion": "all four homogeneous components are injective simultaneously almost surely under any parameter law absolutely continuous with respect to four-dimensional Lebesgue measure",
+    "product_definition": "P = D_1 * D_2 * D_3 * D_4",
+    "zero_set_conclusion": "the set where at least one D_m vanishes is the zero set of P and has four-dimensional Lebesgue measure zero"
+  },
+  "architecture": "shallow_biased_tanh",
+  "bracket_convention": "[V,W](x) = DW(x)V(x) - DV(x)W(x)",
+  "certification_method": "exact_symbolic_determinant_simplification",
+  "certified_homogeneous_degrees": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "combined_determinant_product": {
+    "denominator": 16777216,
+    "exact_fraction": "-6075/16777216",
+    "nonzero": true,
+    "numerator": -6075
+  },
+  "conclusion": "the representation is injective on each homogeneous free-Lie component L_{2,m}, m=1,2,3,4",
+  "constant_definition": "q = atanh(1/2) = log(3)/2",
+  "exact_parameters": {
+    "biases": {
+      "entries": [
+        "0",
+        "log(3)/2"
+      ],
+      "shape": [
+        2,
+        1
+      ]
+    },
+    "weights": {
+      "entries": [
+        "1",
+        "0"
+      ],
+      "shape": [
+        2,
+        1,
+        1
+      ]
+    }
+  },
+  "finite_evaluation_lemma": "If evaluations of vector fields F_1,...,F_r at finitely many points form a full-column-rank matrix, then F_1,...,F_r are linearly independent as functions.",
+  "homogeneous_certificates": [
+    {
+      "basis_labels": [
+        "X1",
+        "X2"
+      ],
+      "certification_method": "exact_symbolic_determinant_simplification",
+      "degree": 1,
+      "determinant_representation": {
+        "denominator": 4,
+        "exact_fraction": "-1/4",
+        "nonzero": true,
+        "numerator": -1
+      },
+      "evaluation_points": [
+        "0",
+        "log(3)/2"
+      ],
+      "exact_matrix": [
+        [
+          "0",
+          "1/2"
+        ],
+        [
+          "1/2",
+          "1/2"
+        ]
+      ],
+      "selected_columns": [
+        0,
+        1
+      ],
+      "selected_rows": [
+        0,
+        1
+      ],
+      "status": "exact_nonzero"
+    },
+    {
+      "basis_labels": [
+        "[X1,X2]"
+      ],
+      "certification_method": "exact_symbolic_determinant_simplification",
+      "degree": 2,
+      "determinant_representation": {
+        "denominator": 2,
+        "exact_fraction": "-1/2",
+        "nonzero": true,
+        "numerator": -1
+      },
+      "evaluation_points": [
+        "0"
+      ],
+      "exact_matrix": [
+        [
+          "-1/2"
+        ]
+      ],
+      "selected_columns": [
+        0
+      ],
+      "selected_rows": [
+        0
+      ],
+      "status": "exact_nonzero"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,X2]]",
+        "[[X1,X2],X2]"
+      ],
+      "certification_method": "exact_symbolic_determinant_simplification",
+      "degree": 3,
+      "determinant_representation": {
+        "denominator": 256,
+        "exact_fraction": "-45/256",
+        "nonzero": true,
+        "numerator": -45
+      },
+      "evaluation_points": [
+        "-log(3)/2",
+        "log(3)/2"
+      ],
+      "exact_matrix": [
+        [
+          "15/32",
+          "3/16"
+        ],
+        [
+          "15/32",
+          "-3/16"
+        ]
+      ],
+      "selected_columns": [
+        0,
+        1
+      ],
+      "selected_rows": [
+        0,
+        1
+      ],
+      "status": "exact_nonzero"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "certification_method": "exact_symbolic_determinant_simplification",
+      "degree": 4,
+      "determinant_representation": {
+        "denominator": 8192,
+        "exact_fraction": "135/8192",
+        "nonzero": true,
+        "numerator": 135
+      },
+      "evaluation_points": [
+        "-log(3)/2",
+        "0",
+        "log(3)/2"
+      ],
+      "exact_matrix": [
+        [
+          "-57/128",
+          "-3/32",
+          "3/64"
+        ],
+        [
+          "-1/2",
+          "0",
+          "1/4"
+        ],
+        [
+          "-57/128",
+          "3/32",
+          "3/64"
+        ]
+      ],
+      "selected_columns": [
+        0,
+        1,
+        2
+      ],
+      "selected_rows": [
+        0,
+        1,
+        2
+      ],
+      "status": "exact_nonzero"
+    }
+  ],
+  "input_dim": 2,
+  "reported_numerical_cross_checks": {
+    "combined_product_conversion": {
+      "conversion": "Fraction -> Python binary64 float",
+      "exact_value": "-6075/16777216",
+      "purpose": "compare the exact determinant product with its numerical check",
+      "value": -0.00036209821701049805,
+      "warning": "This conversion is a numerical cross-check, not certification."
+    },
+    "comparison_absolute_tolerance": 2e-14,
+    "homogeneous": [
+      {
+        "condition_number_rounded": 2.618034,
+        "degree": 1,
+        "determinant_conversion": {
+          "conversion": "Fraction -> Python binary64 float",
+          "exact_value": "-1/4",
+          "purpose": "compare the exact degree-1 determinant with a numerical determinant",
+          "value": -0.25,
+          "warning": "This conversion is a numerical cross-check, not certification."
+        },
+        "minor_conversion": {
+          "conversion": "Fraction matrix -> Python binary64 float matrix",
+          "exact_values": [
+            [
+              "0",
+              "1/2"
+            ],
+            [
+              "1/2",
+              "1/2"
+            ]
+          ],
+          "purpose": "compare the exact degree-1 minor with the PyTorch autodiff minor",
+          "values": [
+            [
+              0.0,
+              0.5
+            ],
+            [
+              0.5,
+              0.5
+            ]
+          ],
+          "warning": "This conversion is a numerical cross-check, not certification."
+        },
+        "numerical_evidence_status_in_isolation": "numerical_candidate_only",
+        "numerical_rank": 2
+      },
+      {
+        "condition_number_rounded": 1.0,
+        "degree": 2,
+        "determinant_conversion": {
+          "conversion": "Fraction -> Python binary64 float",
+          "exact_value": "-1/2",
+          "purpose": "compare the exact degree-2 determinant with a numerical determinant",
+          "value": -0.5,
+          "warning": "This conversion is a numerical cross-check, not certification."
+        },
+        "minor_conversion": {
+          "conversion": "Fraction matrix -> Python binary64 float matrix",
+          "exact_values": [
+            [
+              "-1/2"
+            ]
+          ],
+          "purpose": "compare the exact degree-2 minor with the PyTorch autodiff minor",
+          "values": [
+            [
+              -0.5
+            ]
+          ],
+          "warning": "This conversion is a numerical cross-check, not certification."
+        },
+        "numerical_evidence_status_in_isolation": "numerical_candidate_only",
+        "numerical_rank": 1
+      },
+      {
+        "condition_number_rounded": 2.5,
+        "degree": 3,
+        "determinant_conversion": {
+          "conversion": "Fraction -> Python binary64 float",
+          "exact_value": "-45/256",
+          "purpose": "compare the exact degree-3 determinant with a numerical determinant",
+          "value": -0.17578125,
+          "warning": "This conversion is a numerical cross-check, not certification."
+        },
+        "minor_conversion": {
+          "conversion": "Fraction matrix -> Python binary64 float matrix",
+          "exact_values": [
+            [
+              "15/32",
+              "3/16"
+            ],
+            [
+              "15/32",
+              "-3/16"
+            ]
+          ],
+          "purpose": "compare the exact degree-3 minor with the PyTorch autodiff minor",
+          "values": [
+            [
+              0.46875,
+              0.1875
+            ],
+            [
+              0.46875,
+              -0.1875
+            ]
+          ],
+          "warning": "This conversion is a numerical cross-check, not certification."
+        },
+        "numerical_evidence_status_in_isolation": "numerical_candidate_only",
+        "numerical_rank": 2
+      },
+      {
+        "condition_number_rounded": 6.2704558,
+        "degree": 4,
+        "determinant_conversion": {
+          "conversion": "Fraction -> Python binary64 float",
+          "exact_value": "135/8192",
+          "purpose": "compare the exact degree-4 determinant with a numerical determinant",
+          "value": 0.0164794921875,
+          "warning": "This conversion is a numerical cross-check, not certification."
+        },
+        "minor_conversion": {
+          "conversion": "Fraction matrix -> Python binary64 float matrix",
+          "exact_values": [
+            [
+              "-57/128",
+              "-3/32",
+              "3/64"
+            ],
+            [
+              "-1/2",
+              "0",
+              "1/4"
+            ],
+            [
+              "-57/128",
+              "3/32",
+              "3/64"
+            ]
+          ],
+          "purpose": "compare the exact degree-4 minor with the PyTorch autodiff minor",
+          "values": [
+            [
+              -0.4453125,
+              -0.09375,
+              0.046875
+            ],
+            [
+              -0.5,
+              0.0,
+              0.25
+            ],
+            [
+              -0.4453125,
+              0.09375,
+              0.046875
+            ]
+          ],
+          "warning": "This conversion is a numerical cross-check, not certification."
+        },
+        "numerical_evidence_status_in_isolation": "numerical_candidate_only",
+        "numerical_rank": 3
+      }
+    ],
+    "numerical_product": -0.00036209821701049805,
+    "q_conversion": {
+      "conversion": "exact expression evaluated with math.log in binary64",
+      "exact_value": "log(3)/2",
+      "purpose": "construct the numerical autodiff cross-checks only",
+      "value": 0.5493061443340549,
+      "warning": "This conversion is not used for certification."
+    },
+    "reproducer_requires_autodiff_agreement": true,
+    "warning": "All floating values in this section are non-certifying cross-checks only."
+  },
+  "reproduction_command": "python research_output/reproduce_certificate.py",
+  "schema_version": 2,
+  "scope_limit": "This proves injectivity separately on L_{2,m} for m=1,2,3,4. It does not prove ungraded cross-degree independence or injectivity on their ungraded direct sum.",
+  "source_numerical_candidate": {
+    "architecture": "shallow_biased_tanh",
+    "basis_labels": [
+      "[X1,[X1,[X1,X2]]]",
+      "[X1,[[X1,X2],X2]]",
+      "[[[X1,X2],X2],X2]"
+    ],
+    "degree": 4,
+    "extension_point_seed": 1000002719,
+    "floating_condition_number": 1.9857803041316449,
+    "floating_determinant": -5.041803997872895,
+    "input_dim": 2,
+    "manifest_path": "research_output/selected_target/manifest.json",
+    "manifest_sha256": "e02b971ca5ad8461a4f5cb8cdc72a24644ec6a77f2d605ca1d65daa7c8ed0bc6",
+    "point_count": 42,
+    "point_seed": 2719,
+    "selected_columns": [
+      0,
+      1,
+      2
+    ],
+    "selected_rows": [
+      18,
+      32,
+      22
+    ],
+    "state_dim": 1,
+    "status": "numerical_candidate_only",
+    "verification": {
+      "artifact_hashes_match": true,
+      "autodiff_matrix_matches": true,
+      "basis_order_matches": true,
+      "minor_slice_matches": true,
+      "parameters_match": true,
+      "pivoted_qr_rows_reproduced": true,
+      "spectrum_matches": true
+    },
+    "warning": "This source witness remains numerical_candidate_only.",
+    "weight_seed": 1729
+  },
+  "state_dim": 1,
+  "status": "exact_nonzero",
+  "status_scope": "all_homogeneous_degrees_1_through_4",
+  "symbolic_reconstruction": "exact Fraction Taylor jets generated from y'=a*(1-y^2), combined recursively with [V,W]=W'V-V'W",
+  "through_degree": 4
+}

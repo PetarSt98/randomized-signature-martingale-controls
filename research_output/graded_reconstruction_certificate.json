@@ -1,0 +1,468 @@
+{
+  "artifact_kind": "exact_graded_reconstruction_certificate",
+  "authoritative_source": {
+    "certificate_path": "research_output/certificate.json",
+    "certificate_semantic_sha256": "b211938a201150d3140a7a085e2c97a11bced7e8aa305af373819ab8dd0b5959",
+    "matrix_constructor": "lie_reservoir.certificates.degree_exact_certificate"
+  },
+  "conventions": {
+    "associative_words": "chronological zero-based tuples (i1,...,im)",
+    "factorial_normalization": "J_m=(1/m!) partial_r^m Y_T(rX)|_{r=0}",
+    "free_lie_bracket": "[X1,X2]=X1X2-X2X1",
+    "log_signature": "S^{<=4}=exp_tensor(ell_1+...+ell_4)",
+    "operator_action": "D_V f = f' V",
+    "operator_representation": "Gamma(i1...im)=D_Vi1 ... D_Vim; Gamma is a homomorphism",
+    "tensor_product": "noncommutative concatenation, truncated at 4",
+    "vector_field_bracket": "[V,W]=DW V-DV W"
+  },
+  "degree_data": [
+    {
+      "authoritative_matrix": [
+        [
+          "0",
+          "1/2"
+        ],
+        [
+          "1/2",
+          "1/2"
+        ]
+      ],
+      "basis_labels": [
+        "X1",
+        "X2"
+      ],
+      "degree": 1,
+      "left_identity_verified": true,
+      "point_labels": [
+        "0",
+        "log(3)/2"
+      ],
+      "recomputed_inverse": [
+        [
+          "-2",
+          "2"
+        ],
+        [
+          "2",
+          "0"
+        ]
+      ],
+      "right_identity_verified": true
+    },
+    {
+      "authoritative_matrix": [
+        [
+          "-1/2"
+        ]
+      ],
+      "basis_labels": [
+        "[X1,X2]"
+      ],
+      "degree": 2,
+      "left_identity_verified": true,
+      "point_labels": [
+        "0"
+      ],
+      "recomputed_inverse": [
+        [
+          "-2"
+        ]
+      ],
+      "right_identity_verified": true
+    },
+    {
+      "authoritative_matrix": [
+        [
+          "15/32",
+          "3/16"
+        ],
+        [
+          "15/32",
+          "-3/16"
+        ]
+      ],
+      "basis_labels": [
+        "[X1,[X1,X2]]",
+        "[[X1,X2],X2]"
+      ],
+      "degree": 3,
+      "left_identity_verified": true,
+      "point_labels": [
+        "-log(3)/2",
+        "log(3)/2"
+      ],
+      "recomputed_inverse": [
+        [
+          "16/15",
+          "16/15"
+        ],
+        [
+          "8/3",
+          "-8/3"
+        ]
+      ],
+      "right_identity_verified": true
+    },
+    {
+      "authoritative_matrix": [
+        [
+          "-57/128",
+          "-3/32",
+          "3/64"
+        ],
+        [
+          "-1/2",
+          "0",
+          "1/4"
+        ],
+        [
+          "-57/128",
+          "3/32",
+          "3/64"
+        ]
+      ],
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "degree": 4,
+      "left_identity_verified": true,
+      "point_labels": [
+        "-log(3)/2",
+        "0",
+        "log(3)/2"
+      ],
+      "recomputed_inverse": [
+        [
+          "-64/45",
+          "8/15",
+          "-64/45"
+        ],
+        [
+          "-16/3",
+          "0",
+          "16/3"
+        ],
+        [
+          "-128/45",
+          "76/15",
+          "-128/45"
+        ]
+      ],
+      "right_identity_verified": true
+    }
+  ],
+  "exclusions": [
+    "degree-four truncated finite-scale responses (object B)",
+    "actual full CDE responses and levels at least five (object C)",
+    "finite-difference reconstruction",
+    "local stability constants",
+    "global inversion",
+    "measurement or reservoir-run minimality"
+  ],
+  "gate": {
+    "all_eight_coordinates_nonzero_in_each_vector": true,
+    "exact_round_trips_verified": true,
+    "nontrivial_rational_vector_count": 3
+  },
+  "gate_round_trips": [
+    {
+      "exact_equality_verified": true,
+      "input_hall_coordinates": [
+        [
+          "1",
+          "-1"
+        ],
+        [
+          "2"
+        ],
+        [
+          "3",
+          "-2"
+        ],
+        [
+          "-1",
+          "2",
+          "-3"
+        ]
+      ],
+      "observed_normalized_jets": [
+        [
+          "-1/2",
+          "0"
+        ],
+        [
+          "-5/4"
+        ],
+        [
+          "37/32",
+          "3/2"
+        ],
+        [
+          "445/512",
+          "5/32",
+          "207/256"
+        ]
+      ],
+      "recovered_hall_coordinates": [
+        [
+          "1",
+          "-1"
+        ],
+        [
+          "2"
+        ],
+        [
+          "3",
+          "-2"
+        ],
+        [
+          "-1",
+          "2",
+          "-3"
+        ]
+      ],
+      "recursive_steps": [
+        {
+          "basis_labels": [
+            "X1",
+            "X2"
+          ],
+          "degree": 1,
+          "lower_level_correction": [
+            "0",
+            "0"
+          ],
+          "observed_jet_vector": [
+            "-1/2",
+            "0"
+          ],
+          "point_labels": [
+            "0",
+            "log(3)/2"
+          ],
+          "recovered_hall_coefficients": [
+            "1",
+            "-1"
+          ],
+          "residual": [
+            "-1/2",
+            "0"
+          ]
+        },
+        {
+          "basis_labels": [
+            "[X1,X2]"
+          ],
+          "degree": 2,
+          "lower_level_correction": [
+            "-1/4"
+          ],
+          "observed_jet_vector": [
+            "-5/4"
+          ],
+          "point_labels": [
+            "0"
+          ],
+          "recovered_hall_coefficients": [
+            "2"
+          ],
+          "residual": [
+            "-1"
+          ]
+        },
+        {
+          "basis_labels": [
+            "[X1,[X1,X2]]",
+            "[[X1,X2],X2]"
+          ],
+          "degree": 3,
+          "lower_level_correction": [
+            "1/8",
+            "-9/32"
+          ],
+          "observed_jet_vector": [
+            "37/32",
+            "3/2"
+          ],
+          "point_labels": [
+            "-log(3)/2",
+            "log(3)/2"
+          ],
+          "recovered_hall_coefficients": [
+            "3",
+            "-2"
+          ],
+          "residual": [
+            "33/32",
+            "57/32"
+          ]
+        },
+        {
+          "basis_labels": [
+            "[X1,[X1,[X1,X2]]]",
+            "[X1,[[X1,X2],X2]]",
+            "[[[X1,X2],X2],X2]"
+          ],
+          "degree": 4,
+          "lower_level_correction": [
+            "385/512",
+            "13/32",
+            "81/256"
+          ],
+          "observed_jet_vector": [
+            "445/512",
+            "5/32",
+            "207/256"
+          ],
+          "point_labels": [
+            "-log(3)/2",
+            "0",
+            "log(3)/2"
+          ],
+          "recovered_hall_coefficients": [
+            "-1",
+            "2",
+            "-3"
+          ],
+          "residual": [
+            "15/128",
+            "-1/4",
+            "63/128"
+          ]
+        }
+      ]
+    },
+    {
+      "exact_equality_verified": true,
+      "input_hall_coordinates": [
+        [
+          "1/2",
+          "-2/3"
+        ],
+        [
+          "5/7"
+        ],
+        [
+          "-3/5",
+          "4/9"
+        ],
+        [
+          "7/11",
+          "-8/13",
+          "9/14"
+        ]
+      ],
+      "observed_normalized_jets": [
+        [
+          "-1/3",
+          "-1/12"
+        ],
+        [
+          "-37/84"
+        ],
+        [
+          "-5239/32256",
+          "-13817/32256"
+        ],
+        [
+          "-1599438283/15498362880",
+          "-393733/1995840",
+          "-6666901981/15498362880"
+        ]
+      ],
+      "recovered_hall_coordinates": [
+        [
+          "1/2",
+          "-2/3"
+        ],
+        [
+          "5/7"
+        ],
+        [
+          "-3/5",
+          "4/9"
+        ],
+        [
+          "7/11",
+          "-8/13",
+          "9/14"
+        ]
+      ]
+    },
+    {
+      "exact_equality_verified": true,
+      "input_hall_coordinates": [
+        [
+          "-5/3",
+          "2/7"
+        ],
+        [
+          "-11/4"
+        ],
+        [
+          "13/8",
+          "-17/9"
+        ],
+        [
+          "19/10",
+          "-23/12",
+          "29/15"
+        ]
+      ],
+      "observed_normalized_jets": [
+        [
+          "1/7",
+          "-29/42"
+        ],
+        [
+          "211/168"
+        ],
+        [
+          "27269/84672",
+          "63241/84672"
+        ],
+        [
+          "-74384759/142248960",
+          "-2116939/4445280",
+          "-45565913/17781120"
+        ]
+      ],
+      "recovered_hall_coordinates": [
+        [
+          "-5/3",
+          "2/7"
+        ],
+        [
+          "-11/4"
+        ],
+        [
+          "13/8",
+          "-17/9"
+        ],
+        [
+          "19/10",
+          "-23/12",
+          "29/15"
+        ]
+      ]
+    }
+  ],
+  "reproduction_command": "python research_output/reproduce_graded_reconstruction.py",
+  "schema_version": 1,
+  "scope": {
+    "architecture": "certified scalar tanh witness",
+    "degrees": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "input_dimension": 2,
+    "observation_object": "A: ideal normalized graded scale jets",
+    "state_dimension": 1,
+    "total_hall_dimension": 8
+  },
+  "status": "PROVED"
+}

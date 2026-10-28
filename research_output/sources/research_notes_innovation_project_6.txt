@@ -1,0 +1,392 @@
+PAGES 5
+
+--- PAGE 1 ---
+Updated Research Note
+Randomized-Signature Reservoirs
+for Partial-Information Hedging
+Causal State Representations for Observed-Filtration GKW Hedging
+Petar Stojković Updated research note, ETH Zurich June 2026
+Problem and Research Question
+The trader does not observe the full simulator state. The discounted tradable prices are observed, together with a noisy signal
+about volatility, but the latent volatility itself is hidden. A hedge must therefore be chosen from the observed history only. For
+a path-dependent payoff, this history can matter: the current price and current signal may not contain enough information
+for a good hedge. The mathematical target is the best hedge achievable from the observed filtration. In the formulation
+below, this is the traded-gain component in the partial-information Galtchouk–Kunita–Watanabe decomposition.
+The question is how to summarize the observed path in a finite-dimensional state useful for hedging. A classical filter gives
+a model-based estimate of the hidden volatility. Finite signatures give systematic path features, but their dimension grows
+quickly. A Transformer gives a flexible trainable sequence model, but uses non-convex training. A randomized-signature
+reservoir gives another compromise: the reservoir dynamics are sampled once, and only a linear or affine hedge readout is
+trained.
+Research question: Can randomized-signature reservoirs use the observed history of prices and noisy volatility signals
+to build a useful state for G-predictable quadratic hedging? The empirical test is how much of the hedging-risk gap
+between raw observed features and the fitted true-state benchmark they close, and how that compares with a classical
+filter, finite signatures, and a causal Transformer.
+Central claim and novelty boundary. The project studies the effect of the information constraint on hedging. The hedge
+is allowed to use only the observed filtration G, not the hidden volatility or future information. The current contribution
+is the controlled comparison of randomized-signature reservoir states as causal features for the observed-filtration GKW
+hedge.
+The project does not claim a new GKW decomposition, a new filtering method, a new signature method, or a new
+deep-hedging framework. The point is narrower: to compare reservoir states with raw features, a classical filter, finite
+signatures, and a causal Transformer under the same observed-information constraint. The reservoir is called filter-like only
+because it compresses the observed history causally; classical filters remain explicit benchmarks.
+Preliminary partial-information hedging evidence. With 10,000/3,000/10,000 train/validation/test paths, η =
+0.02, and validation-only model selection, the reservoir reduced one-asset Heston Asian hedging RMSE from 2.4037 for
+raw observed features to 1.0167 on the N = 252 grid. The corresponding RMSEs were 1.1026 for finite signatures,
+2.2579 for the implemented particle-filter quadratic hedge, 0.8102 for the causal Transformer, and 0.7921 for the fitted
+true-state Transformer benchmark. The reservoir closed 92.1% of the empirical raw-to-fitted-true-state MSE gap.
+The same experiment was also run for a three-asset Heston basket Asian payoff. There, RMSE was 2.0981 for raw
+observed features, 1.0573 for the reservoir, 1.2486 for finite signatures, 0.8684 for the Transformer, and 0.8496 for its
+fitted true-state benchmark. The reservoir closed 89.2% of the empirical gap. The same method ordering and nearly
+identical gap closures were also obtained on the N = 52 grid.
+Paired test-path bootstrap intervals supported lower reservoir MSE than raw features and finite signatures in both
+experiments, and lower reservoir MSE than the implemented particle-filter hedge in the one-asset experiment. The
+Transformer achieved lower MSE than the reservoir. These are single-seed preliminary results, conditional on the fitted
+models and representation draws. The observation-noise sweep and multi-seed analysis remain the final validation steps.
+Completed first iteration: martingale-control pricing. The project started from martingale control variates
+for path-dependent Monte Carlo pricing using randomized-signature reservoirs. This first iteration established the
+adapted-readout construction, sample-split unbiasedness, and the comparison with finite-signature controls. In preliminary
+N = 252 benchmarks, reservoir readouts achieved lower held-out residual variance than matched finite-signature controls
+across Black–Scholes, Heston, multi-asset Heston, and commodity-curve pricing examples. These results are kept as appendix
+evidence for the adapted-readout machinery, but they are not the main evidence for the partial-information hedging claim.
+Core Formulation
+Main object: observed-filtration quadratic hedging. We work under the pricing measure Q on a discrete observation
+and trading grid 0 = t < · · · < t = T , and write S := S and V := V . The notation in this section is for the one-asset
+0 N k tk k tk
+case; the three-asset extension is componentwise. The initial state (S , V , Y ) is fixed, so G is trivial and the initial capital
+0 0 0 t0
+c is constant. We first define the simulator filtration and the observed trader filtration:
+Fsim = σ(S , V , Y : 0 ≤ i ≤ k) ∨ σ(∆W S, ∆W V : 1 ≤ ℓ ≤ k), G = σ(S , Y : 0 ≤ i ≤ k) ⊆ Fsim.
+tk i i i ℓ ℓ tk i i tk
+For the population information comparison, also define the state-augmented filtration
+Fstate = G ∨ σ(V : 0 ≤ i ≤ k).
+tk tk i
+Thus
+G ⊆ Fstate ⊆ Fsim.
+tk tk tk
+
+--- PAGE 2 ---
+The simulator filtration describes the data-generating process. The state-augmented filtration is used for the population
+comparison between observed information and true state information.
+Here ∆W S and ∆W V denote the spot and variance Brownian increments over (t , t ].
+ℓ ℓ ℓ−1 ℓ
+In the implemented Heston benchmark, Y = V and, for k ≥ 1,
+0 0
+Y = V + ηε , ε i.∼i.d. N (0, 1),
+k k k k
+with observation noise independent of the Heston shocks. The hedge may use (S , Y ) , but not V , future observations,
+i i i≤k k
+or hidden Brownian shocks. This is a discrete-observation problem; continuous observation of a diffusion price can reveal
+volatility through quadratic variation and is not considered here.
+Let S(cid:101)k ∈ Rr be the discounted prices of the r traded assets and write ∆S(cid:101)k+1 = S(cid:101)k+1 − S(cid:101)k . The implemented discretization
+is chosen so that S(cid:101) is a square-integrable martingale in the simulator filtration. Since S(cid:101) is observed by the trader and
+G ⊆ Fstate ⊆ Fsim,
+tk tk tk
+we also have
+(cid:104) (cid:105)
+E Q ∆S(cid:101)k+1 | G tk = 0.
+Thus the hedge gain is built from the G-martingale increments ∆S(cid:101)k+1 . If the discretization introduced a predictable drift
+in discounted prices, this clean martingale formulation would no longer apply; that case is outside the main experiment.
+Let Θ be the set of processes θ = (θ )N−1 such that θ ∈ Rr is G -measurable and
+G k k=0 k tk
+N−1
+(cid:88) θ
+k
+· ∆S(cid:101)k+1 ∈ L2(Q).
+k=0
+For a discounted payoff H = H(S ) ∈ L2(G ), the quadratic hedge solves
+0:N tN
+(cid:32)
+N−1
+(cid:33)2
+(cid:88)
+inf E Q  H − c − θ k · ∆S(cid:101)k+1  .
+c∈R, θ∈ΘG
+k=0
+At the population level, the optimal terminal gain is the stochastic-integral component in the discrete-time
+partial-information Galtchouk–Kunita–Watanabe decomposition
+N−1
+H = E Q[H] + (cid:88) ξ
+k
+G · ∆S(cid:101)k+1 + LG
+N
+,
+k=0
+where ξG ∈ Θ
+G
+, LG
+0
+= 0, and LG is a square-integrable G-martingale orthogonal to S(cid:101); equivalently, LG
+N
+is orthogonal in
+L2(Q) to all admissible traded-gain integrals. The stochastic integral is the hedgeable component and LG is the residual
+N
+risk.
+The optimal terminal gain is unique in L2(Q). The integrand ξG is unique only up to predictable null trading directions.
+For the one-asset Asian benchmark, let
+k
+S = 1 (cid:88) S , xobs = (cid:0) log(S /S ), log(S /S ), Y − V (cid:1) .
+k k + 1 i k k 0 k 0 k 0
+i=0
+Let u ∈ Rq be the fixed time-augmented path input; in the one-asset case it consists of t /T , the two log-state coordinates
+k k
+above, and Y − V , so q = 4. For reservoir dimension D, random matrices R ∈ RD×D, shifts b ∈ RD, and initial state
+k 0 a a
+h ∈ RD, the randomized-signature state satisfies
+init
+hRS = h , hRS = hRS + (cid:88) q σ (cid:16) R hRS + b (cid:17) (ua − ua) ,
+0 init k+1 k a k a k+1 k
+a=1
+where σ acts componentwise. The hedge readout is
+(cid:20) xobs(cid:21)
+θβ = a + b t + B k ∈ Rr.
+k β β k β hRS
+k
+Here a , b ∈ Rr and B ∈ Rr×(3+D). The reservoir draw and preprocessing are fixed; only β = (a , b , B ) is trained. The
+β β β β β β
+causal Transformer benchmark is written as
+(cid:16) (cid:17)
+hTR = Φ (t , xobs) ; w , θω,γ = A (t , xobs, hTR) ∈ Rr,
+k TR,ω i i i≤k k γ k k k
+Here ω and γ denote the encoder and readout parameters, respectively, and w is the local causal-attention window in each
+encoder layer. Both parameter sets are trained; finite signatures and the particle filter provide alternative causal states for
+the same G-predictable hedge.
+
+--- PAGE 3 ---
+Related Work and Gap
+Representative authors and works What it provides Relation to this project
+Christa Cuchiero, Lukas Gonon, Lyudmila Randomized-signature reservoir Not a study of observed-filtration quadratic
+Grigoryeva, Juan-Pablo Ortega, Josef framework: random path dynamics hedging from noisy signals.
+Teichmann with trained readouts.
+Discrete-Time Signatures and
+Randomness in Reservoir Computing
+Compagnoni, Scampicchio, Biggio, Evidence that randomized Supports the representation, but not
+Orvieto, Hofmann, Teichmann signatures can be effective reservoir partial-information GKW hedging.
+On the Effectiveness of Randomized states for rough dynamics.
+Signatures as Reservoir for Learning
+Rough Dynamics
+Akyildirim, Gambara, Teichmann, Zhou Finance-facing use of randomized Portfolio selection and drift estimation, not
+Randomized Signature Methods in signatures in a small signal-to-noise filtration-constrained hedging of contingent
+Optimal Portfolio Selection portfolio setting. claims.
+Lyons, Nejad, Perez Arribas; Muça Cirone Signature and signature-kernel These works rule out generic “signatures for
+and Salvi; Abi Jaber and Gérard methods already address hedging” as a novelty claim, but do not study
+Nonparametric Pricing and Hedging of path-dependent pricing, hedging, randomized-signature reservoirs as
+Exotic Derivatives; Rough Kernel and memory-dependent strategies. observed-filtration states under noisy
+Hedging; Hedging with Memory: Shallow latent-factor signals.
+and Deep Learning with Signatures
+Neufeld and Schmocker Lp-hedging through iterated This establishes close prior art for
+Chaotic Hedging with Iterated Integrals Stratonovich-integral chaos iterated-integral, readout-only random-feature
+and Neural Networks expansions, with deterministic hedging. Its formal setting uses one filtration
+integrands parametrized by fully generated by the traded semimartingale X,
+trained or random neural networks. with gains integrated against X. It does not
+For p = 2, this is quadratic hedging; study nested observed and state-information
+in the random-network case, only filtrations, a non-traded noisy signal, or the
+linear readouts are trained. decomposition of information loss and
+representation error.
+Mania, Tevzadze, Toronjadze; Ceci, Classical restricted-information Provides the mathematical backbone, but not
+Cretarola, Russo hedging, GKW decompositions, the representation comparison studied here.
+Mean-variance Hedging Under Partial dual predictable projections, and
+Information; GKW Representation filtering links.
+Theorem under Restricted Information:
+An Application to Risk-Minimization
+Buehler, Gonon, Teichmann, Wood; Ruf Flexible neural and The present project isolates the information set
+and Wang regression-based hedging methods. and causal state representation, with reservoir
+Deep Hedging; Hedging with Linear dynamics and simple readouts.
+Regressions and Neural Networks
+F’ecamp, Mikael, Warin Discrete-time incomplete-market Important adjacent prior art: it already studies
+Risk Management with hedging with variance-type criteria, machine-learning hedging with non-tradable
+Machine-Learning-Based Algorithms non-tradable risk factors, and factors, but not an observed filtration generated
+neural hedge policies. by a noisy non-traded signal, and not
+randomized-signature reservoir states.
+Fouque and Han; Han and Lai Martingale and adapted control The control-variate idea is established and
+A Martingale Control Variate Method for variates for Monte Carlo option serves only as the completed first iteration of
+Option Pricing with Stochastic Volatility; pricing. this project.
+Generalized Control Variate Methods for
+Pricing Asian Options
+Tong, Nguyen-Tang, Lee, Tran, Choi Combines signature features and Does not organize the problem around
+SigFormer: Signature Transformers for Transformers for hedging and partial-information GKW projection or
+Deep Hedging directly motivates the causal randomized-signature reservoirs under noisy
+attention benchmark. observation.
+Caccia, Rémillard Mean–variance hedging under Relevant background for hidden-state hedging,
+Option Pricing and Hedging for Discrete latent Markov states or partially but not a comparison of raw features, filters,
+Time Autoregressive Hidden Markov observed market coefficients, using signatures, reservoirs, and Transformers under a
+Model; filtering and model-specific solution common observed-filtration traded-gain
+Fujii, Takahashi methods. constraint.
+Making Mean-Variance Hedging
+Implementable in a Partially Observable
+Market
+
+--- PAGE 4 ---
+Gap and novelty boundary. Several neighbouring literatures are already active. Classical partial-information and
+restricted-information quadratic hedging provide the L2 projection backbone. Signature-based hedging, random-feature hedging,
+deep hedging, filtering-based hedging, and machine-learning hedging with non-tradable factors are also well studied. In particular,
+Neufeld–Schmocker are close prior art for quadratic hedging with iterated-integral random features and trained linear readouts, while
+Fécamp–Mikael–Warin are close prior art for machine-learning hedging with non-tradable factors.
+The information and trading restriction is classical. What is specific here is the comparison of causal state representations under that
+restriction. The trader observes
+Gtk = σ(Si, Yi : 0 ≤ i ≤ k),
+where Y is informative but not traded, and hedge gains are generated only from ∆S(cid:101)k+1 . Within this restriction, the note evaluates
+randomized-signature reservoir states built causally from (S, Y ) against raw features, a classical filter, finite signatures, and a causal
+Transformer.
+The claim is therefore narrow. This is not a new GKW theorem, not a new filtering method, not generic signature hedging, not
+readout-only random-feature hedging, and not generic deep hedging. The contribution is the controlled comparison of reservoir states
+for observed-filtration quadratic hedging with a noisy non-traded signal.
+Contributions
+• Observed-filtration projection view. The hedging problem is written as an L2 projection onto terminal traded gains. This
+gives three nested comparison classes: state-information strategies, observed-filtration strategies, and the finite feature classes used
+in the experiments. This separates the loss from not observing V from the finite-representation restriction.
+• Reservoir hedge class. The project builds causal reservoir states from the observed price and signal history, and then trains
+only a linear or affine hedge readout. The resulting hedge is G-predictable by construction. Classical filters, finite observed-path
+signatures, and a causal Transformer are used as comparators, so that the reservoir is tested against model-based filtering, signature
+features, and a fully trained sequence model.
+• Empirical hedging comparison. The main quantity is out-of-sample quadratic hedging risk as the observation noise changes.
+The experiments measure how much each method improves on raw observed features and how close it gets to the fitted true-state
+benchmark. The comparison reports feature dimension and computational cost; the remaining analysis adds path-budget sensitivity
+and stability across simulation and representation seeds.
+Completed foundation. The martingale-control pricing study is supporting appendix evidence, not a separate main contribution.
+Not claimed: this is not a new theory of GKW decompositions, partial-information hedging, nonlinear filtering, signatures, randomized
+signatures, Transformers, martingale control variates, or sample splitting. The contribution is the filtration-constrained use and
+evaluation of randomized-signature states for quadratic hedging.
+Theory Target
+The theory part is kept deliberately modest. The goal is not to prove a new partial-information hedging theorem. The goal is to
+make clear which strategies are admissible, what the population L2 hedge is, and how the experiments separate information loss from
+finite-representation error. The pricing-control arguments from the first iteration are treated as appendix material.
+• Observed-filtration admissibility. Let
+h
+k
+= Φ((Si, Yi)
+i≤k
+)
+be a causal state, for example a reservoir state, a finite observed-path signature, a filter state, or a causally masked Transformer
+state. Since h
+k
+only depends on observations up to time t
+k
+, it is Gtk -measurable. Therefore any readout of the form
+θ = A(t , xobs, h )
+k k k k
+is Gtk -measurable. It is an admissible hedge when the terminal gain
+N−1
+(cid:88)
+θ
+k
+· ∆S(cid:101)k+1
+k=0
+is square-integrable and the implementation does not use future observations or hidden states.
+• Restricted partial-information projection. For a fixed causal state h , the best linear hedge in the corresponding feature class
+k
+solves
+(cid:32)
+N−1
+(cid:33)2
+inf E Q  H − c − (cid:88) A β (xo k bs, h k , t k ) · ∆S(cid:101)k+1  .
+c,β
+k=0
+Over all admissible G-predictable strategies, the population target is the observed-filtration GKW hedge. The fixed-feature solution
+is the best approximation to this hedge within the terminal-gain subspace generated by the chosen features. This is the unpenalized
+population projection for a fixed feature map. The validation-selected ridge estimator used in the experiments also contains
+estimation and regularization error.
+• Information loss versus representation error. Let Kstate and KG be closed subspaces of L2(Ω, F
+t
+s
+N
+tate, Q). Both contain
+constants and terminal gains built from the same traded increments ∆S(cid:101)k+1 . The difference is the information available to the
+s s t u r b a s t p e a g c y e : g F e t s nk t e a r te at f e o d r t b h y e c s o t n a s t t e a -i n n t f s or a m nd at t i e o r n m s i p n a a c l e g a a n in d s G fr tk om for on th e e fi o x b ed ser c v a e u d s - a i l n f f e o a rm tu a r t e io c n la s s p s. ace. Let KΦ ⊆ KG be the finite-dimensional
+Define
+R
+A
+⋆ = inf E Q[(H − K)2],
+K∈KA
+and let ΠA be the L2(Q)-orthogonal projection onto KA . Since
+KΦ ⊆ KG ⊆ Kstate,
+orthogonal projection gives
+R
+Φ
+⋆ − R
+G
+⋆ = ∥ΠGH − ΠΦH∥2
+L2
+, R
+G
+⋆ − R
+s
+⋆
+tate
+= ∥ΠstateH − ΠGH∥2
+L2
+.
+The first term is the finite-feature restriction. The second is the population loss from not observing V , while trading the same assets.
+The earlier pricing controls use simulator innovations rather than traded gains and are not part of this nesting. This population
+identity motivates, but is not identified with, the descriptive fitted-true-state gap statistic below.
+
+--- PAGE 5 ---
+Method and Evaluation
+Benchmarks and comparators. The main experiments are a one-asset Heston Asian call and a three-asset Heston basket Asian
+call. Volatility is not traded, so some hedging error generally remains even when the variance state is known. All methods are trained
+and tested on the same simulated paths. They also use the same current price and payoff-state variables; each representation method
+then adds its own causal state.
+The compared methods are: an affine hedge using raw observed features; an observation-conditioned particle filter in the one-asset
+case, using the known Heston parameters and the observations (Si, Yi)
+i≤k
+to approximate the conditional mean and variance
+m
+(cid:98) k
+≈ E[V
+k
+| Gtk ], q
+(cid:98)k
+≈ Var(V
+k
+| Gtk ),
+followed by an affine or quadratic ridge readout selected on validation paths; finite observed-path signatures; randomized-signature
+reservoirs with affine readouts; a causal Transformer; and fitted true-state benchmarks using V
+k
+− V0 in place of Y
+k
+− V0 . In all cases,
+wealth gains are generated only from the traded increments ∆S(cid:101)k+1 .
+Primary estimand and figure. The primary population criterion is the quadratic hedging risk
+(cid:32)
+N−1
+(cid:33)2
+R(θ, c) = E Q  H − c − (cid:88) θ k · ∆S(cid:101)k+1  .
+k=0
+Its independent-test estimate is denoted by R(cid:98) and reported as a function of the observation-noise level η. MSE is the main metric
+because it is the quantity optimized in the quadratic hedging problem; the mean and standard deviation of the hedging error are
+reported separately.
+When
+R(cid:98)raw(η) > R(cid:98)TS(η),
+define
+GapClose (η) =
+R(cid:98)raw(η) − R(cid:98)Φ(η)
+.
+Φ
+R(cid:98)raw(η) − R(cid:98)TS(η)
+Here R(cid:98)TS is the test risk of the validation-selected fitted true-state benchmark, which uses V
+k
+− V0 in place of Y
+k
+− V0 . It is not the
+population state-information optimum, and its fitted class is not treated as a nested theoretical space. Therefore, gap closure is only
+a descriptive empirical statistic. The component risks and paired uncertainty intervals remain primary.
+Evaluation protocol. All model choices are made on validation paths only and then fixed before test evaluation. The current results
+are single-seed results. The remaining robustness analysis will repeat the experiments across simulation seeds and, where relevant,
+reservoir draws and Transformer initializations. The final comparison will report paired uncertainty intervals, feature dimension, fitted
+parameter count, training time, evaluation time, memory use, and stability across path budgets.
+Remaining ablations. The remaining ablations vary the observation-noise level η, reservoir dimension D, time-grid size N, signature
+truncation level L, ridge parameter λ, reservoir input channels, and Transformer window length w. A negative result is also useful: if
+raw features, the particle filter, finite signatures, or the Transformer retain hedge-relevant information better than the reservoir, this
+should be reported rather than hidden.
+Limitations and Failure Modes
+The preliminary results are encouraging, but they are not final benchmark claims. The reservoir improves on raw features, finite
+signatures, and the implemented particle-filter quadratic hedge, but it does not outperform the causal Transformer. The main empirical
+question is therefore the risk–complexity trade-off, and how this trade-off changes with observation noise.
+The fitted true-state benchmark is not the population state-information optimum. Gap closure can also be unstable when the
+raw-to-true-state denominator is small. For this reason, the component risks and paired uncertainty intervals remain the main reported
+quantities.
+The results may depend on reservoir dimension and draw, input scaling, ridge regularization, simulation seed, and Transformer
+initialization or attention window. The current pricing and hedging results are single-seed preliminary evidence. Final conclusions
+require repeated simulation seeds and representation seeds.
+The information constraint is strict. Hidden Brownian shocks and latent variance may be used for diagnostics or for the fitted true-state
+benchmark, but not by an admissible G-predictable hedge. Wealth gains must be generated only by traded increments. The experiment
+is also discrete-observation; it should not be read as continuous observation of the full price path.

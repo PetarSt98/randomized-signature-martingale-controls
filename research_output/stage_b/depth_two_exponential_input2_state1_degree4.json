@@ -1,0 +1,3652 @@
+{
+  "basis": "standard_lyndon",
+  "bracket_convention": "[V,W](x) = DW(x)V(x) - DV(x)W(x)",
+  "completed_count": 15,
+  "device": "cpu",
+  "dtype": "torch.float64",
+  "evidence_kind": "numerical_rank_only",
+  "matrix_column_order": "lexicographic_standard_lyndon_basis",
+  "matrix_row_order": "evaluation_point_then_state_coordinate",
+  "nullspace_basis_note": "sign-canonicalized SVD basis; repeated singular subspaces may rotate across numerical backends",
+  "nullspace_sign_convention": "largest_absolute_entry_positive",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.13.3",
+  "result_count": 15,
+  "results": [
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          0.0012769696877264916,
+          0.001244432562538044,
+          0.0012097603157800927
+        ],
+        "largest_column_norm": 0.0012769696877264916,
+        "largest_singular_value": 0.002154645628571805,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 2.154645628571805e-11,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 2.154645628571805e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 2.154645628571805e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 52005.94655374109,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          0.002154645628571805,
+          1.6918075349925782e-05,
+          4.143075496847791e-08
+        ],
+        "smallest_column_norm": 0.0012097603157800927,
+        "smallest_retained_singular_value": 4.143075496847791e-08,
+        "smallest_singular_value": 4.143075496847791e-08,
+        "standard_tolerance": 2.0093952368686233e-17
+      },
+      "elapsed_seconds": 3.5970687000080943,
+      "evaluation_points": [
+        [
+          -2.2310653390045228
+        ],
+        [
+          1.0833133213706705
+        ],
+        [
+          2.2484501878873018
+        ],
+        [
+          0.45715112240076067
+        ],
+        [
+          0.23614658593140073
+        ],
+        [
+          -0.9635111228312818
+        ],
+        [
+          1.3631250997206201
+        ],
+        [
+          0.09320183511383155
+        ],
+        [
+          0.19263246721617594
+        ],
+        [
+          -0.8806244040046934
+        ],
+        [
+          1.8721283126736734
+        ],
+        [
+          0.010044566834691172
+        ],
+        [
+          -1.3910259512626924
+        ],
+        [
+          0.4311091978615563
+        ],
+        [
+          0.938642325778022
+        ],
+        [
+          -1.876097692506224
+        ],
+        [
+          -0.9041068833262516
+        ],
+        [
+          -0.5030163233482677
+        ],
+        [
+          -2.122434033923668
+        ],
+        [
+          -0.6883253741757158
+        ],
+        [
+          0.2522158904155721
+        ],
+        [
+          -0.009276436838217023
+        ],
+        [
+          -0.04964775372232625
+        ],
+        [
+          -1.1082178302730357
+        ],
+        [
+          -0.5249460541843445
+        ],
+        [
+          0.38281313667515793
+        ],
+        [
+          -0.11524394838402878
+        ],
+        [
+          -0.005597335854753758
+        ],
+        [
+          1.6960013985315288
+        ],
+        [
+          0.5998389329116444
+        ],
+        [
+          -1.44070801117051
+        ],
+        [
+          0.3530389412494624
+        ],
+        [
+          0.1707778468214059
+        ],
+        [
+          -0.5419000463987665
+        ],
+        [
+          1.2362723946213288
+        ],
+        [
+          -1.9441577084207775
+        ],
+        [
+          1.3581264816278864
+        ],
+        [
+          0.3612144620150947
+        ],
+        [
+          -1.3610593534162554
+        ],
+        [
+          0.44616230451275213
+        ],
+        [
+          0.01947993548757634
+        ],
+        [
+          -0.39556969874021913
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2718,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 2.0093952368686233e-17,
+        "state_dim": 1,
+        "weight_seed": 1729
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.13974639278267806
+          ],
+          [
+            0.14364079096034785
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              -0.11257398491596682
+            ]
+          ],
+          [
+            [
+              -0.0005658299322056218
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          0.0012808690373590707,
+          0.001247348269641578,
+          0.0012115874879101258
+        ],
+        "largest_column_norm": 0.0012808690373590707,
+        "largest_singular_value": 0.0021596570252026825,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 2.1596570252026826e-11,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 2.1596570252026827e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 2.1596570252026826e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 44315.72763468077,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          0.0021596570252026825,
+          1.8137492139680248e-05,
+          4.8733421303739803e-08
+        ],
+        "smallest_column_norm": 0.0012115874879101258,
+        "smallest_retained_singular_value": 4.8733421303739803e-08,
+        "smallest_singular_value": 4.8733421303739803e-08,
+        "standard_tolerance": 2.0140688019257317e-17
+      },
+      "elapsed_seconds": 3.593898299965076,
+      "evaluation_points": [
+        [
+          -0.036425608206980487
+        ],
+        [
+          0.18191742174586262
+        ],
+        [
+          2.2346657654335025
+        ],
+        [
+          1.8920857031491607
+        ],
+        [
+          -0.9544847311932386
+        ],
+        [
+          -2.129958573188675
+        ],
+        [
+          -0.7735011751275155
+        ],
+        [
+          -0.9937141416798905
+        ],
+        [
+          -0.37165502794548855
+        ],
+        [
+          0.573459145067278
+        ],
+        [
+          -0.995381538572654
+        ],
+        [
+          -1.480471897803367
+        ],
+        [
+          0.3688546246706436
+        ],
+        [
+          -0.547714003891469
+        ],
+        [
+          1.3803880587068267
+        ],
+        [
+          0.539217434361696
+        ],
+        [
+          -1.0221320224775996
+        ],
+        [
+          1.4858019089100571
+        ],
+        [
+          -1.1899977347072233
+        ],
+        [
+          0.5323353265785749
+        ],
+        [
+          -0.6357178649179686
+        ],
+        [
+          0.27279435382038547
+        ],
+        [
+          -0.32805889398431204
+        ],
+        [
+          0.34991810232079396
+        ],
+        [
+          -1.623093105459974
+        ],
+        [
+          -0.39996782955365545
+        ],
+        [
+          0.2244109777256912
+        ],
+        [
+          0.041524712900405124
+        ],
+        [
+          -2.0006426729716806
+        ],
+        [
+          -0.5907182546751156
+        ],
+        [
+          -0.1747350379344975
+        ],
+        [
+          -2.3862709221300613
+        ],
+        [
+          -2.1409444480002278
+        ],
+        [
+          0.11460783486591533
+        ],
+        [
+          1.2509574703209014
+        ],
+        [
+          1.556153195435431
+        ],
+        [
+          0.9266436225969948
+        ],
+        [
+          -0.3998188665425945
+        ],
+        [
+          2.0613835420059865
+        ],
+        [
+          0.8070181309048099
+        ],
+        [
+          0.4188051109295674
+        ],
+        [
+          -1.0187396946982594
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2719,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 2.0140688019257317e-17,
+        "state_dim": 1,
+        "weight_seed": 1729
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.13974639278267806
+          ],
+          [
+            0.14364079096034785
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              -0.11257398491596682
+            ]
+          ],
+          [
+            [
+              -0.0005658299322056218
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          0.0012809116449613914,
+          0.0012487269162576992,
+          0.0012144465243221986
+        ],
+        "largest_column_norm": 0.0012809116449613914,
+        "largest_singular_value": 0.0021621096562639925,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 2.1621096562639927e-11,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 2.1621096562639927e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 2.1621096562639926e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 61762.986571951646,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          0.0021621096562639925,
+          1.4688331660564364e-05,
+          3.5006559369424485e-08
+        ],
+        "smallest_column_norm": 0.0012144465243221986,
+        "smallest_retained_singular_value": 3.5006559369424485e-08,
+        "smallest_singular_value": 3.5006559369424485e-08,
+        "standard_tolerance": 2.0163560946048806e-17
+      },
+      "elapsed_seconds": 3.097321999957785,
+      "evaluation_points": [
+        [
+          0.20584060301904328
+        ],
+        [
+          0.45597283215014933
+        ],
+        [
+          -1.3958055920769663
+        ],
+        [
+          -1.898688174463433
+        ],
+        [
+          0.9962699796038618
+        ],
+        [
+          -0.6651688944422214
+        ],
+        [
+          0.5033470396703763
+        ],
+        [
+          0.40809737333306867
+        ],
+        [
+          -0.28242072359116266
+        ],
+        [
+          -1.4689088983445064
+        ],
+        [
+          -0.19634622224030934
+        ],
+        [
+          -2.313086154375389
+        ],
+        [
+          -1.3318925931471695
+        ],
+        [
+          -0.8220959203697159
+        ],
+        [
+          -1.0181473128074292
+        ],
+        [
+          1.3577828371126124
+        ],
+        [
+          0.15168512104692336
+        ],
+        [
+          -1.377898738373654
+        ],
+        [
+          -1.1267525291997336
+        ],
+        [
+          0.3016370102154644
+        ],
+        [
+          -0.05123247996395987
+        ],
+        [
+          0.1677513460727175
+        ],
+        [
+          1.011898352363573
+        ],
+        [
+          -0.5706933855069357
+        ],
+        [
+          -0.7828454388130112
+        ],
+        [
+          0.13477105392053082
+        ],
+        [
+          -0.6033746523201026
+        ],
+        [
+          0.36933685590348386
+        ],
+        [
+          -0.885469210141226
+        ],
+        [
+          1.3445717969484163
+        ],
+        [
+          1.3021475425504505
+        ],
+        [
+          1.2839618027397033
+        ],
+        [
+          -0.4276529015879654
+        ],
+        [
+          0.18176874729338285
+        ],
+        [
+          0.07922600157352754
+        ],
+        [
+          1.0905907095344278
+        ],
+        [
+          0.0813426446911857
+        ],
+        [
+          0.6183197501271792
+        ],
+        [
+          0.39557312324055655
+        ],
+        [
+          0.1563412350170111
+        ],
+        [
+          -0.33339412399931173
+        ],
+        [
+          -0.2683374226058304
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2720,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 2.0163560946048806e-17,
+        "state_dim": 1,
+        "weight_seed": 1729
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.13974639278267806
+          ],
+          [
+            0.14364079096034785
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              -0.11257398491596682
+            ]
+          ],
+          [
+            [
+              -0.0005658299322056218
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          1.4304544664774605e-05,
+          1.624303934069292e-05,
+          1.7911624142352986e-05
+        ],
+        "largest_column_norm": 1.7911624142352986e-05,
+        "largest_singular_value": 2.8093418866036843e-05,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 2.8093418866036844e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 2.8093418866036845e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 2.809341886603684e-17,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 133399.87740920045,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          2.8093418866036843e-05,
+          2.0596329723060972e-07,
+          2.1059553735466377e-10
+        ],
+        "smallest_column_norm": 1.4304544664774605e-05,
+        "smallest_retained_singular_value": 2.1059553735466377e-10,
+        "smallest_singular_value": 2.1059553735466377e-10,
+        "standard_tolerance": 2.61995667910308e-19
+      },
+      "elapsed_seconds": 3.6890402000863105,
+      "evaluation_points": [
+        [
+          -2.2310653390045228
+        ],
+        [
+          1.0833133213706705
+        ],
+        [
+          2.2484501878873018
+        ],
+        [
+          0.45715112240076067
+        ],
+        [
+          0.23614658593140073
+        ],
+        [
+          -0.9635111228312818
+        ],
+        [
+          1.3631250997206201
+        ],
+        [
+          0.09320183511383155
+        ],
+        [
+          0.19263246721617594
+        ],
+        [
+          -0.8806244040046934
+        ],
+        [
+          1.8721283126736734
+        ],
+        [
+          0.010044566834691172
+        ],
+        [
+          -1.3910259512626924
+        ],
+        [
+          0.4311091978615563
+        ],
+        [
+          0.938642325778022
+        ],
+        [
+          -1.876097692506224
+        ],
+        [
+          -0.9041068833262516
+        ],
+        [
+          -0.5030163233482677
+        ],
+        [
+          -2.122434033923668
+        ],
+        [
+          -0.6883253741757158
+        ],
+        [
+          0.2522158904155721
+        ],
+        [
+          -0.009276436838217023
+        ],
+        [
+          -0.04964775372232625
+        ],
+        [
+          -1.1082178302730357
+        ],
+        [
+          -0.5249460541843445
+        ],
+        [
+          0.38281313667515793
+        ],
+        [
+          -0.11524394838402878
+        ],
+        [
+          -0.005597335854753758
+        ],
+        [
+          1.6960013985315288
+        ],
+        [
+          0.5998389329116444
+        ],
+        [
+          -1.44070801117051
+        ],
+        [
+          0.3530389412494624
+        ],
+        [
+          0.1707778468214059
+        ],
+        [
+          -0.5419000463987665
+        ],
+        [
+          1.2362723946213288
+        ],
+        [
+          -1.9441577084207775
+        ],
+        [
+          1.3581264816278864
+        ],
+        [
+          0.3612144620150947
+        ],
+        [
+          -1.3610593534162554
+        ],
+        [
+          0.44616230451275213
+        ],
+        [
+          0.01947993548757634
+        ],
+        [
+          -0.39556969874021913
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2718,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 2.61995667910308e-19,
+        "state_dim": 1,
+        "weight_seed": 1730
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.06989858752615409
+          ],
+          [
+            -0.029951082758988525
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              0.0020211237534305806
+            ]
+          ],
+          [
+            [
+              -0.2333212826894606
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          1.4295941929178503e-05,
+          1.624143272129205e-05,
+          1.7915813261478896e-05
+        ],
+        "largest_column_norm": 1.7915813261478896e-05,
+        "largest_singular_value": 2.809066375763702e-05,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 2.809066375763702e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 2.809066375763702e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 2.809066375763702e-17,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 119142.47386403642,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          2.809066375763702e-05,
+          2.2151050239542957e-07,
+          2.3577371567501325e-10
+        ],
+        "smallest_column_norm": 1.4295941929178503e-05,
+        "smallest_retained_singular_value": 2.3577371567501325e-10,
+        "smallest_singular_value": 2.3577371567501325e-10,
+        "standard_tolerance": 2.619699741181491e-19
+      },
+      "elapsed_seconds": 3.5912371000740677,
+      "evaluation_points": [
+        [
+          -0.036425608206980487
+        ],
+        [
+          0.18191742174586262
+        ],
+        [
+          2.2346657654335025
+        ],
+        [
+          1.8920857031491607
+        ],
+        [
+          -0.9544847311932386
+        ],
+        [
+          -2.129958573188675
+        ],
+        [
+          -0.7735011751275155
+        ],
+        [
+          -0.9937141416798905
+        ],
+        [
+          -0.37165502794548855
+        ],
+        [
+          0.573459145067278
+        ],
+        [
+          -0.995381538572654
+        ],
+        [
+          -1.480471897803367
+        ],
+        [
+          0.3688546246706436
+        ],
+        [
+          -0.547714003891469
+        ],
+        [
+          1.3803880587068267
+        ],
+        [
+          0.539217434361696
+        ],
+        [
+          -1.0221320224775996
+        ],
+        [
+          1.4858019089100571
+        ],
+        [
+          -1.1899977347072233
+        ],
+        [
+          0.5323353265785749
+        ],
+        [
+          -0.6357178649179686
+        ],
+        [
+          0.27279435382038547
+        ],
+        [
+          -0.32805889398431204
+        ],
+        [
+          0.34991810232079396
+        ],
+        [
+          -1.623093105459974
+        ],
+        [
+          -0.39996782955365545
+        ],
+        [
+          0.2244109777256912
+        ],
+        [
+          0.041524712900405124
+        ],
+        [
+          -2.0006426729716806
+        ],
+        [
+          -0.5907182546751156
+        ],
+        [
+          -0.1747350379344975
+        ],
+        [
+          -2.3862709221300613
+        ],
+        [
+          -2.1409444480002278
+        ],
+        [
+          0.11460783486591533
+        ],
+        [
+          1.2509574703209014
+        ],
+        [
+          1.556153195435431
+        ],
+        [
+          0.9266436225969948
+        ],
+        [
+          -0.3998188665425945
+        ],
+        [
+          2.0613835420059865
+        ],
+        [
+          0.8070181309048099
+        ],
+        [
+          0.4188051109295674
+        ],
+        [
+          -1.0187396946982594
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2719,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 2.619699741181491e-19,
+        "state_dim": 1,
+        "weight_seed": 1730
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.06989858752615409
+          ],
+          [
+            -0.029951082758988525
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              0.0020211237534305806
+            ]
+          ],
+          [
+            [
+              -0.2333212826894606
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          1.4302182990628458e-05,
+          1.624611052186478e-05,
+          1.791889588576255e-05
+        ],
+        "largest_column_norm": 1.791889588576255e-05,
+        "largest_singular_value": 2.8098838365144675e-05,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 2.8098838365144675e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 2.8098838365144677e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 2.8098838365144676e-17,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 188834.5935959933,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          2.8098838365144675e-05,
+          1.7509328427335759e-07,
+          1.488013283480325e-10
+        ],
+        "smallest_column_norm": 1.4302182990628458e-05,
+        "smallest_retained_singular_value": 1.488013283480325e-10,
+        "smallest_singular_value": 1.488013283480325e-10,
+        "standard_tolerance": 2.620462094729162e-19
+      },
+      "elapsed_seconds": 3.530809900024906,
+      "evaluation_points": [
+        [
+          0.20584060301904328
+        ],
+        [
+          0.45597283215014933
+        ],
+        [
+          -1.3958055920769663
+        ],
+        [
+          -1.898688174463433
+        ],
+        [
+          0.9962699796038618
+        ],
+        [
+          -0.6651688944422214
+        ],
+        [
+          0.5033470396703763
+        ],
+        [
+          0.40809737333306867
+        ],
+        [
+          -0.28242072359116266
+        ],
+        [
+          -1.4689088983445064
+        ],
+        [
+          -0.19634622224030934
+        ],
+        [
+          -2.313086154375389
+        ],
+        [
+          -1.3318925931471695
+        ],
+        [
+          -0.8220959203697159
+        ],
+        [
+          -1.0181473128074292
+        ],
+        [
+          1.3577828371126124
+        ],
+        [
+          0.15168512104692336
+        ],
+        [
+          -1.377898738373654
+        ],
+        [
+          -1.1267525291997336
+        ],
+        [
+          0.3016370102154644
+        ],
+        [
+          -0.05123247996395987
+        ],
+        [
+          0.1677513460727175
+        ],
+        [
+          1.011898352363573
+        ],
+        [
+          -0.5706933855069357
+        ],
+        [
+          -0.7828454388130112
+        ],
+        [
+          0.13477105392053082
+        ],
+        [
+          -0.6033746523201026
+        ],
+        [
+          0.36933685590348386
+        ],
+        [
+          -0.885469210141226
+        ],
+        [
+          1.3445717969484163
+        ],
+        [
+          1.3021475425504505
+        ],
+        [
+          1.2839618027397033
+        ],
+        [
+          -0.4276529015879654
+        ],
+        [
+          0.18176874729338285
+        ],
+        [
+          0.07922600157352754
+        ],
+        [
+          1.0905907095344278
+        ],
+        [
+          0.0813426446911857
+        ],
+        [
+          0.6183197501271792
+        ],
+        [
+          0.39557312324055655
+        ],
+        [
+          0.1563412350170111
+        ],
+        [
+          -0.33339412399931173
+        ],
+        [
+          -0.2683374226058304
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2720,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 2.620462094729162e-19,
+        "state_dim": 1,
+        "weight_seed": 1730
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.06989858752615409
+          ],
+          [
+            -0.029951082758988525
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              0.0020211237534305806
+            ]
+          ],
+          [
+            [
+              -0.2333212826894606
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          0.002941335493320485,
+          0.0030234830997424357,
+          0.0031147682819191963
+        ],
+        "largest_column_norm": 0.0031147682819191963,
+        "largest_singular_value": 0.005243468821932813,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 5.243468821932813e-11,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 5.243468821932813e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 5.243468821932813e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 59137.44269469933,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          0.005243468821932813,
+          2.6845750161519753e-05,
+          8.86658026286754e-08
+        ],
+        "smallest_column_norm": 0.002941335493320485,
+        "smallest_retained_singular_value": 8.86658026286754e-08,
+        "smallest_singular_value": 8.86658026286754e-08,
+        "standard_tolerance": 4.889992644611721e-17
+      },
+      "elapsed_seconds": 3.624397699953988,
+      "evaluation_points": [
+        [
+          -2.2310653390045228
+        ],
+        [
+          1.0833133213706705
+        ],
+        [
+          2.2484501878873018
+        ],
+        [
+          0.45715112240076067
+        ],
+        [
+          0.23614658593140073
+        ],
+        [
+          -0.9635111228312818
+        ],
+        [
+          1.3631250997206201
+        ],
+        [
+          0.09320183511383155
+        ],
+        [
+          0.19263246721617594
+        ],
+        [
+          -0.8806244040046934
+        ],
+        [
+          1.8721283126736734
+        ],
+        [
+          0.010044566834691172
+        ],
+        [
+          -1.3910259512626924
+        ],
+        [
+          0.4311091978615563
+        ],
+        [
+          0.938642325778022
+        ],
+        [
+          -1.876097692506224
+        ],
+        [
+          -0.9041068833262516
+        ],
+        [
+          -0.5030163233482677
+        ],
+        [
+          -2.122434033923668
+        ],
+        [
+          -0.6883253741757158
+        ],
+        [
+          0.2522158904155721
+        ],
+        [
+          -0.009276436838217023
+        ],
+        [
+          -0.04964775372232625
+        ],
+        [
+          -1.1082178302730357
+        ],
+        [
+          -0.5249460541843445
+        ],
+        [
+          0.38281313667515793
+        ],
+        [
+          -0.11524394838402878
+        ],
+        [
+          -0.005597335854753758
+        ],
+        [
+          1.6960013985315288
+        ],
+        [
+          0.5998389329116444
+        ],
+        [
+          -1.44070801117051
+        ],
+        [
+          0.3530389412494624
+        ],
+        [
+          0.1707778468214059
+        ],
+        [
+          -0.5419000463987665
+        ],
+        [
+          1.2362723946213288
+        ],
+        [
+          -1.9441577084207775
+        ],
+        [
+          1.3581264816278864
+        ],
+        [
+          0.3612144620150947
+        ],
+        [
+          -1.3610593534162554
+        ],
+        [
+          0.44616230451275213
+        ],
+        [
+          0.01947993548757634
+        ],
+        [
+          -0.39556969874021913
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2718,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 4.889992644611721e-17,
+        "state_dim": 1,
+        "weight_seed": 1731
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            0.004543592561673636
+          ],
+          [
+            -0.12223866943281843
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              -0.0012594077259041343
+            ]
+          ],
+          [
+            [
+              0.1417824097355623
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          0.0029801571945499436,
+          0.0030651960489945043,
+          0.0031598550102906633
+        ],
+        "largest_column_norm": 0.0031598550102906633,
+        "largest_singular_value": 0.005316072815303029,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 5.316072815303029e-11,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 5.316072815303029e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 5.316072815303029e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 50735.218775171714,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          0.005316072815303029,
+          2.858706832566869e-05,
+          1.0478072123549321e-07
+        ],
+        "smallest_column_norm": 0.0029801571945499436,
+        "smallest_retained_singular_value": 1.0478072123549321e-07,
+        "smallest_singular_value": 1.0478072123549321e-07,
+        "standard_tolerance": 4.957702209711972e-17
+      },
+      "elapsed_seconds": 3.256921299966052,
+      "evaluation_points": [
+        [
+          -0.036425608206980487
+        ],
+        [
+          0.18191742174586262
+        ],
+        [
+          2.2346657654335025
+        ],
+        [
+          1.8920857031491607
+        ],
+        [
+          -0.9544847311932386
+        ],
+        [
+          -2.129958573188675
+        ],
+        [
+          -0.7735011751275155
+        ],
+        [
+          -0.9937141416798905
+        ],
+        [
+          -0.37165502794548855
+        ],
+        [
+          0.573459145067278
+        ],
+        [
+          -0.995381538572654
+        ],
+        [
+          -1.480471897803367
+        ],
+        [
+          0.3688546246706436
+        ],
+        [
+          -0.547714003891469
+        ],
+        [
+          1.3803880587068267
+        ],
+        [
+          0.539217434361696
+        ],
+        [
+          -1.0221320224775996
+        ],
+        [
+          1.4858019089100571
+        ],
+        [
+          -1.1899977347072233
+        ],
+        [
+          0.5323353265785749
+        ],
+        [
+          -0.6357178649179686
+        ],
+        [
+          0.27279435382038547
+        ],
+        [
+          -0.32805889398431204
+        ],
+        [
+          0.34991810232079396
+        ],
+        [
+          -1.623093105459974
+        ],
+        [
+          -0.39996782955365545
+        ],
+        [
+          0.2244109777256912
+        ],
+        [
+          0.041524712900405124
+        ],
+        [
+          -2.0006426729716806
+        ],
+        [
+          -0.5907182546751156
+        ],
+        [
+          -0.1747350379344975
+        ],
+        [
+          -2.3862709221300613
+        ],
+        [
+          -2.1409444480002278
+        ],
+        [
+          0.11460783486591533
+        ],
+        [
+          1.2509574703209014
+        ],
+        [
+          1.556153195435431
+        ],
+        [
+          0.9266436225969948
+        ],
+        [
+          -0.3998188665425945
+        ],
+        [
+          2.0613835420059865
+        ],
+        [
+          0.8070181309048099
+        ],
+        [
+          0.4188051109295674
+        ],
+        [
+          -1.0187396946982594
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2719,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 4.957702209711972e-17,
+        "state_dim": 1,
+        "weight_seed": 1731
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            0.004543592561673636
+          ],
+          [
+            -0.12223866943281843
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              -0.0012594077259041343
+            ]
+          ],
+          [
+            [
+              0.1417824097355623
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          0.002933378823927253,
+          0.003013787558564323,
+          0.003102958516838258
+        ],
+        "largest_column_norm": 0.003102958516838258,
+        "largest_singular_value": 0.005226416127031466,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 5.226416127031466e-11,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 5.226416127031467e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 5.226416127031466e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 68033.59698773884,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          0.005226416127031466,
+          2.3511513029442342e-05,
+          7.68211054307974e-08
+        ],
+        "smallest_column_norm": 0.002933378823927253,
+        "smallest_retained_singular_value": 7.68211054307974e-08,
+        "smallest_singular_value": 7.68211054307974e-08,
+        "standard_tolerance": 4.8740895172221595e-17
+      },
+      "elapsed_seconds": 3.354971900000237,
+      "evaluation_points": [
+        [
+          0.20584060301904328
+        ],
+        [
+          0.45597283215014933
+        ],
+        [
+          -1.3958055920769663
+        ],
+        [
+          -1.898688174463433
+        ],
+        [
+          0.9962699796038618
+        ],
+        [
+          -0.6651688944422214
+        ],
+        [
+          0.5033470396703763
+        ],
+        [
+          0.40809737333306867
+        ],
+        [
+          -0.28242072359116266
+        ],
+        [
+          -1.4689088983445064
+        ],
+        [
+          -0.19634622224030934
+        ],
+        [
+          -2.313086154375389
+        ],
+        [
+          -1.3318925931471695
+        ],
+        [
+          -0.8220959203697159
+        ],
+        [
+          -1.0181473128074292
+        ],
+        [
+          1.3577828371126124
+        ],
+        [
+          0.15168512104692336
+        ],
+        [
+          -1.377898738373654
+        ],
+        [
+          -1.1267525291997336
+        ],
+        [
+          0.3016370102154644
+        ],
+        [
+          -0.05123247996395987
+        ],
+        [
+          0.1677513460727175
+        ],
+        [
+          1.011898352363573
+        ],
+        [
+          -0.5706933855069357
+        ],
+        [
+          -0.7828454388130112
+        ],
+        [
+          0.13477105392053082
+        ],
+        [
+          -0.6033746523201026
+        ],
+        [
+          0.36933685590348386
+        ],
+        [
+          -0.885469210141226
+        ],
+        [
+          1.3445717969484163
+        ],
+        [
+          1.3021475425504505
+        ],
+        [
+          1.2839618027397033
+        ],
+        [
+          -0.4276529015879654
+        ],
+        [
+          0.18176874729338285
+        ],
+        [
+          0.07922600157352754
+        ],
+        [
+          1.0905907095344278
+        ],
+        [
+          0.0813426446911857
+        ],
+        [
+          0.6183197501271792
+        ],
+        [
+          0.39557312324055655
+        ],
+        [
+          0.1563412350170111
+        ],
+        [
+          -0.33339412399931173
+        ],
+        [
+          -0.2683374226058304
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2720,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 4.8740895172221595e-17,
+        "state_dim": 1,
+        "weight_seed": 1731
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            0.004543592561673636
+          ],
+          [
+            -0.12223866943281843
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              -0.0012594077259041343
+            ]
+          ],
+          [
+            [
+              0.1417824097355623
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          3.120629019094773e-05,
+          3.373819560832362e-05,
+          3.645422441116055e-05
+        ],
+        "largest_column_norm": 3.645422441116055e-05,
+        "largest_singular_value": 5.8660023888807434e-05,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 5.866002388880744e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 5.8660023888807435e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 5.866002388880743e-17,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 2878982.595681483,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          5.8660023888807434e-05,
+          1.022994160655501e-07,
+          2.0375261725026873e-11
+        ],
+        "smallest_column_norm": 3.120629019094773e-05,
+        "smallest_retained_singular_value": 2.0375261725026873e-11,
+        "smallest_singular_value": 2.0375261725026873e-11,
+        "standard_tolerance": 5.470559568298921e-19
+      },
+      "elapsed_seconds": 3.423521399963647,
+      "evaluation_points": [
+        [
+          -2.2310653390045228
+        ],
+        [
+          1.0833133213706705
+        ],
+        [
+          2.2484501878873018
+        ],
+        [
+          0.45715112240076067
+        ],
+        [
+          0.23614658593140073
+        ],
+        [
+          -0.9635111228312818
+        ],
+        [
+          1.3631250997206201
+        ],
+        [
+          0.09320183511383155
+        ],
+        [
+          0.19263246721617594
+        ],
+        [
+          -0.8806244040046934
+        ],
+        [
+          1.8721283126736734
+        ],
+        [
+          0.010044566834691172
+        ],
+        [
+          -1.3910259512626924
+        ],
+        [
+          0.4311091978615563
+        ],
+        [
+          0.938642325778022
+        ],
+        [
+          -1.876097692506224
+        ],
+        [
+          -0.9041068833262516
+        ],
+        [
+          -0.5030163233482677
+        ],
+        [
+          -2.122434033923668
+        ],
+        [
+          -0.6883253741757158
+        ],
+        [
+          0.2522158904155721
+        ],
+        [
+          -0.009276436838217023
+        ],
+        [
+          -0.04964775372232625
+        ],
+        [
+          -1.1082178302730357
+        ],
+        [
+          -0.5249460541843445
+        ],
+        [
+          0.38281313667515793
+        ],
+        [
+          -0.11524394838402878
+        ],
+        [
+          -0.005597335854753758
+        ],
+        [
+          1.6960013985315288
+        ],
+        [
+          0.5998389329116444
+        ],
+        [
+          -1.44070801117051
+        ],
+        [
+          0.3530389412494624
+        ],
+        [
+          0.1707778468214059
+        ],
+        [
+          -0.5419000463987665
+        ],
+        [
+          1.2362723946213288
+        ],
+        [
+          -1.9441577084207775
+        ],
+        [
+          1.3581264816278864
+        ],
+        [
+          0.3612144620150947
+        ],
+        [
+          -1.3610593534162554
+        ],
+        [
+          0.44616230451275213
+        ],
+        [
+          0.01947993548757634
+        ],
+        [
+          -0.39556969874021913
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2718,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 5.470559568298921e-19,
+        "state_dim": 1,
+        "weight_seed": 1732
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.018639725645421754
+          ],
+          [
+            -0.05031933291933241
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              -0.12206049415649983
+            ]
+          ],
+          [
+            [
+              -0.08104948445272288
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          3.1241772296686774e-05,
+          3.3780554601497165e-05,
+          3.6504108636237614e-05
+        ],
+        "largest_column_norm": 3.6504108636237614e-05,
+        "largest_singular_value": 5.87342498484553e-05,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 5.873424984845529e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 5.87342498484553e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 5.873424984845529e-17,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 2549655.7240839447,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          5.87342498484553e-05,
+          1.097610481577603e-07,
+          2.3036149270528546e-11
+        ],
+        "smallest_column_norm": 3.1241772296686774e-05,
+        "smallest_retained_singular_value": 2.3036149270528546e-11,
+        "smallest_singular_value": 2.3036149270528546e-11,
+        "standard_tolerance": 5.477481787330702e-19
+      },
+      "elapsed_seconds": 3.106056399992667,
+      "evaluation_points": [
+        [
+          -0.036425608206980487
+        ],
+        [
+          0.18191742174586262
+        ],
+        [
+          2.2346657654335025
+        ],
+        [
+          1.8920857031491607
+        ],
+        [
+          -0.9544847311932386
+        ],
+        [
+          -2.129958573188675
+        ],
+        [
+          -0.7735011751275155
+        ],
+        [
+          -0.9937141416798905
+        ],
+        [
+          -0.37165502794548855
+        ],
+        [
+          0.573459145067278
+        ],
+        [
+          -0.995381538572654
+        ],
+        [
+          -1.480471897803367
+        ],
+        [
+          0.3688546246706436
+        ],
+        [
+          -0.547714003891469
+        ],
+        [
+          1.3803880587068267
+        ],
+        [
+          0.539217434361696
+        ],
+        [
+          -1.0221320224775996
+        ],
+        [
+          1.4858019089100571
+        ],
+        [
+          -1.1899977347072233
+        ],
+        [
+          0.5323353265785749
+        ],
+        [
+          -0.6357178649179686
+        ],
+        [
+          0.27279435382038547
+        ],
+        [
+          -0.32805889398431204
+        ],
+        [
+          0.34991810232079396
+        ],
+        [
+          -1.623093105459974
+        ],
+        [
+          -0.39996782955365545
+        ],
+        [
+          0.2244109777256912
+        ],
+        [
+          0.041524712900405124
+        ],
+        [
+          -2.0006426729716806
+        ],
+        [
+          -0.5907182546751156
+        ],
+        [
+          -0.1747350379344975
+        ],
+        [
+          -2.3862709221300613
+        ],
+        [
+          -2.1409444480002278
+        ],
+        [
+          0.11460783486591533
+        ],
+        [
+          1.2509574703209014
+        ],
+        [
+          1.556153195435431
+        ],
+        [
+          0.9266436225969948
+        ],
+        [
+          -0.3998188665425945
+        ],
+        [
+          2.0613835420059865
+        ],
+        [
+          0.8070181309048099
+        ],
+        [
+          0.4188051109295674
+        ],
+        [
+          -1.0187396946982594
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2719,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 5.477481787330702e-19,
+        "state_dim": 1,
+        "weight_seed": 1732
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.018639725645421754
+          ],
+          [
+            -0.05031933291933241
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              -0.12206049415649983
+            ]
+          ],
+          [
+            [
+              -0.08104948445272288
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          3.124514567583174e-05,
+          3.3781354524494763e-05,
+          3.650200385377583e-05
+        ],
+        "largest_column_norm": 3.650200385377583e-05,
+        "largest_singular_value": 5.873523396140194e-05,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 5.873523396140194e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 5.8735233961401945e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 5.873523396140194e-17,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 3939637.781921975,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          5.873523396140194e-05,
+          8.728490000847643e-08,
+          1.4908790404773614e-11
+        ],
+        "smallest_column_norm": 3.124514567583174e-05,
+        "smallest_retained_singular_value": 1.4908790404773614e-11,
+        "smallest_singular_value": 1.4908790404773614e-11,
+        "standard_tolerance": 5.477573564458286e-19
+      },
+      "elapsed_seconds": 3.5335243999725208,
+      "evaluation_points": [
+        [
+          0.20584060301904328
+        ],
+        [
+          0.45597283215014933
+        ],
+        [
+          -1.3958055920769663
+        ],
+        [
+          -1.898688174463433
+        ],
+        [
+          0.9962699796038618
+        ],
+        [
+          -0.6651688944422214
+        ],
+        [
+          0.5033470396703763
+        ],
+        [
+          0.40809737333306867
+        ],
+        [
+          -0.28242072359116266
+        ],
+        [
+          -1.4689088983445064
+        ],
+        [
+          -0.19634622224030934
+        ],
+        [
+          -2.313086154375389
+        ],
+        [
+          -1.3318925931471695
+        ],
+        [
+          -0.8220959203697159
+        ],
+        [
+          -1.0181473128074292
+        ],
+        [
+          1.3577828371126124
+        ],
+        [
+          0.15168512104692336
+        ],
+        [
+          -1.377898738373654
+        ],
+        [
+          -1.1267525291997336
+        ],
+        [
+          0.3016370102154644
+        ],
+        [
+          -0.05123247996395987
+        ],
+        [
+          0.1677513460727175
+        ],
+        [
+          1.011898352363573
+        ],
+        [
+          -0.5706933855069357
+        ],
+        [
+          -0.7828454388130112
+        ],
+        [
+          0.13477105392053082
+        ],
+        [
+          -0.6033746523201026
+        ],
+        [
+          0.36933685590348386
+        ],
+        [
+          -0.885469210141226
+        ],
+        [
+          1.3445717969484163
+        ],
+        [
+          1.3021475425504505
+        ],
+        [
+          1.2839618027397033
+        ],
+        [
+          -0.4276529015879654
+        ],
+        [
+          0.18176874729338285
+        ],
+        [
+          0.07922600157352754
+        ],
+        [
+          1.0905907095344278
+        ],
+        [
+          0.0813426446911857
+        ],
+        [
+          0.6183197501271792
+        ],
+        [
+          0.39557312324055655
+        ],
+        [
+          0.1563412350170111
+        ],
+        [
+          -0.33339412399931173
+        ],
+        [
+          -0.2683374226058304
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2720,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 5.477573564458286e-19,
+        "state_dim": 1,
+        "weight_seed": 1732
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.018639725645421754
+          ],
+          [
+            -0.05031933291933241
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              -0.12206049415649983
+            ]
+          ],
+          [
+            [
+              -0.08104948445272288
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          3.371757613659661e-05,
+          1.9438159296858818e-05,
+          9.340342769233751e-06
+        ],
+        "largest_column_norm": 3.371757613659661e-05,
+        "largest_singular_value": 3.995308145112443e-05,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 3.995308145112443e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 3.995308145112444e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 3.9953081451124433e-17,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 87335.22401053189,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          3.995308145112443e-05,
+          2.389615612303789e-06,
+          4.574681281667798e-10
+        ],
+        "smallest_column_norm": 9.340342769233751e-06,
+        "smallest_retained_singular_value": 4.574681281667798e-10,
+        "smallest_singular_value": 4.574681281667798e-10,
+        "standard_tolerance": 3.725973798268059e-19
+      },
+      "elapsed_seconds": 3.3131738000083715,
+      "evaluation_points": [
+        [
+          -2.2310653390045228
+        ],
+        [
+          1.0833133213706705
+        ],
+        [
+          2.2484501878873018
+        ],
+        [
+          0.45715112240076067
+        ],
+        [
+          0.23614658593140073
+        ],
+        [
+          -0.9635111228312818
+        ],
+        [
+          1.3631250997206201
+        ],
+        [
+          0.09320183511383155
+        ],
+        [
+          0.19263246721617594
+        ],
+        [
+          -0.8806244040046934
+        ],
+        [
+          1.8721283126736734
+        ],
+        [
+          0.010044566834691172
+        ],
+        [
+          -1.3910259512626924
+        ],
+        [
+          0.4311091978615563
+        ],
+        [
+          0.938642325778022
+        ],
+        [
+          -1.876097692506224
+        ],
+        [
+          -0.9041068833262516
+        ],
+        [
+          -0.5030163233482677
+        ],
+        [
+          -2.122434033923668
+        ],
+        [
+          -0.6883253741757158
+        ],
+        [
+          0.2522158904155721
+        ],
+        [
+          -0.009276436838217023
+        ],
+        [
+          -0.04964775372232625
+        ],
+        [
+          -1.1082178302730357
+        ],
+        [
+          -0.5249460541843445
+        ],
+        [
+          0.38281313667515793
+        ],
+        [
+          -0.11524394838402878
+        ],
+        [
+          -0.005597335854753758
+        ],
+        [
+          1.6960013985315288
+        ],
+        [
+          0.5998389329116444
+        ],
+        [
+          -1.44070801117051
+        ],
+        [
+          0.3530389412494624
+        ],
+        [
+          0.1707778468214059
+        ],
+        [
+          -0.5419000463987665
+        ],
+        [
+          1.2362723946213288
+        ],
+        [
+          -1.9441577084207775
+        ],
+        [
+          1.3581264816278864
+        ],
+        [
+          0.3612144620150947
+        ],
+        [
+          -1.3610593534162554
+        ],
+        [
+          0.44616230451275213
+        ],
+        [
+          0.01947993548757634
+        ],
+        [
+          -0.39556969874021913
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2718,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 3.725973798268059e-19,
+        "state_dim": 1,
+        "weight_seed": 1733
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.062173112614914754
+          ],
+          [
+            0.03516478060886634
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              0.03138680831486023
+            ]
+          ],
+          [
+            [
+              -0.19648846095926148
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          3.392785373535351e-05,
+          1.965099650699226e-05,
+          9.57106086904832e-06
+        ],
+        "largest_column_norm": 3.392785373535351e-05,
+        "largest_singular_value": 4.027858671297661e-05,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 4.027858671297661e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 4.027858671297661e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 4.027858671297661e-17,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 79482.01432299906,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          4.027858671297661e-05,
+          2.5498198196745954e-06,
+          5.067635370851632e-10
+        ],
+        "smallest_column_norm": 9.57106086904832e-06,
+        "smallest_retained_singular_value": 5.067635370851632e-10,
+        "smallest_singular_value": 5.067635370851632e-10,
+        "standard_tolerance": 3.756330006921033e-19
+      },
+      "elapsed_seconds": 3.2788194000022486,
+      "evaluation_points": [
+        [
+          -0.036425608206980487
+        ],
+        [
+          0.18191742174586262
+        ],
+        [
+          2.2346657654335025
+        ],
+        [
+          1.8920857031491607
+        ],
+        [
+          -0.9544847311932386
+        ],
+        [
+          -2.129958573188675
+        ],
+        [
+          -0.7735011751275155
+        ],
+        [
+          -0.9937141416798905
+        ],
+        [
+          -0.37165502794548855
+        ],
+        [
+          0.573459145067278
+        ],
+        [
+          -0.995381538572654
+        ],
+        [
+          -1.480471897803367
+        ],
+        [
+          0.3688546246706436
+        ],
+        [
+          -0.547714003891469
+        ],
+        [
+          1.3803880587068267
+        ],
+        [
+          0.539217434361696
+        ],
+        [
+          -1.0221320224775996
+        ],
+        [
+          1.4858019089100571
+        ],
+        [
+          -1.1899977347072233
+        ],
+        [
+          0.5323353265785749
+        ],
+        [
+          -0.6357178649179686
+        ],
+        [
+          0.27279435382038547
+        ],
+        [
+          -0.32805889398431204
+        ],
+        [
+          0.34991810232079396
+        ],
+        [
+          -1.623093105459974
+        ],
+        [
+          -0.39996782955365545
+        ],
+        [
+          0.2244109777256912
+        ],
+        [
+          0.041524712900405124
+        ],
+        [
+          -2.0006426729716806
+        ],
+        [
+          -0.5907182546751156
+        ],
+        [
+          -0.1747350379344975
+        ],
+        [
+          -2.3862709221300613
+        ],
+        [
+          -2.1409444480002278
+        ],
+        [
+          0.11460783486591533
+        ],
+        [
+          1.2509574703209014
+        ],
+        [
+          1.556153195435431
+        ],
+        [
+          0.9266436225969948
+        ],
+        [
+          -0.3998188665425945
+        ],
+        [
+          2.0613835420059865
+        ],
+        [
+          0.8070181309048099
+        ],
+        [
+          0.4188051109295674
+        ],
+        [
+          -1.0187396946982594
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2719,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 3.756330006921033e-19,
+        "state_dim": 1,
+        "weight_seed": 1733
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.062173112614914754
+          ],
+          [
+            0.03516478060886634
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              0.03138680831486023
+            ]
+          ],
+          [
+            [
+              -0.19648846095926148
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    },
+    {
+      "basis_labels": [
+        "[X1,[X1,[X1,X2]]]",
+        "[X1,[[X1,X2],X2]]",
+        "[[[X1,X2],X2],X2]"
+      ],
+      "diagnostics": {
+        "column_norms": [
+          3.376566642753061e-05,
+          1.9450475340635527e-05,
+          9.272173517795949e-06
+        ],
+        "largest_column_norm": 3.376566642753061e-05,
+        "largest_singular_value": 4.000377598432414e-05,
+        "nullity": 0,
+        "numerical_rank": 3,
+        "relative_ranks": [
+          {
+            "absolute_tolerance": 4.0003775984324143e-13,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-08
+          },
+          {
+            "absolute_tolerance": 4.0003775984324144e-15,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-10
+          },
+          {
+            "absolute_tolerance": 4.000377598432414e-17,
+            "nullity": 0,
+            "numerical_rank": 3,
+            "relative_tolerance": 1e-12
+          }
+        ],
+        "retained_condition_number": 130657.81515782964,
+        "right_numerical_nullspace": [
+          [],
+          [],
+          []
+        ],
+        "singular_values": [
+          4.000377598432414e-05,
+          2.0278877972719685e-06,
+          3.0617208726474656e-10
+        ],
+        "smallest_column_norm": 9.272173517795949e-06,
+        "smallest_retained_singular_value": 3.0617208726474656e-10,
+        "smallest_singular_value": 3.0617208726474656e-10,
+        "standard_tolerance": 3.7307015062584583e-19
+      },
+      "elapsed_seconds": 3.7350599999772385,
+      "evaluation_points": [
+        [
+          0.20584060301904328
+        ],
+        [
+          0.45597283215014933
+        ],
+        [
+          -1.3958055920769663
+        ],
+        [
+          -1.898688174463433
+        ],
+        [
+          0.9962699796038618
+        ],
+        [
+          -0.6651688944422214
+        ],
+        [
+          0.5033470396703763
+        ],
+        [
+          0.40809737333306867
+        ],
+        [
+          -0.28242072359116266
+        ],
+        [
+          -1.4689088983445064
+        ],
+        [
+          -0.19634622224030934
+        ],
+        [
+          -2.313086154375389
+        ],
+        [
+          -1.3318925931471695
+        ],
+        [
+          -0.8220959203697159
+        ],
+        [
+          -1.0181473128074292
+        ],
+        [
+          1.3577828371126124
+        ],
+        [
+          0.15168512104692336
+        ],
+        [
+          -1.377898738373654
+        ],
+        [
+          -1.1267525291997336
+        ],
+        [
+          0.3016370102154644
+        ],
+        [
+          -0.05123247996395987
+        ],
+        [
+          0.1677513460727175
+        ],
+        [
+          1.011898352363573
+        ],
+        [
+          -0.5706933855069357
+        ],
+        [
+          -0.7828454388130112
+        ],
+        [
+          0.13477105392053082
+        ],
+        [
+          -0.6033746523201026
+        ],
+        [
+          0.36933685590348386
+        ],
+        [
+          -0.885469210141226
+        ],
+        [
+          1.3445717969484163
+        ],
+        [
+          1.3021475425504505
+        ],
+        [
+          1.2839618027397033
+        ],
+        [
+          -0.4276529015879654
+        ],
+        [
+          0.18176874729338285
+        ],
+        [
+          0.07922600157352754
+        ],
+        [
+          1.0905907095344278
+        ],
+        [
+          0.0813426446911857
+        ],
+        [
+          0.6183197501271792
+        ],
+        [
+          0.39557312324055655
+        ],
+        [
+          0.1563412350170111
+        ],
+        [
+          -0.33339412399931173
+        ],
+        [
+          -0.2683374226058304
+        ]
+      ],
+      "matrix_shape": [
+        42,
+        3
+      ],
+      "metadata": {
+        "actual_row_oversampling": 39,
+        "architecture": "depth_two_exponential",
+        "column_count": 3,
+        "degree": 4,
+        "dtype": "torch.float64",
+        "input_dim": 2,
+        "machine_epsilon": 2.220446049250313e-16,
+        "matrix_entry_count": 126,
+        "max_matrix_entries": 10000,
+        "parameter_scales": {
+          "diagonal_scale": 0.1,
+          "outer_weight_scale": 0.1
+        },
+        "point_count": 42,
+        "point_distribution": "normal",
+        "point_scale": 1.0,
+        "point_seed": 2720,
+        "relative_tolerances": [
+          1e-08,
+          1e-10,
+          1e-12
+        ],
+        "row_count": 42,
+        "row_oversampling": 39,
+        "standard_relative_tolerance": 9.325873406851315e-15,
+        "standard_tolerance": 3.7307015062584583e-19,
+        "state_dim": 1,
+        "weight_seed": 1733
+      },
+      "numerically_full_column_rank": true,
+      "sampled_parameters": {
+        "diagonal_entries": [
+          [
+            -0.062173112614914754
+          ],
+          [
+            0.03516478060886634
+          ]
+        ],
+        "outer_weights": [
+          [
+            [
+              0.03138680831486023
+            ]
+          ],
+          [
+            [
+              -0.19648846095926148
+            ]
+          ]
+        ],
+        "parameter_type": "depth_two_exponential"
+      },
+      "skip_reason": null,
+      "status": "completed"
+    }
+  ],
+  "schema_version": 1,
+  "skipped_count": 0,
+  "torch_config": "PyTorch built with:\n  - C++ Version: 202002\n  - MSVC 194234444\n  - Intel(R) oneAPI Math Kernel Library Version 2026.0-Product Build 20260401 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.11.2 (Git Hash 03c022d3ffdcee958cfacbe720048e725fdf644c)\n  - OpenMP 2019\n  - LAPACK is enabled (usually provided by MKL)\n  - CPU capability usage: AVX2\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=7269437d655783a26cba32aa88195b741ff496aa, CUDA_FLAGS= -DLIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS -Xcompiler /Zc:__cplusplus -Xcompiler /Zc:preprocessor -Xcompiler /w -w -Xcompiler /FS -Xfatbin -compress-all  -Xcompiler=/wd4819,/wd4503,/wd4190,/wd4244,/wd4251,/wd4275,/wd4522 -Wno-deprecated-gpu-targets --expt-extended-lambda -DCUB_WRAPPED_NAMESPACE=at_cuda_detail -DDISABLE_CUSPARSE_DEPRECATED -DCUDA_HAS_FP16=1 -D__CUDA_NO_HALF_OPERATORS__ -D__CUDA_NO_HALF_CONVERSIONS__ -D__CUDA_NO_HALF2_OPERATORS__ -D__CUDA_NO_BFLOAT16_CONVERSIONS__, CXX_COMPILER=C:/actions-runner/_work/pytorch/pytorch/.ci/pytorch/windows/tmp_bin/sccache-cl.exe, CXX_FLAGS=/DWIN32 /D_WINDOWS /EHsc /Zc:__cplusplus /bigobj /FS /utf-8 -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOCUPTI -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE /wd4624 /wd4068 /wd4067 /wd4267 /wd4661 /wd4717 /wd4244 /wd4804 /wd4273, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.12.1, USE_CUDA=0, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=OFF, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+  "torch_num_threads": 16,
+  "torch_version": "2.12.1+cpu"
+}

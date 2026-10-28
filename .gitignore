@@ -13,3 +13,12 @@ data/
 .pytest_cache/
 .ipynb_checkpoints/
 .DS_Store
+
+# Local editor settings and regenerable research outputs
+/.idea/
+/paper/build/
+/research_output/smoke_validation/
+/research_output/stage_a_stdout.log
+/research_output/stage_a_stderr.log
+/research_output/stage_b_stdout.log
+/research_output/stage_b_stderr.log
