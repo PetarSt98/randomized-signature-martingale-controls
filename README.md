@@ -1,5 +1,11 @@
 # Randomized-Signature Martingale Control Variates
 
+For the reviewed memory and history-window hedging comparisons, see the
+[CAS memory report](results/cas_memory/REPORT.md).
+Generated result bundles, figures, logs and execution snapshots stay local and
+are ignored by Git. The report retains the verified tables and limitations;
+its audit claims refer to the completed local artifacts, not files in this clone.
+
 Variance reduction for Monte Carlo pricing of path-dependent options using
 **martingale control variates**, where the predictable control integrand comes
 from a *frozen randomized-signature reservoir* (only a linear readout is
@@ -386,7 +392,7 @@ The second command also resumes: completed fits are reused; interrupted attempts
 are recorded as failures rather than silently repeated beyond the budget.
 Results, failures, individual fit/feature/evaluation times, residuals and the
 comparison figure are saved under `results/cas_frictionless/`.
-See [the evaluated comparison](results/cas_frictionless/REPORT.md).
+The runner writes its local report to `results/cas_frictionless/REPORT.md`.
 The completed declaration used 44/44 fits with zero fit failures. Independent
 test RMSE was 2.4711 for the simple state hedge, 1.4057 for shallow tanh,
 1.4363 for depth-two tanh, and 1.0727 for the Transformer (discounted price
@@ -465,7 +471,7 @@ counts and aliases are saved; this does not omit a comparison or enlarge search.
 From the repository root, declare with `python scripts/cas_costs.py --declare`,
 then run/resume with `python scripts/cas_costs.py`, using the prepared virtual
 environment and the same two-thread environment settings documented above.
-See [cost-aware results](results/cas_costs/REPORT.md) for saved selections,
+The local `results/cas_costs/REPORT.md` describes saved selections,
 checkpoint histories, convergence status, failures, net errors, turnover, costs
 and complete timings. Conclusions concern these implemented policy classes and
 bounded optimizer runs, **not globally optimal hedging**. Cost calibration,
@@ -572,7 +578,7 @@ OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 MPLBACKEND=Agg MPLCON
 The run command reuses completed fits. A fit interrupted inside optimization
 remains identified and counted; it is not silently restarted with extra budget.
 Use `--report-only` to verify saved runs and regenerate the three figures and
-[result tables](results/cas_transfer/REPORT.md). Conclusions concern the tested
+local result tables in `results/cas_transfer/REPORT.md`. Conclusions concern the tested
 policy classes, sparse shortlist and bounded optimization, not globally optimal
 hedging. Historical experiments and reconstruction mathematics remain separate.
 
@@ -599,17 +605,50 @@ effect. On the Heston reference, the freshly fitted Transformer had lower
 RMSE (1.071211 / 1.085698 for zero / combined costs) with greater fitting expense.
 The simple hedge remains reported for every task and condition.
 
-The full experiment invocation took 1,796.649 seconds, excluding subsequent
-report rendering; unique fitting totaled 357.723 seconds for tuning and
+The recorded study interval took 1,796.649 seconds, ending before final result
+serialization, an additional audit and report rendering; a complete historical
+end-to-end time is unavailable. Unique fitting totaled 357.723 seconds for tuning and
 1,058.423 seconds for final fits. Feature generation, deployment, artifact I/O
 and reporting timings are separately saved. Peak process RSS was 1,130.06 MiB;
 the largest named feature group used 381.32 MiB. These are measured wall times
 and process/array memory statistics, not controlled hardware benchmarks.
 Optimizer outcomes were 117 exact ridge solves, one stationary run and 242
-runs reaching their limits without establishing convergence. All 91 tests
-passed. The independent saved-run audit regenerated all 12 dataset partitions
+runs reaching their limits without establishing convergence. The saved test log
+records 91 passing tests; the current independent review reran 63 focused tests.
+The independent saved-run audit regenerated all 12 dataset partitions
 and verified all residual-based CSV aggregates, selections, premiums, source
 hashes and timing identities. Its reusable script and output are saved in
 `results/cas_transfer/provenance/independent_audit.py` and
 `results/cas_transfer/independent_audit.json`. See the report for all three
 figures, descriptive dataset error bars, paired differences and per-run records.
+
+## Memory and short-history comparison
+
+`scripts/cas_memory.py` compares fixed random features using the same observable
+summaries, training premium and ridge hedge accounting. The original 414-fit
+study compares affine, current-summary tanh and a shallow reservoir. Its 756-fit
+extension compares current-summary tanh, windows 5 and 20, and the reservoir.
+Window w contains the current vector plus w earlier vectors, padding with the
+initial observation; only the nonlinear input expands.
+
+Each nonlinear representation uses 64 features and six scale/penalty candidates,
+with three partitions per task, three tuning draws and three fresh final draws.
+All choices freeze before test generation. Both protocols and seed lists are
+embedded in the runner; declaring a run saves them before any fitting.
+
+On Linux, with dependencies installed and the Python environment activated:
+
+```bash
+python scripts/cas_memory.py --windows --declare
+python scripts/cas_memory.py --windows
+```
+
+Omit `--windows` for the original comparison. These commands execute the full
+protocol; they are not tests. Resume uses the run command, and `--report-only`
+requires completed local artifacts with matching source hashes.
+
+The completed extension found lower reservoir MSE than either window in all
+nine partition averages, with higher selection cost. Current-summary tanh had
+the lowest pooled MSE on all three tasks. This supports the reservoir over the
+tested windows without demonstrating a benefit from additional history over
+current summaries; see the linked report for draw variability and tail effects.

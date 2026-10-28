@@ -13,3 +13,9 @@ data/
 .pytest_cache/
 .ipynb_checkpoints/
 .DS_Store
+
+# Keep generated studies local; publish only the maintained memory report.
+/results/*
+!/results/cas_memory/
+/results/cas_memory/*
+!/results/cas_memory/REPORT.md
