@@ -26,7 +26,7 @@ from cas_transfer_report import _write_csv
 from rsmc.control import RidgeMartingaleControl, control_features
 from rsmc.cost_hedging import hedge_readout_features
 from rsmc.features import PathFeatures
-from rsmc.hedging import FrozenTanhFeatures, discounted_traded_increments, evaluate_hedge, fit_fixed_premium_hedge
+from rsmc.hedging import FrozenTanhFeatures, discounted_traded_increments, evaluate_hedge, fit_fixed_premium_hedge, ewma_hedging_features
 from rsmc.reservoir import RandomizedSignatureReservoir
 from rsmc.transfer_tasks import make_transfer_dataset
 
@@ -58,7 +58,7 @@ PLAN = {
 
 
 def configure_windows():
-    """The single declared extension; historical constants remain the default."""
+    """The fixed history-window extension; historical constants remain the default."""
     global OUT, METHODS, PLAN
     from dataclasses import asdict
     from rsmc.transfer_tasks import BlackScholesModel, HestonModel, MultiAssetHestonModel
@@ -92,23 +92,59 @@ def configure_windows():
     PLAN["payoff"]="Discounted strike-100 arithmetic Asian call; average dates1..50, excluding inception. Basket weights1/3 each. Summary running averages include inception; no latent variance or innovations enter policies."
 
 
+def configure_two_factor():
+    """Optional observed-total-variance benchmark; reuse the window protocol."""
+    global OUT, METHODS, TASKS, PLAN
+    from dataclasses import asdict
+    from rsmc.two_factor_heston import TwoFactorHestonModel
+    configure_windows()
+    OUT = ROOT / "results/cas_memory/two_factor"
+    TASKS = ["two_factor_heston"]
+    METHODS = ["static", "window5", "window20", "ewma", "reservoir"]
+    PLAN = {**PLAN,
+        "tasks": TASKS, "methods": METHODS,
+        "models": {"two_factor_heston": asdict(TwoFactorHestonModel())},
+        "ewma_rates": [0.5, 5.0],
+        "datasets": [dict(id=f"two_factor_heston_{b}", task=TASKS[0], partition=b,
+            seed=2026300000+b,
+            tuning_seeds={m:[2026310000+100*b+10*i+j for j in (1,2,3)]
+                          for i,m in enumerate(METHODS)},
+            final_seeds={m:[2026320000+100*b+10*i+j for j in (1,2,3)]
+                         for i,m in enumerate(METHODS)}) for b in (1,2,3)],
+        "selection": "Separately for each of three datasets and five fixed representations: minimum unpenalized validation MSE averaged over three tuning draws; candidate order breaks exact ties. Freeze all 15 settings before test generation. No selection between representations, extra starts, replacement seeds or test selection.",
+        "information": "Common [t/T, log(S/S0), log(A/S0), z], z=(v1+v2)/0.04. Running average includes inception. Total variance is observed exactly; individual factors and simulated innovations are not policy inputs. Original current-summary passthrough for every representation; no fitted input normalization.",
+        "ewma_inputs": "Only EWMA tanh appends two causal summaries of z to its nonlinear input: q0=z0, qk=exp(-kappa*dt)*q_(k-1)+(1-exp(-kappa*dt))*zk for kappa=0.5,5.0. These are historical summaries, not exact factor estimates. The readout passthrough remains the original four current summaries.",
+        "random_scaling": "Static/window A has Gaussian SD s/sqrt(4*(w+1)); EWMA A has six input channels and SD s/sqrt(6). All tanh biases have SD1. Reservoir channel matrices retain SD s/sqrt(64), biases SD1, and the unchanged recurrence. Reuse base draws across scales and penalties.",
+        "payoff": "Discounted strike-100 arithmetic Asian call; average dates1..50, excluding inception. Fixed-grid projected Euler factors and current-variance log-Euler stock define the numerical target.",
+        "budget": {"nonlinear_selection":270,"affine_selection":0,"nonlinear_final":45,"affine_final":0,"total":315},
+        "aggregation": "Average squared errors over three draws within each partition, then equally over three partitions. RMSE is sqrt(pooled MSE). Report partition sample SD and within-partition draw variation separately, no confidence intervals. Save all ten paired differences; figure shows each tanh representation minus reservoir.",
+        "protocol_revision": "Optional two-factor Heston benchmark with observed total variance and fixed EWMA comparator. Finite-factor model, not rough volatility; no assumed history benefit or reservoir advantage. Historical protocols and artifacts remain unchanged.",
+    }
+    PLAN = json.loads(json.dumps(PLAN))
+
+
 def feature_map(method, candidate, seed, channels):
     if method == "affine":
         return None
     cls = RandomizedSignatureReservoir if method == "reservoir" else FrozenTanhFeatures
     options = {"window": PLAN.get("windows", {}).get(method, 0)} if cls is FrozenTanhFeatures else {}
-    return cls.draw(channels, candidate["dim"], np.random.default_rng(seed),
+    nonlinear_channels = channels + len(PLAN["ewma_rates"]) if method == "ewma" else channels
+    return cls.draw(nonlinear_channels, candidate["dim"], np.random.default_rng(seed),
                     weight_scale=candidate["weight_scale"], bias_scale=candidate["bias_scale"], **options)
 
 
-def gain_rows(data, times, rate, model):
+def gain_rows(data, times, rate, model, method=None):
     features = data["features"]
     n = len(features.values)
     chunks, feature_s, gain_s = [], 0., 0.
     for start in range(0, n, PLAN.get("path_batch_size", n)):
         stop = min(start + PLAN.get("path_batch_size", n), n)
         batch = PathFeatures(features.values[start:stop], features.names)
-        phi, seconds = timed(lambda: hedge_readout_features(batch, times, model))
+        def readout():
+            nonlinear = (ewma_hedging_features(batch, times, PLAN["ewma_rates"])
+                         if method == "ewma" else None)
+            return hedge_readout_features(batch, times, model, nonlinear_features=nonlinear)
+        phi, seconds = timed(readout)
         feature_s += seconds
         psi, seconds = timed(lambda: control_features(phi, discounted_traded_increments(data["spot"][start:stop], times, rate)))
         gain_s += seconds
@@ -206,20 +242,40 @@ def render(results):
             evaluation_s=sum(sum(r.get("evaluation_attempts_s",[r.get("evaluation_s",0.)])) for r in fits),
             interrupted_fit_attempts=sum(len(r.get("interrupted_attempts",[])) for r in fits))
     if "windows" in PLAN:
-        fig,axes=plt.subplots(1,3,figsize=(12,4.5),layout="constrained")
-        for ax,task,title in zip(axes,TASKS,["Black–Scholes Asian","Heston Asian","Heston basket Asian"]):
+        tasks = PLAN["tasks"]
+        comparators = [m for m in METHODS if m != "reservoir"]
+        titles = {"black_scholes":"Black–Scholes Asian", "heston":"Heston Asian",
+                  "basket":"Heston basket Asian", "two_factor_heston":"Two-factor Heston Asian"}
+        labels = {"static":"Current", "window5":"Window 5", "window20":"Window 20", "ewma":"Two EWMAs", "reservoir":"Reservoir"}
+        show_costs = tasks == ["two_factor_heston"]
+        panels = len(tasks) + (2 if show_costs else 0)
+        fig,axes=plt.subplots(1,panels,figsize=(15 if show_costs else max(6,4*len(tasks)),4.8),layout="constrained",squeeze=False)
+        for ax,task in zip(axes[0][:len(tasks)],tasks):
             means=[]
-            for i,method in enumerate(METHODS[:-1]):
+            for i,method in enumerate(comparators):
                 values=np.array([r[f"{method}_minus_reservoir"] for r in paired if r["task"]==task])
                 means.append(float(values.mean()))
                 ax.errorbar(i,values.mean(),yerr=values.std(ddof=1),fmt="o",color="black",capsize=4,markersize=4)
-                ax.scatter(i+np.array([-.09,0,.09]),values,color="tab:blue",s=23,zorder=3)
+                ax.scatter(i+np.linspace(-.09,.09,len(values)),values,color="tab:blue",s=23,zorder=3)
             ax.axhline(0,color="gray",ls="--",lw=1)
-            ax.set(xticks=range(3),xticklabels=["Current","Window 5","Window 20"],title=title,
+            ax.set(xticks=range(len(comparators)),xticklabels=[labels[m] for m in comparators],title=titles[task],
                 ylabel="Tanh MSE − reservoir MSE (currency²)")
             ax.text(.5,-.17,"Means: "+", ".join(f"{v:+.3g}" for v in means),ha="center",transform=ax.transAxes,fontsize=9)
-        fig.suptitle("Paired test error differences; three partitions per task")
-        fig.text(.01,-.05,"Dots: partitions after averaging draws. Black: mean ± partition SD, not a confidence interval. Positive favors reservoir; panel scales differ.",fontsize=9)
+        if show_costs:
+            for ax,field,title,ylabel in zip(axes[0][-2:],
+                    ["selection_s", "deployment_s"],
+                    ["Full selection per partition", "Single-draw test inference"],
+                    ["Seconds (features + gains + fits + validation)", "Seconds per 8,000 paths (features + gains + evaluation)"]):
+                for i,method in enumerate(METHODS):
+                    values=np.array([r[field] for r in dataset_rows if r["method"]==method])
+                    ax.errorbar(i,values.mean(),yerr=values.std(ddof=1),fmt="o",color="black",capsize=4,markersize=4)
+                    ax.scatter(i+np.linspace(-.09,.09,len(values)),values,color="tab:blue",s=23,zorder=3)
+                ax.set(xticks=range(len(METHODS)),xticklabels=[labels[m] for m in METHODS],title=title,ylabel=ylabel)
+                ax.set_ylim(bottom=0)
+            for ax in axes[0]:
+                ax.tick_params(axis="x",labelrotation=25)
+        fig.suptitle(f"Paired errors and measured costs; {len(PLAN['datasets'])//len(tasks)} partitions" if show_costs else f"Paired test error differences; {len(PLAN['datasets'])//len(tasks)} partitions per task")
+        fig.text(.01,-.05,"Dots: partition values (test draws averaged within each). Black: mean ± partition SD, not a confidence interval. Positive error differences favor reservoir.",fontsize=9)
         fig.savefig(OUT/"comparison.png",dpi=170,bbox_inches="tight")
         plt.close(fig)
         return
@@ -253,18 +309,22 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--declare",action="store_true")
     parser.add_argument("--report-only",action="store_true")
-    parser.add_argument("--windows",action="store_true",help="Run the fixed 756-fit history-window extension.")
+    modes=parser.add_mutually_exclusive_group()
+    modes.add_argument("--windows",action="store_true",help="Run the fixed 756-fit history-window extension.")
+    modes.add_argument("--two-factor",action="store_true",help="Run the optional 315-fit observed-total-variance benchmark.")
     args=parser.parse_args()
     if args.windows: configure_windows()
+    if args.two_factor: configure_two_factor()
+    frozen_declaration = args.windows or args.two_factor
     OUT.mkdir(parents=True,exist_ok=True)
     plan_path=OUT/"plan.json"
     source_paths=[Path(__file__),plan_path,*sorted((ROOT/"rsmc").glob("*.py"))]
-    if args.windows: source_paths += [ROOT/"scripts/cas_frictionless.py",ROOT/"scripts/cas_transfer_report.py"]
+    if frozen_declaration: source_paths += [ROOT/"scripts/cas_frictionless.py",ROOT/"scripts/cas_transfer_report.py"]
     if args.declare:
         if plan_path.exists() and json.loads(plan_path.read_text())!=PLAN:
             raise RuntimeError("Existing declaration differs; refusing overwrite.")
         if not plan_path.exists(): write_json(plan_path,PLAN)
-        if args.windows:
+        if frozen_declaration:
             sources={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
             declaration=OUT/"declaration.json"
             if declaration.exists():
@@ -273,7 +333,7 @@ def main():
             else:
                 seeds=[d["seed"] for d in PLAN["datasets"]]
                 seeds += [s for d in PLAN["datasets"] for phase in ("tuning_seeds","final_seeds") for draws in d[phase].values() for s in draws]
-                assert len(seeds)==len(set(seeds))==225
+                assert len(seeds)==len(set(seeds))
                 def integers(value):
                     if type(value) is int: yield value
                     elif isinstance(value,dict):
@@ -298,7 +358,7 @@ def main():
     path=OUT/"results.json"
     results=json.loads(path.read_text()) if path.exists() else dict(status="running",fits={},groups=[],datasets={},selection={},failures=[],invocations=[])
     sources={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
-    if args.windows and json.loads((OUT/"declaration.json").read_text())["source_sha256"]!=sources:
+    if frozen_declaration and json.loads((OUT/"declaration.json").read_text())["source_sha256"]!=sources:
         raise RuntimeError("Sources differ from the pre-execution declaration.")
     if results.get("source_sha256",sources)!=sources:
         # A completed study may rerender after a plotting-only revision. Preserve
@@ -333,13 +393,14 @@ def main():
         generation=dict(dataset=ds["id"],test_included=test,started_utc=datetime.now(timezone.utc).isoformat(),paths=sum(sizes.values()))
         invocation.setdefault("data_generation",[]).append(generation)
         save()
-        (data,times,rate,premium,meta),seconds=timed(lambda:make_transfer_dataset(ds["task"],sizes,50,ds["seed"],100.))
+        (data,times,rate,premium,meta),seconds=timed(lambda:make_transfer_dataset(ds["task"],sizes,PLAN["n_steps"],ds["seed"],PLAN["strike"]))
         if isinstance(meta["model"].get("correlation"),np.ndarray): meta["model"]["correlation"]=meta["model"]["correlation"].tolist()
         previous=results["datasets"].get(ds["id"])
         if previous:
             assert premium==previous["premium"]
-            for split,digest in previous["dataset_spot_sha256"].items():
-                assert digest==meta["dataset_spot_sha256"][split]
+            for field in ("dataset_spot_sha256", "dataset_features_sha256"):
+                for split,digest in previous.get(field,{}).items():
+                    assert digest==meta[field][split]
         results["datasets"][ds["id"]]=meta
         generation.update(seconds=seconds,completed_utc=datetime.now(timezone.utc).isoformat())
         save()
@@ -355,7 +416,7 @@ def main():
         results["groups"].append(g)
         save()
         for split in data:
-            rows[split],g["feature_s"][split],g["gain_s"][split]=gain_rows(data[split],times,rate,model)
+            rows[split],g["feature_s"][split],g["gain_s"][split]=gain_rows(data[split],times,rate,model,method)
             save()
         g.update(status="completed",completed_utc=datetime.now(timezone.utc).isoformat())
         save()
@@ -388,10 +449,11 @@ def main():
         for ds in PLAN["datasets"]:
             if ds["id"] in results["selection"]: continue
             data,times,rate,premium=dataset(ds,False)
+            rows=None  # A resume can reuse every fit before its selection was saved.
             choices={}
             for method in METHODS:
-                candidates=[dict(lam=l) for l in PLAN["affine_lambdas"]] if method=="affine" else CANDIDATES
-                for s in ([None] if method=="affine" else [.5,1.]):
+                candidates=[dict(lam=l) for l in PLAN["affine_lambdas"]] if method=="affine" else PLAN["candidates"]
+                for s in dict.fromkeys(c.get("weight_scale") for c in candidates):
                     indices=[i for i,c in enumerate(candidates) if c.get("weight_scale")==s]
                     for seed in ([0] if method=="affine" else ds["tuning_seeds"][method]):
                         keys=[f"{ds['id']}_tuning_{method}_c{i}_d{seed}" for i in indices]
@@ -401,7 +463,8 @@ def main():
                 scores=[]
                 for i,candidate in enumerate(candidates):
                     records=[r for r in results["fits"].values() if r["dataset"]==ds["id"] and r["phase"]=="tuning" and r["method"]==method and r["candidate_index"]==i]
-                    if len(records)!=(1 if method=="affine" else 3) or any(r["status"]!="completed" for r in records): raise RuntimeError("Incomplete selection grid; inspect failures.")
+                    expected = 1 if method=="affine" else len(ds["tuning_seeds"][method])
+                    if len(records)!=expected or any(r["status"]!="completed" for r in records): raise RuntimeError("Incomplete selection grid; inspect failures.")
                     scores.append(float(np.mean([r["validation_mse"] for r in records])))
                 index=min(range(len(scores)),key=lambda i:(scores[i],i))
                 choices[method]=dict(candidate_index=index,candidate=candidates[index],validation_mse=scores[index],candidate_scores=scores)
@@ -410,7 +473,8 @@ def main():
             save()
             print("Selection frozen",ds["id"],{m:v["candidate_index"] for m,v in choices.items()},flush=True)
             del rows,data
-        assert len(results["selection"])==9
+        assert len(results["selection"])==len(PLAN["datasets"])
+        assert all(set(choices)==set(METHODS) for choices in results["selection"].values())
         frozen=hashlib.sha256(json.dumps(results["selection"],sort_keys=True).encode()).hexdigest()
         assert results.get("selection_sha256",frozen)==frozen
         results["selection_sha256"]=frozen

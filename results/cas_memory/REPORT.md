@@ -635,3 +635,240 @@ window run with matching frozen source hashes, use
 figure without fits. Do not use the ordinary run command for completed outputs:
 it records another invocation and replaces the latest invocation timing.
 A fresh checkout does not contain the numerical inputs for `--report-only`.
+
+## Optional two-factor Heston benchmark — implementation only
+
+**Implementation record before execution; completed results follow below.** This separate mode
+asks whether historical representations help hedge when observed total variance
+has slow and fast components. It is a finite-factor stochastic-volatility model,
+not rough volatility. Unequal reversion speeds make the conditional evolution of
+total variance depend on its hidden composition. This motivates the comparison;
+it does not establish that history improves the optimal Asian hedge.
+
+One stock has two independent Brownian pairs, with within-pair correlations
+$\rho=(-0.7,-0.7)$. Parameters are $S_0=K=100$, $r=0.03$, $T=1$,
+$v_0=\theta=(0.02,0.02)$, $\kappa=(0.5,5)$ and $\xi=(0.3,0.3)$.
+With $\Delta=1/50$, the numerical target is
+$$
+v_{i,k+1}=\left[v_{i,k}+\kappa_i(\theta_i-v_{i,k})\Delta
+             +\xi_i\sqrt{v_{i,k}\Delta}\,Z^W_{i,k+1}\right]^+,
+$$
+$$
+\log S_{k+1}=\log S_k+\left(r-\tfrac12 U_k\right)\Delta
+       +\sum_{i=1}^2\sqrt{v_{i,k}\Delta}\,Z^B_{i,k+1},
+\qquad U_k=v_{1,k}+v_{2,k}.
+$$
+Both stock drift and diffusion use current variances. Separate projections need
+not collapse pathwise to the ordinary Heston scheme when factor parameters match.
+The Asian payoff, discounting, training-derived fixed premium and ridge objective
+remain those defined above.
+
+All methods observe exactly
+$x_k=[t_k/T,\log(S_k/S_0),\log(A_k/S_0),z_k]$, with
+$A_k=(k+1)^{-1}\sum_{j=0}^kS_j$ and $z_k=U_k/0.04$.
+They receive neither individual factors nor innovations. The five fixed
+representations are current tanh, window-5 tanh, window-20 tanh, two-EWMA tanh,
+and the unchanged shallow reservoir. Window order and inception padding are
+unchanged. For each rate $\kappa\in\{0.5,5\}$, the EWMA starts at $q_0=z_0$
+and updates $q_k=e^{-\kappa\Delta}q_{k-1}+(1-e^{-\kappa\Delta})z_k$.
+These historical summaries are not exact factor estimates. Only the EWMA
+nonlinear map receives $[x_k,q_k^{0.5},q_k^5]$; every readout retains
+$[1,t_k,\log(S_k/S_0),\log(A_k/S_0),z_k]$ plus 64 nonlinear features.
+Thus all methods fit 69 coefficients. Tanh input dimensions are 4/24/84/6,
+with Gaussian weight SD $s/\sqrt{\text{input dimension}}$; reservoir channel
+matrices retain SD $s/\sqrt{64}$. Every bias SD is 1.
+
+There are three partitions, each with 4,000/2,000/8,000 training/validation/test
+paths. Each method separately selects the existing six $(s,\lambda)$ tuples
+from $s\in\{0.5,1\}$, $\lambda\in\{0,0.1,10\}$, using mean validation MSE
+across three draws and candidate-order ties. All 15 selections freeze before
+test generation; three fresh final draws per selection are fitted on training
+paths only. The budget is $3\times5\times6\times3=270$ selection fits plus
+$3\times5\times3=45$ final fits, totaling **315**. The existing batching,
+accounting, timing, failure, aggregation and resume logic is shared.
+
+For partition $b=1,2,3$, method index $m=0,\ldots,4$ in the order above,
+and draw $j=1,2,3$, dataset seeds are `2026300000+b`, tuning seeds are
+`2026310000+100*b+10*m+j`, and final seeds are `2026320000+100*b+10*m+j`.
+The 93 seeds are disjoint from the historical protocols. Declaration checks
+available prior JSON records for collisions, saves the plan and source hashes,
+and generates no paths. Historical files are not required in a fresh checkout.
+
+**Fixed-grid martingale and moment justification.** Conditional on the full
+history, $\sum_i\sqrt{v_{i,k}\Delta}Z^B_{i,k+1}$ is centered Gaussian with
+variance $\Delta U_k$. Its exponential moment gives
+$E[\widetilde S_{k+1}\mid\mathcal F_k]=\widetilde S_k$ exactly for the
+declared transition law. The tower property gives the same identity in the
+observed price/total-variance filtration; within-pair leverage does not alter it.
+
+For each projected factor, write $v'=(b+cv+\xi\sqrt{\Delta v}Z)^+$,
+where $b=\kappa\theta\Delta$, $c=1-\kappa\Delta$. For every $a\ge0$,
+$$
+E[e^{av'}\mid v]\le1+\exp\left(ab+
+           [ac+\tfrac12a^2\xi^2\Delta]v\right).
+$$
+Replacing the coefficient of $v$ by its positive part gives a bound by a
+positive exponential moment. Starting from deterministic factors, induction
+proves all positive exponential moments of each factor at every finite grid
+date; Hölder gives the same for $U_k$. For every $p\ge1$,
+$$
+E[S_{k+1}^p]
+\le e^{pr\Delta}\sqrt{E[S_k^{2p}]
+                       E[e^{p(p-1)\Delta U_k}]}.
+$$
+Simultaneous induction over dates for all $p$ proves finite stock moments,
+including second moments, while allowing stock/variance dependence. Jensen's
+inequality gives square integrability of the Asian payoff. This is an analytic
+finite-grid argument, not a simulation check or a uniform grid-refinement claim.
+
+On Linux, with the repository environment activated, declare with
+`python scripts/cas_memory.py --two-factor --declare`, then run or resume with
+`python scripts/cas_memory.py --two-factor`. Outputs go to
+`results/cas_memory/two_factor/`. `--two-factor` and `--windows` are mutually
+exclusive. Source checks include the new module and all other `rsmc` modules.
+Historical declarations, hashes and numerical outputs remain unchanged and
+require their original source versions; the new mode does not bypass those checks.
+
+## Two-factor benchmark — completed 29 October 2026
+
+**315/315 fits completed: 270 selection and 45 final fits, with zero failures,
+interrupted fits or replacement draws.** The declaration froze the specified
+model, four observable summaries, five representations, six candidates and 93
+seeds before execution. All 15 validation selections froze before test generation.
+Three partitions each use 4,000/2,000/8,000 paths and 50 intervals; each selected
+representation has three fresh final draws. No old study was rerun or retuned.
+
+MSE is in discounted currency squared and RMSE in currency. Squared errors are
+averaged over feature draws within partitions, then equally over three partitions.
+Partition SD describes those three means. The last three columns report each
+partition's draw-averaged MSE ± within-partition draw SD. Neither SD is a confidence
+interval; shared paths and feature draws are not independent datasets.
+
+| Representation | Pooled MSE | RMSE | Partition MSE SD | Partition 1 MSE ± draw SD | Partition 2 | Partition 3 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Current tanh | 2.1195 | 1.4559 | 0.6006 | 2.7915 ± 1.2082 | 1.6348 ± 0.1046 | 1.9323 ± 0.1506 |
+| Window 5 | 2.4300 | 1.5588 | 0.0932 | 2.5133 ± 0.0855 | 2.3294 ± 0.0282 | 2.4472 ± 0.0380 |
+| Window 20 | 3.0628 | 1.7501 | 0.1134 | 3.1454 ± 0.0532 | 2.9335 ± 0.0596 | 3.1094 ± 0.0861 |
+| Two-EWMA tanh | 1.9926 | 1.4116 | 0.0617 | 2.0076 ± 0.0451 | 1.9248 ± 0.0554 | 2.0454 ± 0.0843 |
+| Reservoir | 2.5166 | 1.5864 | 0.1821 | 2.4788 ± 0.1041 | 2.3564 ± 0.1595 | 2.7146 ± 0.3117 |
+
+Paired differences use the same test paths, averaging draws first. Positive
+values favor the method on the right. All ten comparisons per partition are
+saved locally in `two_factor/paired.csv`; the question's main comparisons are:
+
+| MSE difference | Mean ± partition SD |
+| --- | ---: |
+| Current − window 5 | -0.3104 ± 0.5176 |
+| Current − window 20 | -0.9432 ± 0.5140 |
+| Current − EWMA | +0.1270 ± 0.5758 |
+| Current − reservoir | -0.3971 ± 0.6154 |
+| Window 5 − reservoir | -0.0866 ± 0.1596 |
+| Window 20 − reservoir | +0.5462 ± 0.1385 |
+| EWMA − reservoir | -0.5240 ± 0.1273 |
+
+All settings have D=64 and bias SD 1. Selected `(scale, ridge penalty)` tuples:
+
+| Representation | Partition 1 | Partition 2 | Partition 3 |
+| --- | --- | --- | --- |
+| Current tanh | (1, 0) | (1, 0) | (1, 0) |
+| Window 5 | (1, 0) | (0.5, 0) | (1, 0) |
+| Window 20 | (0.5, 0) | (0.5, 0) | (0.5, 0) |
+| Two-EWMA tanh | (1, 0) | (1, 0) | (1, 0) |
+| Reservoir | (0.5, 0.1) | (0.5, 0.1) | (0.5, 0.1) |
+
+**Extreme errors are retained.** Current tanh's partition-1 path 2285 contributes
+26.90% of that partition's draw-averaged squared error; its largest five paths
+contribute 40.50%. Draw 2026320102 has signed error -130.1814 on path 2285.
+This path alone contributes +0.2447 to pooled current-minus-EWMA MSE, exceeding
+the net +0.1270; the five largest absolute paired contributions sum to +0.3934.
+Thus the pooled EWMA improvement is strongly tail-sensitive. These are signed
+contributions, which can exceed the net difference through cancellation; no
+paths were removed and no trimmed estimates were substituted.
+
+Reservoir partition 3 also has concentrated errors: path 5671 contributes 8.60%
+of its squared error, and the largest five contribute 13.37%. The pooled
+window-5-minus-reservoir difference is -0.0866, while its largest five absolute
+pathwise contributions sum to -0.1082. That small ranking is tail-sensitive too.
+All 45 method/pair tail diagnostics and indices remain in `two_factor/results.json`.
+Saved-model cash replays reproduce these extremes; no accounting discrepancy
+explains them, and large errors alone do not identify their statistical cause.
+
+The full process took **116.037 seconds**; internal through-save time was
+114.868 seconds and peak RSS 392.86 MiB. Common simulation/summary construction
+took 1.198 seconds. Execution used CPU float64 and two BLAS/OpenMP threads on
+an Intel Xeon Platinum 8573C. The following component totals cover all candidates
+and final draws. Selection is a subset, not an additional cost; inference is the
+mean single-draw cost for 8,000 test paths, including features, gains and evaluation.
+
+| Representation | Features (s) | Gain rows (s) | Fitting (s) | Validation (s) | Test evaluation (s) | Full selection (s) | Inference (s/8,000 paths) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Current tanh | 8.956 | 0.569 | 0.607 | 0.022 | 0.007 | 5.011 | 0.309 |
+| Window 5 | 13.916 | 0.586 | 0.645 | 0.019 | 0.006 | 7.071 | 0.501 |
+| Window 20 | 24.519 | 0.549 | 0.607 | 0.020 | 0.008 | 11.934 | 0.868 |
+| Two-EWMA tanh | 10.529 | 0.536 | 0.612 | 0.020 | 0.007 | 5.856 | 0.345 |
+| Reservoir | 38.640 | 0.690 | 0.633 | 0.019 | 0.005 | 18.883 | 1.328 |
+
+EWMA construction is included in feature time. Random-parameter drawing adds
+0.047 seconds in total; remaining process time includes saving and reporting.
+These are single-run measurements, not controlled timing estimates. All methods
+fit 69 readout coefficients; frozen random-parameter counts are respectively
+320/1,600/5,440/448/16,640. The local figure `two_factor/comparison.png` shows
+partition-level error differences, selection costs and inference costs. Dots are
+partition values; black markers and bars show mean ± partition SD, not confidence
+intervals. Generated figures and raw bundles remain excluded from Git.
+
+The three answers are:
+
+1. **History versus current summaries:** EWMA has 5.99% lower pooled MSE, but wins
+   only partition 1; current tanh wins partitions 2 and 3. Neither window nor the
+   reservoir improves pooled current-summary error. The tail-sensitive EWMA result
+   does not establish a consistent benefit from historical representations.
+2. **Reservoir versus simple history:** the reservoir beats window 20 in all three
+   partition means, but loses to window 5 overall and in two partitions. Window-5
+   and reservoir draw ranges overlap in every partition; one window-20/reservoir
+   draw comparison also reverses in partition 3. EWMA beats the reservoir in every
+   partition and every within-partition comparison between final draws.
+3. **Computational value:** the reservoir's extra cost is not justified against
+   EWMA here: selection costs 3.22 times as much and inference 3.85 times as much,
+   with higher error. EWMA costs 16.86% more selection time and 11.61% more inference
+   time than current tanh for its lower pooled MSE. That observed trade-off is
+   modest, but its reliability remains unresolved given the partition reversals
+   and extreme-path dependence.
+
+**Execution checks:** 84 focused tests passed before declaration. Independent saved-record
+aggregation reproduced all 90 candidate means, 15 selections, 45 residual vectors,
+15 partition rows, five summaries, 30 paired differences and 45 tail diagnostics:
+1,050 numerical checks, maximum discrepancy $4.44\times10^{-16}$. All 22 frozen
+source hashes match; three test-price hashes are distinct and disjoint from 31
+historical hashes. Replaying 180 representative model/path cases, including each
+model's three largest absolute errors, matched saved errors within
+$9.81\times10^{-11}$ and nominal-versus-discounted cash accounting within
+$1.61\times10^{-13}$. Verification time is outside benchmark timings; no refits
+were performed. Previous numerical artifacts, declarations and hashes are unchanged.
+
+**Independent review (29 October 2026): VERIFIED.** The 84 focused tests passed
+again. A separate reconstruction verified all 315 fit IDs, 15 validation
+selections, errors, paired differences, tail diagnostics and timing totals
+(910 numerical comparisons; maximum discrepancy $8.88\times10^{-16}$).
+Saved chronology and the runner's selection guard agree: all selections froze
+before the first test generation. All 22 frozen source hashes match, and all
+269 historical nonreport files match the pre-run inventory. Independently rebuilt
+features and direct cash replays for 15 saved strategies on 45 paths, including
+each representation/partition's largest absolute error, matched saved errors
+within $2.87\times10^{-11}$ and cash accounting within $8.18\times10^{-14}$.
+For one saved draw per method in partition 1, all 345 training gain scales matched
+exactly; the normalized ridge normal-equation residual was at most $2.50\times10^{-12}$.
+No material transition, information, selection or accounting defect was found.
+The finite-grid martingale and moment argument is valid; feature timings include
+EWMA construction. The figure was visually inspected and its values, units and
+descriptive error bars checked. Research code and numerical outputs were unchanged;
+no refits or new experiments were run during this review.
+
+Only three partitions, three draws per setting, one fixed grid and a narrow
+shortlist were tested. Rankings concern these fitted representations and budgets;
+they do not prove an intrinsic memory mechanism. This benchmark observes total
+variance and changes the market model, so its errors must not be compared directly
+with the older price-only Heston errors as if the information sets were identical.
+Artifacts are local under `results/cas_memory/two_factor/`: `plan.json`,
+`declaration.json`, `results.json`, three `test_*.npz` archives, summary/paired CSVs,
+`timing.json`, `run.log`, the executed-source snapshot and `comparison.png`.

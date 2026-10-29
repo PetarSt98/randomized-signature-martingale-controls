@@ -11,6 +11,7 @@ from rsmc.hedging import (
     assemble_static_hedge_features,
     discounted_traded_increments,
     evaluate_hedge,
+    ewma_hedging_features,
     fit_fixed_premium_hedge,
     hedging_features,
     multi_asset_hedging_features,
@@ -255,4 +256,93 @@ def test_window_dimensions_passthrough_and_fitted_gain_accounting(window, n_asse
     np.testing.assert_allclose(
         evaluate_hedge(fitted, psi[240:], payoff[240:]).errors,
         payoff[240:] - premium - direct_gain[240:], rtol=1e-10, atol=1e-10,
+    )
+
+
+def test_variance_ewmas_use_observed_z_with_causal_initialization():
+    times = np.arange(4) * .02
+    z = np.array([[1., 3., 2., 4.], [2., 2., 2., 2.]])
+    spot = np.full_like(z, 100.)
+    summaries = hedging_features(spot, times, z, "total_variance")
+    before = summaries.values.copy()
+    expanded = ewma_hedging_features(summaries, times)
+    a = np.exp(-np.array([.5, 5.]) * .02)
+    expected = np.array([
+        np.ones(2),
+        a + (1-a)*3.,
+        a**2 + a*(1-a)*3. + (1-a)*2.,
+        a**3 + a**2*(1-a)*3. + a*(1-a)*2. + (1-a)*4.,
+    ])
+    np.testing.assert_allclose(expanded.values[0, :, -2:], expected, rtol=1e-15)
+    np.testing.assert_allclose(expanded.values[1, :, -2:], 2., rtol=1e-15)
+    np.testing.assert_array_equal(expanded.values[:, :, :4], before)
+    np.testing.assert_array_equal(summaries.values, before)
+    assert expanded.n_channels == 6
+    # Different histories with identical current summaries can produce different
+    # EWMAs: these are historical summaries, not another current-only map.
+    changed = summaries.values.copy()
+    changed[0, 1, -1] = 1.
+    altered = ewma_hedging_features(PathFeatures(changed, summaries.names), times)
+    np.testing.assert_array_equal(changed[0, -1], summaries.values[0, -1])
+    assert not np.allclose(altered.values[0, -1, -2:], expanded.values[0, -1, -2:])
+
+
+@pytest.mark.parametrize("method", ["static", "window5", "window20", "ewma", "reservoir"])
+def test_total_variance_representations_share_readout_and_causal_cash_accounting(method):
+    from rsmc.control import control_features
+    from rsmc.cost_hedging import hedge_readout_features
+
+    rng = np.random.default_rng(501)
+    times = np.linspace(0., 1., 8)
+    spot = 100. * np.exp(np.cumsum(rng.normal(0., .03, (100, 8)), axis=1))
+    spot[:, 0] = 100.
+    z = np.exp(rng.normal(0., .15, spot.shape))
+    z[:, 0] = 1.
+    summaries = hedging_features(spot, times, z, "total_variance")
+    future_spot, future_z = spot.copy(), z.copy()
+    future_spot[:, 4:] *= 1.5
+    future_z[:, 4:] *= 2.
+    changed = hedging_features(future_spot, times, future_z, "total_variance")
+    nonlinear = ewma_hedging_features(summaries, times) if method == "ewma" else None
+    changed_nonlinear = ewma_hedging_features(changed, times) if method == "ewma" else None
+    if method == "reservoir":
+        model = RandomizedSignatureReservoir.draw(4, 64, np.random.default_rng(502))
+    else:
+        window = {"static": 0, "window5": 5, "window20": 20, "ewma": 0}[method]
+        d = 6 if method == "ewma" else 4
+        model = FrozenTanhFeatures.draw(d, 64, np.random.default_rng(502), .5, 1., window)
+        input_dim = d * (window + 1)
+        expected_rng = np.random.default_rng(502)
+        np.testing.assert_array_equal(
+            model.weights, expected_rng.standard_normal((64, input_dim)) * (.5 / np.sqrt(input_dim)),
+        )
+        # The nonzero total-variance channel is preserved in early window padding.
+        initial = nonlinear.values[:, 0] if nonlinear is not None else summaries.values[:, 0]
+        expected_initial = np.tanh(np.tile(initial, (1, window+1)) @ model.weights.T + model.biases)
+        np.testing.assert_allclose(model.run(nonlinear if nonlinear is not None else summaries)[:, 0], expected_initial)
+    phi = hedge_readout_features(summaries, times, model, nonlinear_features=nonlinear)
+    future_phi = hedge_readout_features(changed, times, model, nonlinear_features=changed_nonlinear)
+    assert phi.shape == (100, 8, 69)
+    expected_passthrough = np.concatenate([
+        np.ones((100, 8, 1)),
+        np.broadcast_to(times[None, :, None], (100, 8, 1)),
+        summaries.values[:, :, 1:],
+    ], axis=-1)
+    np.testing.assert_array_equal(phi[:, :, :5], expected_passthrough)
+    np.testing.assert_array_equal(phi[:, :4], future_phi[:, :4])
+    psi = control_features(phi, discounted_traded_increments(spot, times, .03))
+    payoff = np.exp(-.03) * np.maximum(spot[:, 1:].mean(axis=1) - 100., 0.)
+    premium = float(np.float32(payoff[:80].mean()))
+    fitted = fit_fixed_premium_hedge(psi[:80], payoff[:80], premium, .1)
+    theta = phi[:, :-1] @ fitted.beta
+    np.testing.assert_array_equal(theta[:, :4], (future_phi[:, :-1] @ fitted.beta)[:, :4])
+    cash = np.full(len(spot), premium) - theta[:, 0] * spot[:, 0]
+    for k in range(1, len(times)):
+        cash *= np.exp(.03 * (times[k] - times[k-1]))
+        next_theta = theta[:, k] if k < theta.shape[1] else np.zeros(len(spot))
+        cash -= (next_theta - theta[:, k-1]) * spot[:, k]
+    np.testing.assert_allclose(cash * np.exp(-.03), premium + psi @ fitted.beta, rtol=1e-10, atol=1e-10)
+    np.testing.assert_allclose(
+        evaluate_hedge(fitted, psi[80:], payoff[80:]).errors,
+        payoff[80:] - cash[80:] * np.exp(-.03), rtol=1e-10, atol=1e-10,
     )

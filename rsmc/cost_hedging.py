@@ -105,10 +105,14 @@ def cost_metrics(payoff, premium, cashflows):
     return {**metrics, "errors": error}
 
 
-def hedge_readout_features(features: PathFeatures, times, reservoir=None):
-    """Existing causal [1,t,current non-time state,h] readout; h is optional."""
+def hedge_readout_features(features: PathFeatures, times, reservoir=None, *, nonlinear_features=None):
+    """Causal [1,t,current non-time state,h], with optional separate nonlinear inputs."""
     current = features.values[:, :, 1:] if features.names[0] == "time" else features.values
-    state = current if reservoir is None else np.concatenate([current, reservoir.run(features)], axis=-1)
+    if nonlinear_features is not None:
+        if reservoir is None or nonlinear_features.values.shape[:2] != features.values.shape[:2]:
+            raise ValueError("Nonlinear inputs need a feature map and matching paths/dates.")
+    inputs = features if nonlinear_features is None else nonlinear_features
+    state = current if reservoir is None else np.concatenate([current, reservoir.run(inputs)], axis=-1)
     return readout_features(state, times)
 
 

@@ -652,3 +652,22 @@ nine partition averages, with higher selection cost. Current-summary tanh had
 the lowest pooled MSE on all three tasks. This supports the reservoir over the
 tested windows without demonstrating a benefit from additional history over
 current summaries; see the linked report for draw variability and tail effects.
+
+An optional **two-factor Heston** benchmark observes total variance alongside
+price, running average and time. It adds a fixed two-EWMA tanh comparator to the
+four representations above, with the same 64 nonlinear features and 69 readout
+coefficients per method. Its declared budget is 270 selection plus 45 final fits.
+The complete 315-fit run found no reservoir advantage over the cheaper EWMA
+comparator. EWMA had the lowest pooled MSE, but its improvement over current
+summaries occurred in only one partition and was tail-sensitive. See the report
+for results, computational costs and the fixed-grid moment proof.
+
+```bash
+python scripts/cas_memory.py --two-factor --declare
+python scripts/cas_memory.py --two-factor
+```
+
+The run command also resumes an interrupted run. `--two-factor` and `--windows`
+are mutually exclusive. Outputs remain local under `results/cas_memory/two_factor/`.
+Historical artifacts require their original source versions: adding a simulator
+changes the all-module source fingerprint, and saved hashes must not be rewritten.

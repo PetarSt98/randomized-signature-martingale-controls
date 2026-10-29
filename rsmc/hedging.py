@@ -146,6 +146,36 @@ def hedging_features(
     return PathFeatures(values=np.stack(channels, axis=-1), names=tuple(names))
 
 
+def ewma_hedging_features(
+    features: PathFeatures,
+    times: np.ndarray,
+    rates: tuple[float, float] = (0.5, 5.0),
+) -> PathFeatures:
+    """Append two causal EWMAs of observed z, not estimates of latent factors.
+
+    Each EWMA starts at z_0 and uses a = exp(-rate * dt). These extra channels
+    belong only to the nonlinear input; retain ``features`` for the readout's
+    current-summary passthrough.
+    """
+    times = np.asarray(times, dtype=float)
+    rates = np.asarray(rates, dtype=float)
+    if (times.shape != (features.values.shape[1],) or not times.size
+            or not np.all(np.isfinite(times)) or np.any(np.diff(times) <= 0)):
+        raise ValueError("times must match the feature dates and increase strictly.")
+    if rates.shape != (2,) or not np.all(np.isfinite(rates)) or np.any(rates <= 0):
+        raise ValueError("Supply two finite positive EWMA rates.")
+    z = features.values[:, :, features.names.index("total_variance")]
+    q = np.empty((*z.shape, 2), dtype=float)
+    q[:, 0, :] = z[:, 0, None]
+    decays = np.exp(-np.diff(times)[:, None] * rates)
+    for k, a in enumerate(decays, start=1):
+        q[:, k, :] = a * q[:, k - 1, :] + (1.0 - a) * z[:, k, None]
+    return PathFeatures(
+        np.concatenate([features.values, q], axis=-1),
+        features.names + tuple(f"total_variance_ewma_{rate:g}" for rate in rates),
+    )
+
+
 def multi_asset_hedging_features(
     spot: np.ndarray,
     times: np.ndarray,
