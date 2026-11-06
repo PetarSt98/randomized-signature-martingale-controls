@@ -1,5 +1,11 @@
 # Randomized-Signature Martingale Control Variates
 
+For the reviewed memory and history-window hedging comparisons, see the
+[CAS memory report](results/cas_memory/REPORT.md).
+Generated result bundles, figures, logs and execution snapshots stay local and
+are ignored by Git. The report retains the verified tables and limitations;
+its audit claims refer to the completed local artifacts, not files in this clone.
+
 Variance reduction for Monte Carlo pricing of path-dependent options using
 **martingale control variates**, where the predictable control integrand comes
 from a *frozen randomized-signature reservoir* (only a linear readout is
@@ -386,7 +392,7 @@ The second command also resumes: completed fits are reused; interrupted attempts
 are recorded as failures rather than silently repeated beyond the budget.
 Results, failures, individual fit/feature/evaluation times, residuals and the
 comparison figure are saved under `results/cas_frictionless/`.
-See [the evaluated comparison](results/cas_frictionless/REPORT.md).
+The runner writes its local report to `results/cas_frictionless/REPORT.md`.
 The completed declaration used 44/44 fits with zero fit failures. Independent
 test RMSE was 2.4711 for the simple state hedge, 1.4057 for shallow tanh,
 1.4363 for depth-two tanh, and 1.0727 for the Transformer (discounted price
@@ -465,7 +471,7 @@ counts and aliases are saved; this does not omit a comparison or enlarge search.
 From the repository root, declare with `python scripts/cas_costs.py --declare`,
 then run/resume with `python scripts/cas_costs.py`, using the prepared virtual
 environment and the same two-thread environment settings documented above.
-See [cost-aware results](results/cas_costs/REPORT.md) for saved selections,
+The local `results/cas_costs/REPORT.md` describes saved selections,
 checkpoint histories, convergence status, failures, net errors, turnover, costs
 and complete timings. Conclusions concern these implemented policy classes and
 bounded optimizer runs, **not globally optimal hedging**. Cost calibration,
@@ -572,7 +578,7 @@ OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 MPLBACKEND=Agg MPLCON
 The run command reuses completed fits. A fit interrupted inside optimization
 remains identified and counted; it is not silently restarted with extra budget.
 Use `--report-only` to verify saved runs and regenerate the three figures and
-[result tables](results/cas_transfer/REPORT.md). Conclusions concern the tested
+local result tables in `results/cas_transfer/REPORT.md`. Conclusions concern the tested
 policy classes, sparse shortlist and bounded optimization, not globally optimal
 hedging. Historical experiments and reconstruction mathematics remain separate.
 
@@ -599,17 +605,151 @@ effect. On the Heston reference, the freshly fitted Transformer had lower
 RMSE (1.071211 / 1.085698 for zero / combined costs) with greater fitting expense.
 The simple hedge remains reported for every task and condition.
 
-The full experiment invocation took 1,796.649 seconds, excluding subsequent
-report rendering; unique fitting totaled 357.723 seconds for tuning and
+The recorded study interval took 1,796.649 seconds, ending before final result
+serialization, an additional audit and report rendering; a complete historical
+end-to-end time is unavailable. Unique fitting totaled 357.723 seconds for tuning and
 1,058.423 seconds for final fits. Feature generation, deployment, artifact I/O
 and reporting timings are separately saved. Peak process RSS was 1,130.06 MiB;
 the largest named feature group used 381.32 MiB. These are measured wall times
 and process/array memory statistics, not controlled hardware benchmarks.
 Optimizer outcomes were 117 exact ridge solves, one stationary run and 242
-runs reaching their limits without establishing convergence. All 91 tests
-passed. The independent saved-run audit regenerated all 12 dataset partitions
+runs reaching their limits without establishing convergence. The saved test log
+records 91 passing tests; the current independent review reran 63 focused tests.
+The independent saved-run audit regenerated all 12 dataset partitions
 and verified all residual-based CSV aggregates, selections, premiums, source
 hashes and timing identities. Its reusable script and output are saved in
 `results/cas_transfer/provenance/independent_audit.py` and
 `results/cas_transfer/independent_audit.json`. See the report for all three
 figures, descriptive dataset error bars, paired differences and per-run records.
+
+## Memory and short-history comparison
+
+`scripts/cas_memory.py` compares fixed random features using the same observable
+summaries, training premium and ridge hedge accounting. The original 414-fit
+study compares affine, current-summary tanh and a shallow reservoir. Its 756-fit
+extension compares current-summary tanh, windows 5 and 20, and the reservoir.
+Window w contains the current vector plus w earlier vectors, padding with the
+initial observation; only the nonlinear input expands.
+
+Each nonlinear representation uses 64 features and six scale/penalty candidates,
+with three partitions per task, three tuning draws and three fresh final draws.
+All choices freeze before test generation. Both protocols and seed lists are
+embedded in the runner; declaring a run saves them before any fitting.
+
+On Linux, with dependencies installed and the Python environment activated:
+
+```bash
+python scripts/cas_memory.py --windows --declare
+python scripts/cas_memory.py --windows
+```
+
+Omit `--windows` for the original comparison. These commands execute the full
+protocol; they are not tests. Resume uses the run command, and `--report-only`
+requires completed local artifacts with matching source hashes.
+
+The completed extension found lower reservoir MSE than either window in all
+nine partition averages, with higher selection cost. Current-summary tanh had
+the lowest pooled MSE on all three tasks. This supports the reservoir over the
+tested windows without demonstrating a benefit from additional history over
+current summaries; see the linked report for draw variability and tail effects.
+
+An optional **two-factor Heston** benchmark observes total variance alongside
+price, running average and time. It adds a fixed two-EWMA tanh comparator to the
+four representations above, with the same 64 nonlinear features and 69 readout
+coefficients per method. Its declared budget is 270 selection plus 45 final fits.
+The complete 315-fit run found no reservoir advantage over the cheaper EWMA
+comparator. EWMA had the lowest pooled MSE, but its improvement over current
+summaries occurred in only one partition and was tail-sensitive. See the report
+for results, computational costs and the fixed-grid moment proof.
+
+```bash
+python scripts/cas_memory.py --two-factor --declare
+python scripts/cas_memory.py --two-factor
+```
+
+The run command also resumes an interrupted run. `--two-factor` and `--windows`
+are mutually exclusive. Outputs remain local under `results/cas_memory/two_factor/`.
+Historical artifacts require their original source versions: adding a simulator
+changes the all-module source fingerprint, and saved hashes must not be rewritten.
+
+## Cost-aware memory comparison
+
+`scripts/cas_costs_memory.py` asks the question the frictionless studies could
+not: once proportional execution costs enter the *training* objective, does a
+history representation beat the static current-summary map? Without costs the
+optimal Asian hedge in the Markov models is a function of the current summary.
+With costs it is not: the optimal trade depends on the position already held,
+which is a function of history. All policies here remain open-loop in the
+position (no feedback of the held position into the features), so the study
+tests whether history *features* can stand in for that dependence.
+
+Tasks are the existing Black–Scholes, Heston and basket Asian calls, the
+two-factor Heston task with observed total variance, and a re-implemented
+**bounded Volterra** model (`rsmc/volterra.py`, Hurst index 0.1, observed
+volatility `sigma_k/0.25`) following the report's Appendix A.6; the original
+Volterra code was never committed. Each task has three partitions of
+4,000/2,000/8,000 paths over 50 intervals, a per-partition float32 training
+premium frozen across methods and cost levels, and discounted stock gains.
+Costs are `kappa * sum_k exp(-r t_k) S_k |q_k|` over entry, rebalances and
+liquidation with `kappa` = 0, 10, 50 and 200 basis points; no temporary impact.
+
+Six representations share the readout `[1, t, current non-time summaries, f_k]`
+with 64 nonlinear features where applicable: a **no-hedge** reference, the
+**affine** map, **static tanh**, a **leaky tanh** (the static features passed
+through `q_k = 0.8 q_(k-1) + 0.2 z_k`, the simplest linear memory), the shallow
+**reservoir**, and the unchanged causal **Transformer** (partition 1 only, one
+seed, all four cost levels). Frozen methods select `(s, lambda)` from
+`s in {0.5, 1}` and `lambda in {0.1, 10, 1000}` per task, partition and cost
+level by validation net MSE of one tuning draw; `lambda = 1000` is the
+"almost no hedge" candidate, and the realized proportional cost is itself an
+L1 penalty on trades, so a tiny hedge is only kept when its variance reduction
+pays for its cost. Zero cost is the exact fixed-premium ridge. Positive costs
+start from that ridge solution and run full-batch **L-BFGS** (strong Wolfe, at
+most 200 iterations, validated every 20) on the training objective with `|q|`
+smoothed to `sqrt(q^2 + 1e-6) - 1e-3`; validation, selection and test always
+use exact costs. A timed trial showed 600 AdamW steps still far from converged
+at 200 bp, which would have confounded method rankings with optimizer progress.
+Three fresh draws per selected setting are refitted and evaluated on 8,000
+shared test paths; reported risk is net MSE, mean error (the cost drag at a
+premium that excludes costs), error SD, 95% shortfall CVaR, turnover and cost.
+
+```bash
+python scripts/cas_costs_memory.py --declare
+python scripts/cas_costs_memory.py --task heston      # one process per task; resumes
+python scripts/cas_costs_memory.py --report           # tables, figures, REPORT.md
+```
+
+Outputs stay local under `results/cas_costs_memory/`; the maintained summary is
+[`results/cas_costs_memory/REPORT.md`](results/cas_costs_memory/REPORT.md).
+
+The completed run (6 November 2026; 1,909 in-plan fits, zero failures) gives
+a clean crossover. Pooled test net RMSE, currency units:
+
+| Task | Static tanh 0 / 200 bp | Leaky tanh 0 / 200 bp | Reservoir 0 / 200 bp | Transformer 0 / 200 bp (partition 1) |
+|---|---:|---:|---:|---:|
+| Black–Scholes | 1.193 / 3.075 | 1.329 / 3.052 | 1.178 / 3.066 | 0.791 / 3.027 |
+| Heston | 1.344 / 2.973 | 1.453 / 2.952 | 1.379 / 2.995 | 1.051 / 2.767 |
+| Heston basket | 1.217 / 2.910 | 1.293 / 2.856 | 1.284 / 2.895 | 1.049 / 2.795 |
+| Two-factor Heston | 1.412 / 3.122 | 1.480 / 3.028 | 1.574 / 3.205 | 1.018 / 2.882 |
+| Volterra H=0.1 | 1.714 / 3.456 | 1.843 / 3.397 | 1.850 / 3.524 | 1.281 / 3.131 |
+
+Without costs the static map beats the leaky integrator in every partition of
+every task and beats the reservoir everywhere except Black–Scholes. At 200 bp
+the ordering flips for the *linear* memory: the leaky tanh has lower MSE than
+static tanh in all 15 partitions (paired gains of 0.12–0.58 MSE, 1.5–6%), and
+at 50 bp it is already within noise. The reservoir does not deliver the same
+benefit: at 200 bp it beats static tanh only in two Black–Scholes and two basket
+partitions and loses in every Heston, two-factor and Volterra partition. The
+Transformer has the lowest error everywhere, but its relative advantage shrinks
+from 35–55% lower MSE at zero cost to 3–18% at 200 bp, because the mean error
+(expected cost at a premium that excludes it, +2.0 to +2.4) then accounts for
+about half of every method's MSE. Hedging remains far better than not hedging
+(no-hedge RMSE 6.1–9.4), and the `lambda = 1000` "almost no hedge" candidate was
+never selected. Turnover falls from about two shares to about one at 200 bp for
+all methods. Nearly all 200 bp final fits reached the 200-iteration L-BFGS cap,
+so those are bounded, not certified, optima; the Transformer uses one partition
+and one seed; all policies are open-loop in the position. The reading is that
+material costs do create a role for history, but a one-parameter leaky
+integrator of the static features captures it and the reservoir's recurrent
+state does not. A position-feedback (closed-loop) policy is the natural next
+comparison.

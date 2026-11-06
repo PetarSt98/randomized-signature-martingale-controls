@@ -146,6 +146,36 @@ def hedging_features(
     return PathFeatures(values=np.stack(channels, axis=-1), names=tuple(names))
 
 
+def ewma_hedging_features(
+    features: PathFeatures,
+    times: np.ndarray,
+    rates: tuple[float, float] = (0.5, 5.0),
+) -> PathFeatures:
+    """Append two causal EWMAs of observed z, not estimates of latent factors.
+
+    Each EWMA starts at z_0 and uses a = exp(-rate * dt). These extra channels
+    belong only to the nonlinear input; retain ``features`` for the readout's
+    current-summary passthrough.
+    """
+    times = np.asarray(times, dtype=float)
+    rates = np.asarray(rates, dtype=float)
+    if (times.shape != (features.values.shape[1],) or not times.size
+            or not np.all(np.isfinite(times)) or np.any(np.diff(times) <= 0)):
+        raise ValueError("times must match the feature dates and increase strictly.")
+    if rates.shape != (2,) or not np.all(np.isfinite(rates)) or np.any(rates <= 0):
+        raise ValueError("Supply two finite positive EWMA rates.")
+    z = features.values[:, :, features.names.index("total_variance")]
+    q = np.empty((*z.shape, 2), dtype=float)
+    q[:, 0, :] = z[:, 0, None]
+    decays = np.exp(-np.diff(times)[:, None] * rates)
+    for k, a in enumerate(decays, start=1):
+        q[:, k, :] = a * q[:, k - 1, :] + (1.0 - a) * z[:, k, None]
+    return PathFeatures(
+        np.concatenate([features.values, q], axis=-1),
+        features.names + tuple(f"total_variance_ewma_{rate:g}" for rate in rates),
+    )
+
+
 def multi_asset_hedging_features(
     spot: np.ndarray,
     times: np.ndarray,
@@ -200,6 +230,104 @@ def multi_asset_hedging_features(
     channels.append(np.log(running_average / basket0))
     names.append("running_basket_average")
     return PathFeatures(values=np.stack(channels, axis=-1), names=tuple(names))
+
+
+@dataclass(frozen=True)
+class FrozenTanhFeatures:
+    """Frozen tanh features of current summaries or a finite causal window.
+
+    Window w uses [x_k, x_(k-1), ..., x_(k-w)], repeating x_0 before inception.
+    It has no recurrent state. Only the nonlinear input is expanded; callers
+    retain the original current-summary readout passthrough. Window zero is
+    the original static map, including its draw order and scaling.
+    """
+
+    weights: np.ndarray
+    biases: np.ndarray
+    window: int = 0
+
+    @classmethod
+    def draw(
+        cls,
+        n_channels: int,
+        dim: int,
+        rng: np.random.Generator | None = None,
+        weight_scale: float = 1.0,
+        bias_scale: float = 1.0,
+        window: int = 0,
+    ) -> FrozenTanhFeatures:
+        """Draw A[j,r] ~ N(0, s**2/m), with m = n_channels * (window+1)."""
+        if n_channels <= 0 or dim <= 0:
+            raise ValueError("n_channels and dim must be positive.")
+        if not isinstance(window, (int, np.integer)) or window < 0:
+            raise ValueError("window must be a non-negative integer.")
+        if not np.isfinite(weight_scale) or weight_scale < 0:
+            raise ValueError("weight_scale must be finite and non-negative.")
+        if not np.isfinite(bias_scale) or bias_scale < 0:
+            raise ValueError("bias_scale must be finite and non-negative.")
+        if rng is None:
+            rng = np.random.default_rng()
+        input_dim = n_channels * (window + 1)
+        weights = rng.standard_normal((dim, input_dim)) * (weight_scale / np.sqrt(input_dim))
+        biases = rng.standard_normal(dim) * bias_scale
+        return cls(weights=weights, biases=biases, window=window)
+
+    @property
+    def dim(self) -> int:
+        return self.weights.shape[0]
+
+    @property
+    def n_channels(self) -> int:
+        return self.weights.shape[1] // (self.window + 1)
+
+    def run(self, features: PathFeatures) -> np.ndarray:
+        """Return tanh(A [x_k,...,x_(k-w)] + b), with causal inception padding."""
+        if features.n_channels != self.n_channels:
+            raise ValueError(
+                f"Static map expects {self.n_channels} channels, "
+                f"features have {features.n_channels}."
+            )
+        values = features.values
+        if self.window:
+            n_paths, n_points, d = values.shape
+            lagged = np.empty((n_paths, n_points, self.weights.shape[1]), dtype=values.dtype)
+            dates = np.arange(n_points)
+            for lag in range(self.window + 1):
+                lagged[:, :, lag*d:(lag+1)*d] = values[:, np.maximum(dates-lag, 0), :]
+            values = lagged
+        return np.tanh(values @ self.weights.T + self.biases)
+
+
+@dataclass(frozen=True)
+class LeakyTanhFeatures(FrozenTanhFeatures):
+    """Static tanh features passed through a causal leaky integrator.
+
+    With z_k = tanh(A x_k + b) the output is q_0 = z_0 and
+    q_k = decay * q_(k-1) + (1 - decay) * z_k. This is a *linear* memory of the
+    current-summary features (a leaky integrator, the simplest recurrent
+    state); decay 0 reproduces the static map exactly. Only the nonlinear input
+    is smoothed; callers keep the current-summary passthrough unchanged.
+    """
+
+    decay: float = 0.8
+
+    def __post_init__(self) -> None:
+        if not np.isfinite(self.decay) or not 0.0 <= self.decay < 1.0:
+            raise ValueError("decay must lie in [0, 1).")
+
+    @classmethod
+    def draw(cls, n_channels, dim, rng=None, weight_scale=1.0, bias_scale=1.0,
+             window=0, decay=0.8):
+        base = FrozenTanhFeatures.draw(n_channels, dim, rng, weight_scale, bias_scale, window)
+        return cls(weights=base.weights, biases=base.biases, window=base.window, decay=decay)
+
+    def run(self, features: PathFeatures) -> np.ndarray:
+        z = super().run(features)
+        q = np.empty_like(z)
+        q[:, 0] = z[:, 0]
+        for k in range(1, z.shape[1]):
+            q[:, k] = self.decay * q[:, k - 1] + (1.0 - self.decay) * z[:, k]
+        return q
 
 
 def assemble_linear_hedge_features(
@@ -272,6 +400,23 @@ def assemble_reservoir_hedge_features(
         phi = readout_features(np.concatenate([current, states], axis=-1), times)
         psi[start:stop] = control_features(phi, increments[start:stop])
     return psi
+
+
+def assemble_static_hedge_features(
+    static_features: FrozenTanhFeatures,
+    features: PathFeatures,
+    times: np.ndarray,
+    increments: np.ndarray,
+    batch_size: int = 10_000,
+) -> np.ndarray:
+    """Gain rows from [1, t_k, current summaries, frozen tanh summaries].
+
+    Reuse the same causal passthrough, batching and traded-gain assembly as the
+    reservoir. The supplied map uses current summaries or its declared causal window.
+    """
+    return assemble_reservoir_hedge_features(
+        static_features, features, times, increments, batch_size,
+    )
 
 
 def assemble_signature_hedge_features(
