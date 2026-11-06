@@ -613,3 +613,9 @@ hashes and timing identities. Its reusable script and output are saved in
 `results/cas_transfer/provenance/independent_audit.py` and
 `results/cas_transfer/independent_audit.json`. See the report for all three
 figures, descriptive dataset error bars, paired differences and per-run records.
+
+## Battery delivery option
+
+[Reproduce the battery study](studies/battery_delivery/README.md) or read the
+[pricing and hedging results](studies/battery_delivery/REPORT.md) for a 15-minute
+power option whose volume depends on battery operating history.
