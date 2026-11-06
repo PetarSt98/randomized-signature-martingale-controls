@@ -1,0 +1,49 @@
+{
+  "train": 6000,
+  "validation": 2500,
+  "test": 10000,
+  "splits": 3,
+  "physical_seeds": [
+    [
+      489321,
+      489322,
+      489323
+    ],
+    [
+      489352,
+      489353,
+      489354
+    ],
+    [
+      489383,
+      489384,
+      489385
+    ]
+  ],
+  "feature_seeds": [
+    79171,
+    83833,
+    89513
+  ],
+  "financial_seeds": [
+    53481,
+    53482,
+    53483
+  ],
+  "price_model": "One frictionless matched-delivery forward, normal independent settlement shock. EUR/MWh.",
+  "observed_forward_mean": 80.0,
+  "observed_forward_sd": 15.0,
+  "strike": 80.0,
+  "settlement_innovation_sd": 15.0,
+  "settlement_simulations_per_history": 16,
+  "physical_risk": "Reference pricing law uses simulated operational probabilities with zero markup for volume risk.",
+  "exposure": "At gate closure available volume for one 4 MW quarter-hour request is fixed, reserved and bounded by 1 MWh. Customer has a call per available MWh.",
+  "premium": "Primary hedging comparison uses one common quote: training mean volume times Bachelier unit premium.",
+  "assessment": "Predict delivered MWh, multiply by unit call price for quote, by normal delta for forward holding. Score quotes against full-state scenario values and compare exact conditional terminal MSE integrated over price and averaged on independent histories. All test observations retained.",
+  "primary_baselines": [
+    "static",
+    "ewma",
+    "circuit"
+  ],
+  "primary_model": "reservoir"
+}
