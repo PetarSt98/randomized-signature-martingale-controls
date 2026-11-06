@@ -10,6 +10,7 @@ from .black_scholes import BlackScholesModel
 from .heston import HestonModel, make_heston_datasets
 from .multi_asset_heston import MultiAssetHestonModel, make_multi_asset_heston_datasets
 from .two_factor_heston import TwoFactorHestonModel, make_two_factor_heston_datasets
+from .volterra import BoundedVolterraModel, make_volterra_datasets
 from .hedging import hedging_features, multi_asset_hedging_features
 from .payoffs import arithmetic_asian_call, basket_arithmetic_asian_call
 
@@ -37,17 +38,26 @@ def make_transfer_dataset(task, sizes, n_steps, seed, strike=100.):
     elif task == "two_factor_heston":
         model = TwoFactorHestonModel()
         paths = make_two_factor_heston_datasets(model, sizes, n_steps, seed)
+    elif task in ("volterra", "volterra_markov"):
+        model = BoundedVolterraModel(hurst=0.1 if task == "volterra" else 0.5)
+        paths = make_volterra_datasets(model, sizes, n_steps, seed)
     else:
         raise ValueError(f"Unknown existing transfer task: {task}")
     basket = task == "basket"
     feature_builder = multi_asset_hedging_features if basket else hedging_features
     payoff_builder = basket_arithmetic_asian_call if basket else arithmetic_asian_call
-    data = {name: dict(
-        features=(hedging_features(p.spot, p.times, p.variance.sum(axis=-1) / 0.04,
-                                  "total_variance") if task == "two_factor_heston"
-                  else feature_builder(p.spot, p.times)),
-        spot=p.spot, payoff=payoff_builder(p, strike, model.r))
-        for name, p in paths.items()}
+
+    def build_features(p):
+        if task == "two_factor_heston":
+            return hedging_features(p.spot, p.times, p.variance.sum(axis=-1) / 0.04, "total_variance")
+        if task.startswith("volterra"):
+            # Observed volatility, scaled by sigma_0 = 0.25 so the channel starts at 1.
+            return hedging_features(p.spot, p.times, p.volatility / model.sigma_initial, "volatility")
+        return feature_builder(p.spot, p.times)
+
+    data = {name: dict(features=build_features(p), spot=p.spot,
+                       payoff=payoff_builder(p, strike, model.r))
+            for name, p in paths.items()}
     payoff = data["train"]["payoff"]
     premium = float(np.float32(payoff.mean()))
     metadata = {
@@ -63,7 +73,7 @@ def make_transfer_dataset(task, sizes, n_steps, seed, strike=100.):
         "basket_weights": [1./3]*3 if basket else None,
         "payoff_includes_initial": False, "running_feature_includes_initial": True,
     }
-    if task == "two_factor_heston":
+    if task == "two_factor_heston" or task.startswith("volterra"):
         metadata["dataset_features_sha256"] = {
             name: hashlib.sha256(d["features"].values.tobytes()).hexdigest()
             for name, d in data.items()}

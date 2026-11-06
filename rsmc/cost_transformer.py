@@ -16,7 +16,10 @@ from .transformer_hedging import (
 
 
 def transformer_positions(model, x, mask):
-    """The existing model's positions, using only features through each trade time."""
+    """The existing model's positions, using only features through each trade time.
+
+    Returns shape (n, N) for one traded asset and (n, N, n_assets) otherwise.
+    """
     import torch
     encoded = model.encoder(model.input_projection(x), mask=mask)
     state = torch.cat([encoded[:, :-1, :], x[:, :-1, :]], dim=-1)
@@ -75,7 +78,8 @@ def fit_cost_transformer(
     y_val = torch.as_tensor(payoff_val, dtype=torch.float32)
     time_grid = torch.as_tensor(times, dtype=torch.float32, device=config.device)
     n_train = len(y_train)
-    model = _build_model(torch, nn, x_train.shape[-1], 1, config, premium).to(config.device)
+    n_assets = 1 if s_train.ndim == 2 else int(s_train.shape[2])
+    model = _build_model(torch, nn, x_train.shape[-1], n_assets, config, premium).to(config.device)
     mask = _make_sliding_causal_mask(torch, x_train.shape[1], config.window, config.device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.learning_rate, weight_decay=0.0)
     loader = DataLoader(TensorDataset(x_train, s_train, y_train), batch_size=config.batch_size, shuffle=True)

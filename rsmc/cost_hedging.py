@@ -86,11 +86,15 @@ def execution_cashflows_torch(theta, spot, times, rate, costs: CostSpec):
 def cost_metrics(payoff, premium, cashflows):
     """Unpenalized, unrecentered discounted net-error and turnover diagnostics."""
     error = np.asarray(payoff) - premium - cashflows["gain"] + cashflows["cost"]
+    # Positive error is a shortfall: payoff plus costs exceeded premium plus gains.
+    tail = np.sort(error)[-max(1, int(np.ceil(0.05 * error.size))):]
     metrics = {
         "net_mse": float(np.mean(error**2)),
         "net_rmse": float(np.sqrt(np.mean(error**2))),
         "mean_error": float(np.mean(error)),
         "mean_error_se": float(np.std(error, ddof=1) / np.sqrt(error.size)),
+        "error_std": float(np.std(error, ddof=1)) if error.size > 1 else 0.0,
+        "shortfall_cvar95": float(np.mean(tail)),
         "mean_gain": float(np.mean(cashflows["gain"])),
         "mean_turnover": float(np.mean(cashflows["share_turnover"])),
         "mean_notional_turnover": float(np.mean(cashflows["notional_turnover"])),
@@ -135,51 +139,89 @@ def readout_positions(phi, beta, spot):
 def fit_cost_readout(
     phi_train, spot_train, payoff_train, phi_val, spot_val, payoff_val,
     times, rate, premium, costs: CostSpec, lam, scale, init_gamma,
-    *, steps=120, lr=.01, grad_tol=1e-5,
+    *, steps=120, lr=.01, grad_tol=1e-5, validate_every=1, dtype="float64",
+    optimizer="adamw", smooth_abs=0.0,
 ):
-    """Bounded full-batch AdamW on net MSE + (lam/n_train)*||gamma||².
+    """Bounded full-batch optimization of net MSE + (lam/n_train)*||gamma||².
+
+    ``optimizer="adamw"`` takes ``steps`` AdamW steps at learning rate ``lr``.
+    ``optimizer="lbfgs"`` runs torch L-BFGS with strong-Wolfe line search for at
+    most ``steps`` iterations, in chunks of ``validate_every`` iterations between
+    validations. ``smooth_abs`` > 0 replaces |q| in the *training* proportional
+    cost by sqrt(q² + eps²) - eps (shares), a convex smooth lower bound, so
+    quasi-Newton steps are well defined; validation always uses exact costs.
 
     No ridge fit is hidden here: the caller supplies and counts initialization.
     beta=gamma/scale, with training-only gain-row RMS scales held fixed. Every
-    checkpoint (including initialization) is selected by unpenalized validation
-    net MSE. Gradient stationarity concerns the final optimization iterate, not
-    a global optimum, and need not characterize the validation-selected iterate.
+    validated checkpoint (including initialization) is selected by unpenalized
+    validation net MSE; ``validate_every`` > 1 validates only every that many
+    steps plus the final iterate. Gradient stationarity concerns the final
+    optimization iterate, not a global optimum, and need not characterize the
+    validation-selected iterate.
     """
     import torch
 
     started = time.perf_counter()
-    if steps < 0 or lam < 0 or lr <= 0 or grad_tol < 0:
+    if steps < 0 or lam < 0 or lr <= 0 or grad_tol < 0 or validate_every < 1 or smooth_abs < 0:
         raise ValueError("Invalid optimizer limits or regularization.")
+    if optimizer not in ("adamw", "lbfgs"):
+        raise ValueError("optimizer must be 'adamw' or 'lbfgs'.")
     scale = np.asarray(scale, dtype=float)
     init_gamma = np.asarray(init_gamma, dtype=float)
     if not np.isfinite(scale).all() or np.any(scale <= 0) or not np.isfinite(init_gamma).all():
         raise ValueError("Scale and initializer must be finite; scales must be positive.")
-    dtype = torch.float64
-    convert = lambda value: torch.as_tensor(value, dtype=dtype)
+    dtype = getattr(torch, dtype)
+    convert = lambda value: torch.as_tensor(np.ascontiguousarray(value), dtype=dtype)
     n_assets = 1 if np.ndim(spot_train) == 2 else np.shape(spot_train)[2]
     scalar = np.ndim(spot_train) == 2
-    train_phi = convert(np.asarray(phi_train[:, :-1]) / scale if scalar else phi_train[:, :-1])
-    val_phi = convert(np.asarray(phi_val[:, :-1]) / scale if scalar else phi_val[:, :-1])
     scale_tensor = convert(scale)
+    # Predictable prefix only; scalar readouts fold the gain-row scale into phi once.
+    train_phi = convert(phi_train[:, :-1])
+    val_phi = convert(phi_val[:, :-1])
+    if scalar:
+        train_phi, val_phi = train_phi / scale_tensor, val_phi / scale_tensor
     train_spot, val_spot = convert(spot_train), convert(spot_val)
     train_payoff, val_payoff, grid = convert(payoff_train), convert(payoff_val), convert(times)
     gamma = torch.nn.Parameter(convert(init_gamma).clone())
     def positions(phi):
         return phi @ gamma if scalar else phi @ (gamma / scale_tensor).reshape(n_assets, -1).T
-    optimizer = torch.optim.AdamW([gamma], lr=lr, weight_decay=0.)
+    train_discounted = train_spot * (torch.exp(-rate * grid)[None, :] if scalar else torch.exp(-rate * grid)[None, :, None])
+    axes = 1 if scalar else (1, 2)
+    def training_objective():
+        theta = positions(train_phi)
+        traded = torch.cat([theta[:, :1], torch.diff(theta, dim=1), -theta[:, -1:]], dim=1)
+        magnitude = traded.abs() if smooth_abs == 0 else torch.sqrt(traded.square() + smooth_abs**2) - smooth_abs
+        cost = (costs.kappa * (train_discounted * magnitude).sum(dim=axes)
+                + costs.eta / costs.q_ref * (train_discounted * traded.square()).sum(dim=axes))
+        gain = (theta * torch.diff(train_discounted, dim=1)).sum(dim=axes)
+        error = train_payoff - premium - gain + cost
+        train_mse = error.square().mean()
+        return train_mse + (lam / len(payoff_train)) * gamma.square().sum(), train_mse
+    use_lbfgs = optimizer == "lbfgs"
+    if use_lbfgs:
+        optimizer = torch.optim.LBFGS([gamma], lr=1.0, max_iter=validate_every, history_size=20,
+                                      line_search_fn="strong_wolfe", tolerance_grad=grad_tol, tolerance_change=1e-14)
+        def closure():
+            optimizer.zero_grad(set_to_none=True)
+            objective, _ = training_objective()
+            if not torch.isfinite(objective):
+                raise FloatingPointError("Nonfinite training objective inside L-BFGS line search.")
+            objective.backward()
+            return objective
+    else:
+        optimizer = torch.optim.AdamW([gamma], lr=lr, weight_decay=0.)
     setup_s = time.perf_counter() - started
     validation_s = 0.
     optimization_s = 0.
     history = []
     best_score, best_gamma, best_step = np.inf, None, None
     status = "budget_exhausted"
-    for step in range(steps + 1):
+    step = 0
+    terminated = False  # L-BFGS stopped inside a chunk (tolerance or failed line search)
+    while step <= steps:
         stage = time.perf_counter()
         optimizer.zero_grad(set_to_none=True)
-        cash = execution_cashflows_torch(positions(train_phi), train_spot, grid, rate, costs)
-        error = train_payoff - premium - cash["gain"] + cash["cost"]
-        train_mse = error.square().mean()
-        objective = train_mse + (lam / len(payoff_train)) * gamma.square().sum()
+        objective, train_mse = training_objective()
         if not torch.isfinite(objective):
             raise FloatingPointError(f"Nonfinite training objective at step {step}.")
         objective.backward()
@@ -187,26 +229,40 @@ def fit_cost_readout(
         if not np.isfinite(gradient_inf):
             raise FloatingPointError(f"Nonfinite gradient at step {step}.")
         optimization_s += time.perf_counter() - stage
-        stage = time.perf_counter()
-        with torch.no_grad():
-            val_cash = execution_cashflows_torch(positions(val_phi), val_spot, grid, rate, costs)
-            val_error = val_payoff - premium - val_cash["gain"] + val_cash["cost"]
-            validation_mse = float(val_error.square().mean())
-        validation_s += time.perf_counter() - stage
-        if not np.isfinite(validation_mse):
-            raise FloatingPointError(f"Nonfinite validation MSE at step {step}.")
-        history.append(dict(step=step, train_mse=float(train_mse.detach()),
-                            train_objective=float(objective.detach()),
-                            validation_mse=validation_mse, gradient_inf=gradient_inf))
-        if validation_mse < best_score:
-            best_score, best_gamma, best_step = validation_mse, gamma.detach().numpy().copy(), step
-        if gradient_inf <= grad_tol:
+        stationary = gradient_inf <= grad_tol
+        if use_lbfgs or step % validate_every == 0 or step == steps or stationary:
+            stage = time.perf_counter()
+            with torch.no_grad():
+                val_cash = execution_cashflows_torch(positions(val_phi), val_spot, grid, rate, costs)
+                val_error = val_payoff - premium - val_cash["gain"] + val_cash["cost"]
+                validation_mse = float(val_error.square().mean())
+            validation_s += time.perf_counter() - stage
+            if not np.isfinite(validation_mse):
+                raise FloatingPointError(f"Nonfinite validation MSE at step {step}.")
+            history.append(dict(step=step, train_mse=float(train_mse.detach()),
+                                train_objective=float(objective.detach()),
+                                validation_mse=validation_mse, gradient_inf=gradient_inf))
+            if validation_mse < best_score:
+                best_score, best_gamma, best_step = validation_mse, gamma.detach().numpy().copy(), step
+        if stationary:
             status = "stationary"
             break
-        if step < steps:
-            stage = time.perf_counter()
+        if terminated:
+            status = "lbfgs_terminated"
+            break
+        if step >= steps:
+            break
+        stage = time.perf_counter()
+        if use_lbfgs:
+            before = optimizer.state[gamma].get("n_iter", 0) if optimizer.state else 0
+            optimizer.step(closure)
+            done = int(optimizer.state[gamma]["n_iter"] - before)
+            terminated = done < validate_every
+            step = min(step + max(done, 1), steps)
+        else:
             optimizer.step()
-            optimization_s += time.perf_counter() - stage
+            step += 1
+        optimization_s += time.perf_counter() - stage
     return {
         "beta": best_gamma / scale, "gamma": best_gamma, "best_step": best_step,
         "validation_mse": best_score, "status": status, "gradient_inf": gradient_inf,

@@ -298,6 +298,38 @@ class FrozenTanhFeatures:
         return np.tanh(values @ self.weights.T + self.biases)
 
 
+@dataclass(frozen=True)
+class LeakyTanhFeatures(FrozenTanhFeatures):
+    """Static tanh features passed through a causal leaky integrator.
+
+    With z_k = tanh(A x_k + b) the output is q_0 = z_0 and
+    q_k = decay * q_(k-1) + (1 - decay) * z_k. This is a *linear* memory of the
+    current-summary features (a leaky integrator, the simplest recurrent
+    state); decay 0 reproduces the static map exactly. Only the nonlinear input
+    is smoothed; callers keep the current-summary passthrough unchanged.
+    """
+
+    decay: float = 0.8
+
+    def __post_init__(self) -> None:
+        if not np.isfinite(self.decay) or not 0.0 <= self.decay < 1.0:
+            raise ValueError("decay must lie in [0, 1).")
+
+    @classmethod
+    def draw(cls, n_channels, dim, rng=None, weight_scale=1.0, bias_scale=1.0,
+             window=0, decay=0.8):
+        base = FrozenTanhFeatures.draw(n_channels, dim, rng, weight_scale, bias_scale, window)
+        return cls(weights=base.weights, biases=base.biases, window=base.window, decay=decay)
+
+    def run(self, features: PathFeatures) -> np.ndarray:
+        z = super().run(features)
+        q = np.empty_like(z)
+        q[:, 0] = z[:, 0]
+        for k in range(1, z.shape[1]):
+            q[:, k] = self.decay * q[:, k - 1] + (1.0 - self.decay) * z[:, k]
+        return q
+
+
 def assemble_linear_hedge_features(
     features: PathFeatures,
     times: np.ndarray,
