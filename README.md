@@ -216,9 +216,13 @@ rsmc/
   signature.py       # finite truncated signature (Chen's identity) - the benchmark
   control.py         # Phi assembly, RidgeMartingaleControl, evaluation + VR metrics
   config.py          # ExperimentConfig + make_datasets (train/val/test splits)
+  impact_hedging.py  # transient-impact market with hidden liquidity + frozen-feature hedgers (torch, closed loop)
 scripts/
   control_variates_demo.py # one-command reservoir-vs-signature pricing sweep
   hedging_demo.py    # observed-filtration hedging sweep
+  impact_hedging_*.py # hidden-liquidity study: run / analyze / diagnostics / probe
+reports/
+  impact_hedging/    # REPORT.md, result tables and figures, trained readouts of the study
 tests/
   test_black_scholes.py   # simulator sanity checks (martingale, European vs analytic)
   test_heston.py          # Heston simulator, features, vector control
@@ -228,6 +232,7 @@ tests/
   test_reservoir.py       # feature + reservoir checks (h_0 = 0, non-anticipative, ...)
   test_control.py         # control-variate checks (unbiased, VR > 1, lambda tuning)
   test_signature.py       # signature correctness (Chen, exp, dim) + unbiased + VR > 1
+  test_impact_hedging.py  # impact market sanity, torch reservoir == numpy reservoir, policy zoo trains
 ```
 
 ## Setup
@@ -313,6 +318,43 @@ phi = assemble_signature_control_features(asian_features(paths), paths.times,
 - **Next:** repeat over 5-10 random seeds for error bars; add explicit optional
   signature-control sweeps for selected levels/sample sizes; then ablations in
   `D`, `N`, `lambda` and model parameters.
+
+## Post-report: hedging under transient market impact with hidden liquidity
+
+The one setting found so far in which the reservoir's **recurrence** beats cheap memoryless and moving-average hedgers.
+The hedger's own trades move the observed price (Obizhaeva–Wang transient impact) and the liquidity parameters (depth
+`kappa`, resilience `lam`) are a hidden per-path regime with identical fundamental volatility, so the regime is learnable
+only from how the price answered the hedger's own past trades — a cross-term `sum_j q_j dS_{j+1}` (level-2 iterated
+integral) that no bank of moving averages of single channels can form. Same frozen reservoir (`rsmc/reservoir.py`
+recurrence, ported to torch and checked for equality), same `[1, t, x, h]` readout, same `net error` metric as the CAS cost
+study; every hedger is a frozen feature map plus one linear readout trained with the same closed-loop budget.
+
+Test net RMSE, 5 seeds × 20 000 paths (price units, premium 5.51; see `reports/impact_hedging/REPORT.md`):
+
+| hedger | features | net RMSE | vs reservoir + tanh head (ratio, 95% paired-bootstrap CI) |
+|---|---:|---:|---:|
+| static tanh (memoryless) | 260 | 1.679 ± 0.006 | 1.292 [1.284, 1.300] |
+| EWMA bank, linear readout | 28 | 1.999 ± 0.010 | 1.538 |
+| EWMA bank + tanh head | 284 | 1.435 ± 0.007 | 1.104 [1.099, 1.109] |
+| hand-crafted propagator statistics + tanh | 302 | 1.368 ± 0.013 | 1.053 |
+| reservoir, recurrence removed (W_r = 0) | 260 | 1.686 ± 0.004 | 1.297 |
+| **reservoir, readout `[1, t, x, h]`** | 132 | **1.362 ± 0.014** | 1.048 |
+| **reservoir + random tanh head** | 260 | **1.299 ± 0.012** | — |
+| GRU trained end-to-end, same budget | 36 | 1.462 ± 0.011 | 1.125 |
+| oracle (sees fundamental, pending impact, regime) | 262 | 1.204 ± 0.012 | 0.927 |
+
+Mechanism: the hidden regime is linearly decodable from the reservoir state with AUC 0.84 after 20 trades and 0.99 at the end,
+identical to hand-crafted propagator statistics; the EWMA bank plateaus at 0.83, static tanh stays at 0.65. The advantage grows
+with regime separation (none at `kappa` 0.5 vs 5, +3% vs EWMA at 0.5 vs 10, +9% at 0.5 vs 20) and vanishes when nothing is hidden.
+
+```bash
+python scripts/impact_hedging_run.py --seeds 0,1,2,3,4 --iters 400 --lr 3e-3 --D 256 --tag main   # protocol, ~12 min/seed on 2 cores
+python scripts/impact_hedging_analyze.py --tag main --sens                                       # tables, bootstrap CIs, figures
+python scripts/impact_hedging_diagnostics.py --what decode,behaviour --tag main --seed 1         # mechanism figures
+pytest tests/test_impact_hedging.py                                                              # incl. torch-vs-numpy reservoir equality
+```
+Files: `rsmc/impact_hedging.py` (market, feature maps, closed-loop rollout/training), `scripts/impact_hedging_*.py`,
+`reports/impact_hedging/` (report, result JSONs, figures, trained readouts). Extra dependency: `scikit-learn` (diagnostics only).
 
 ## CAS: bounded frictionless reservoir comparison
 
