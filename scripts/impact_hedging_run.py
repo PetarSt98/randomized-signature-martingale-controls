@@ -38,7 +38,7 @@ def main():
     ap.add_argument("--kappa", type=str, default="0.5,20")
     ap.add_argument("--lam", type=str, default="0.71,0.95")
     ap.add_argument("--policies", type=str,
-                    default="static_tanh,ewma_linear,ewma_tanh,cross_tanh,reservoir,reservoir_tanh,reservoir_norec,oracle_state,gru")
+                    default="static_tanh,static_lag1,ewma_linear,ewma_tanh,cross_tanh,reservoir,reservoir_tanh,reservoir_norec,oracle_state,gru")
     ap.add_argument("--tag", type=str, default="main")
     ap.add_argument("--outdir", type=str, default=str(ROOT / "reports" / "impact_hedging" / "results"))
     args = ap.parse_args()

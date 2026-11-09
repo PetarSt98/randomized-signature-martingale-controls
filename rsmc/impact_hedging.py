@@ -150,6 +150,21 @@ class StaticTanh(FeatureMap):
         return torch.cat([torch.ones_like(u[:, :1]), u, torch.tanh(u @ self.A.T + self.b)], 1), state
 
 
+class StaticTanhLag1(FeatureMap):
+    """Memoryless plus one lag: random tanh features of (t, S_k, Q_{k-1}, dS_k, q_{k-1})."""
+
+    def __init__(self, D, gen, scale=1.0, s_scale=10.0):
+        self.D = D
+        self.s_scale = s_scale
+        self.A, self.b = _rand_features(gen, 5, D, scale)
+        self.name = f"static_tanh_lag1(D={D})"
+        self.dim = 1 + 5 + D
+
+    def step(self, obs, state):
+        u = torch.stack([obs["tau"], obs["s"] / self.s_scale, obs["Q_prev"], obs["dS"] / self.s_scale, obs["q_prev"]], 1)
+        return torch.cat([torch.ones_like(u[:, :1]), u, torch.tanh(u @ self.A.T + self.b)], 1), state
+
+
 class EWMABank(FeatureMap):
     """Moving/weighted averages of the observable channels (price increments and own trades)
     at log-spaced half-lives, optionally with random tanh features on top (matched count)."""
@@ -349,11 +364,11 @@ def rollout(policy, mkt: Market, batch: dict, premium: float, position=None, rec
             Q = Q_prev
         q = Q - Q_prev
         cost = cost + q * (I + 0.5 * kappa * q + eta * q)
+        if record:   # pre-trade pending impact I_k, observed mid S_k, decision Q_k, features phi_k
+            rec["Q"].append(Q.detach()); rec["I"].append(I.detach()); rec["S"].append(S.detach()); rec["phi"].append(phi.detach())
         I = lam * (I + kappa * q)
         gain = gain + Q * (F[:, k + 1] - F[:, k])
         turnover = turnover + q.abs()
-        if record:
-            rec["Q"].append(Q.detach()); rec["I"].append(I.detach()); rec["S"].append(S.detach()); rec["phi"].append(phi.detach())
         S_prev, Q_prev, q_prev = S, Q, q
     payoff = torch.relu(F[:, -1] - mkt.K)
     err = payoff - premium - gain + cost
@@ -459,6 +474,8 @@ def make_policy(name: str, D: int, gen: torch.Generator) -> FeatureMap:
     """Feature maps of the study; ``D`` is the total random-feature budget (reservoir blocks use D//2)."""
     if name == "static_tanh":
         return StaticTanh(D, gen)
+    if name == "static_lag1":
+        return StaticTanhLag1(D, gen)
     if name == "ewma_linear":
         return EWMABank(HALF_LIVES, gen, D=0)
     if name == "ewma_tanh":

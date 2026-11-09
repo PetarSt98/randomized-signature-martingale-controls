@@ -181,3 +181,62 @@ checked for equality in `tests/test_impact_hedging.py`) and the closed-loop roll
 protocol; `scripts/impact_hedging_analyze.py` / `_diagnostics.py` the tables and figures. The per-path error arrays used for the paired
 bootstrap (`*_err.npy`) are not committed; rerunning the protocol regenerates them. Seeds, batches and test sets are fixed, so the
 tables reproduce up to floating-point/thread nondeterminism of the closed-loop training.
+
+## 9. Audit and independent rerun (9 November 2026)
+
+Before the results were shown to anyone else, the code was audited and the study rerun from the committed repository code
+on **fresh seeds (5–7) with twice the training budget (800 iterations)**, because the 400-iteration validation curves of two
+baselines had not fully flattened under the cosine schedule.
+
+**Audit** — four tests added to `tests/test_impact_hedging.py`, all passing:
+* *No look-ahead*: for every feature map (static, one-lag static, EWMA banks, hand-crafted statistics, reservoir, reservoir+head, GRU),
+  perturbing the fundamental path after step k leaves positions, features and pending impact up to k unchanged.
+* *Accounting identity*: the reported net error equals payoff − premium − terminal wealth where wealth is recomputed from explicit
+  cash flows at the execution prices F_k + I_k + (κ/2 + η) q_k with the final position valued at the unaffected price.
+* *Regime enters only through the price response*: with κ = 0 in both regimes every non-oracle feature map produces identical features
+  and errors whatever the regime label; only the oracle sees it.
+* *Disjoint streams*: warm-start, training, validation and test paths come from different generators.
+One recording quirk was fixed (the diagnostics stored the post-trade rather than pre-trade pending impact; the recomputed
+decodability figures are unchanged within 0.01). A new baseline, static tanh with one lag of (ΔS_k, q_{k−1}), was added.
+
+**Rerun, seeds 5–7, 800 iterations, 20 000 test paths per seed:**
+
+| Hedger | features | test net RMSE (mean ± sd over seeds) | liquid regime | illiquid regime | mean cost | CVaR95 | vs. reservoir+tanh (RMSE ratio, 95% CI) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Static tanh (memoryless) | 260 | **1.678** ± 0.009 | 1.467 | 1.867 | 0.732 | 3.45 | 1.306 [1.297, 1.315] |
+| Static tanh + one lag (dS_k, q_{k-1}) | 262 | **1.670** ± 0.010 | 1.454 | 1.864 | 0.737 | 3.45 | 1.300 [1.291, 1.310] |
+| EWMA bank, linear readout | 28 | **1.989** ± 0.010 | 1.734 | 2.217 | 0.623 | 4.12 | 1.548 [1.536, 1.559] |
+| EWMA bank + tanh head | 284 | **1.425** ± 0.007 | 1.201 | 1.621 | 0.625 | 3.43 | 1.109 [1.104, 1.115] |
+| Hand-crafted propagator stats + tanh | 302 | **1.321** ± 0.012 | 0.914 | 1.631 | 0.591 | 3.40 | 1.028 [1.023, 1.032] |
+| Reservoir, recurrence removed | 260 | **1.685** ± 0.011 | 1.499 | 1.854 | 0.719 | 3.49 | 1.311 [1.302, 1.321] |
+| Reservoir (Petar's readout) | 132 | **1.354** ± 0.011 | 0.970 | 1.653 | 0.593 | 3.54 | 1.053 [1.049, 1.057] |
+| Reservoir + tanh head | 260 | **1.285** ± 0.005 | 0.862 | 1.603 | 0.591 | 3.43 | — |
+| GRU trained end-to-end (same budget) | 36 | **1.390** ± 0.009 | 1.119 | 1.619 | 0.617 | 3.45 | 1.082 [1.077, 1.087] |
+| Oracle (sees F, impact, regime) | 262 | **1.198** ± 0.009 | 0.625 | 1.579 | 0.544 | 3.31 | 0.932 [0.928, 0.937] |
+
+**Side by side with the original run (seeds 0–4, 400 iterations):**
+
+| hedger | main (seeds [0, 1, 2, 3, 4]) | rerun800 (seeds [5, 6, 7]) | change |
+|---|---:|---:|---:|
+| Static tanh (memoryless) | 1.679 ± 0.006 | 1.678 ± 0.009 | -0.0% |
+| Static tanh + one lag (dS_k, q_{k-1}) | — | 1.670 ± 0.010 | new |
+| EWMA bank, linear readout | 1.999 ± 0.010 | 1.989 ± 0.010 | -0.5% |
+| EWMA bank + tanh head | 1.435 ± 0.007 | 1.425 ± 0.007 | -0.6% |
+| Hand-crafted propagator stats + tanh | 1.368 ± 0.013 | 1.321 ± 0.012 | -3.5% |
+| Reservoir, recurrence removed | 1.686 ± 0.004 | 1.685 ± 0.011 | -0.0% |
+| Reservoir (Petar's readout) | 1.362 ± 0.014 | 1.354 ± 0.011 | -0.6% |
+| Reservoir + tanh head | 1.299 ± 0.012 | 1.285 ± 0.005 | -1.1% |
+| GRU trained end-to-end (same budget) | 1.462 ± 0.011 | 1.390 ± 0.009 | -4.9% |
+| Oracle (sees F, impact, regime) | 1.204 ± 0.012 | 1.198 ± 0.009 | -0.5% |
+
+**What changed and what did not.**
+* Static tanh, EWMA banks, the reservoir, its ablation and the oracle move by less than 1%: those numbers were converged.
+* Two baselines were under-trained at 400 iterations: the hand-crafted propagator statistics improve by 3.5% (1.368 → 1.321) and the
+  GRU by 4.9% (1.462 → 1.390). The conclusions against static tanh (−23%) and against moving averages (−10% with the tanh head,
+  −5% for the plain reservoir) are unchanged. The claim against the **model-aware hand-crafted statistics must be softened**: with
+  full training the plain reservoir is 2.5% worse than them and the reservoir with tanh head 2.8% better (CI [1.023, 1.032]).
+  The honest statement is "a generic reservoir that is never told the impact model matches hand-crafted propagator statistics to
+  within ±3%", not "beats them by 5%".
+* One lag of observables does not help (1.670 vs 1.678): the information the hedge needs accumulates over many trades.
+* The same-budget GRU, better trained, still trails both reservoir variants.
+

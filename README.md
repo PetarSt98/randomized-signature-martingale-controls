@@ -347,6 +347,11 @@ Mechanism: the hidden regime is linearly decodable from the reservoir state with
 identical to hand-crafted propagator statistics; the EWMA bank plateaus at 0.83, static tanh stays at 0.65. The advantage grows
 with regime separation (none at `kappa` 0.5 vs 5, +3% vs EWMA at 0.5 vs 10, +9% at 0.5 vs 20) and vanishes when nothing is hidden.
 
+Audit and rerun (9 Nov 2026, `REPORT.md` §9): leakage/accounting tests added; fresh seeds 5–7 at 800 iterations reproduce every
+number above within 1% except two under-trained baselines — the hand-crafted propagator statistics improve to 1.321 and the GRU to
+1.390. Against the model-aware hand-crafted statistics the reservoir therefore only *matches* (plain readout +2.5%, tanh head −2.8%);
+against static tanh (−23%), static tanh with one lag (−23%) and moving averages (−10%) the result is unchanged.
+
 ```bash
 python scripts/impact_hedging_run.py --seeds 0,1,2,3,4 --iters 400 --lr 3e-3 --D 256 --tag main   # protocol, ~12 min/seed on 2 cores
 python scripts/impact_hedging_analyze.py --tag main --sens                                       # tables, bootstrap CIs, figures

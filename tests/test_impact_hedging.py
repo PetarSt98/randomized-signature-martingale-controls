@@ -137,3 +137,104 @@ if __name__ == "__main__":
         if name.startswith("test_") and callable(fn):
             fn()
             print(f"{name}: ok")
+
+
+# ----------------------------------------------------------------------------- audit tests (added 9 Nov 2026)
+def _policies_for_audit():
+    for name in ["static_tanh", "static_lag1", "ewma_tanh", "cross_tanh", "reservoir", "reservoir_tanh", "gru"]:
+        fm = make_policy(name, 16, torch.Generator().manual_seed(21))
+        pol = LinearReadoutPolicy(fm)
+        pol.w.data.normal_(0, 0.05)
+        yield name, pol
+
+
+def test_no_look_ahead_future_shocks_do_not_change_past_positions() -> None:
+    """Positions, features and costs up to step k must be identical on two batches that share the
+    fundamental path up to k and differ afterwards (adaptedness of every feature map)."""
+    mkt = _market(n_steps=30)
+    base = mkt.sample(64, torch.Generator().manual_seed(31))
+    k = 12
+    alt = {kk: v.clone() for kk, v in base.items()}
+    tail = torch.randn(64, mkt.n_steps - k, generator=torch.Generator().manual_seed(32)) * mkt.sigma * (mkt.dt ** 0.5)
+    alt["F"][:, k + 1:] = alt["F"][:, k:k + 1] + torch.cumsum(tail, 1)
+    assert torch.allclose(alt["F"][:, :k + 1], base["F"][:, :k + 1]) and not torch.allclose(alt["F"][:, k + 1:], base["F"][:, k + 1:])
+    for name, pol in _policies_for_audit():
+        with torch.no_grad():
+            a = rollout(pol, mkt, base, mkt.premium, record=True)
+            b = rollout(pol, mkt, alt, mkt.premium, record=True)
+        assert torch.allclose(a["rec"]["Q"][:, :k + 1], b["rec"]["Q"][:, :k + 1], atol=1e-6), name
+        assert torch.allclose(a["rec"]["phi"][:, :k + 1], b["rec"]["phi"][:, :k + 1], atol=1e-6), name
+        assert torch.allclose(a["rec"]["I"][:, :k + 1], b["rec"]["I"][:, :k + 1], atol=1e-6), name
+
+
+def test_net_error_matches_explicit_cash_accounting() -> None:
+    """err = payoff - premium - gain + cost equals payoff - premium - terminal wealth, where wealth is
+    computed from explicit cash flows at execution prices F_k + I_k + (kappa/2 + eta) q_k and the final
+    position is valued at the unaffected price F_N (self-financing identity by summation by parts)."""
+    mkt = _market(n_steps=25)
+    batch = mkt.sample(128, torch.Generator().manual_seed(41))
+    for name, pol in _policies_for_audit():
+        with torch.no_grad():
+            out = rollout(pol, mkt, batch, mkt.premium, record=True)
+        Q = out["rec"]["Q"]                                     # Q_k, k = 0..N-1
+        F = batch["F"]; kappa = batch["kappa"][:, None]; lam = batch["lam"][:, None]; eta = batch["eta"][:, None]
+        Q0 = bachelier_delta(F[:, 0], mkt.K, mkt.sigma, mkt.T)[:, None]
+        Qprev = torch.cat([Q0, Q[:, :-1]], 1)
+        q = Q - Qprev
+        # pending impact before each trade, recomputed independently from the trades
+        I = torch.zeros_like(Q)
+        for k in range(1, mkt.n_steps):
+            I[:, k] = lam[:, 0] * (I[:, k - 1] + kappa[:, 0] * q[:, k - 1])
+        assert torch.allclose(I, out["rec"]["I"], atol=1e-5), name
+        exec_price = F[:, :-1] + I + (0.5 * kappa + eta) * q
+        cash = -(exec_price * q).sum(1)                         # pay for the trades (the inherited Q0 was free)
+        wealth = cash + Q[:, -1] * F[:, -1] - Q0[:, 0] * F[:, 0]  # mark the inherited and final positions at the unaffected price
+        err_explicit = out["payoff"] - mkt.premium - wealth
+        assert torch.allclose(err_explicit, out["err"], atol=1e-4), name
+
+
+def test_recorded_impact_is_pre_trade() -> None:
+    """rec['I'][:, k] is the pending impact BEFORE the trade at k: zero at k=0 and independent of q_k."""
+    mkt = _market(n_steps=10)
+    batch = mkt.sample(16, torch.Generator().manual_seed(51))
+    _, pol = next(_policies_for_audit())
+    with torch.no_grad():
+        out = rollout(pol, mkt, batch, mkt.premium, record=True)
+    assert torch.allclose(out["rec"]["I"][:, 0], torch.zeros(16))
+
+
+def test_train_val_test_streams_are_disjoint() -> None:
+    """The seeds used by the protocol give different fundamental paths for warm start, training, validation and test."""
+    mkt = _market(n_steps=10)
+    seed = 5
+    sets = {"train": mkt.sample(3, torch.Generator().manual_seed(1000 + seed))["F"],
+            "val": mkt.sample(3, torch.Generator().manual_seed(5000 + seed))["F"],
+            "ws": mkt.sample(3, torch.Generator().manual_seed(7000 + seed))["F"],
+            "test": mkt.sample(3, torch.Generator().manual_seed(9000 + seed))["F"]}
+    names = list(sets)
+    for i in range(len(names)):
+        for j in range(i + 1, len(names)):
+            assert not torch.allclose(sets[names[i]], sets[names[j]]), (names[i], names[j])
+
+
+def test_regime_enters_non_oracle_features_only_through_the_price_response() -> None:
+    """With kappa = 0 in both regimes the observed path carries no impact, so every non-oracle feature map
+    must produce identical features and positions whatever the regime label (no leakage of z, kappa, lam)."""
+    regimes = [Regime("a", 0.5, kappa=0.0, lam=0.3), Regime("b", 0.5, kappa=0.0, lam=0.9)]
+    mkt = Market(n_steps=15, regimes=regimes)
+    batch = mkt.sample(32, torch.Generator().manual_seed(61))
+    flipped = {k: v.clone() for k, v in batch.items()}
+    flipped["z"] = 1 - flipped["z"]
+    flipped["lam"] = torch.tensor([r.lam for r in regimes])[flipped["z"]]
+    for name, pol in _policies_for_audit():
+        with torch.no_grad():
+            a = rollout(pol, mkt, batch, mkt.premium, record=True)
+            b = rollout(pol, mkt, flipped, mkt.premium, record=True)
+        assert torch.allclose(a["rec"]["phi"], b["rec"]["phi"], atol=1e-6), name
+        assert torch.allclose(a["err"], b["err"], atol=1e-6), name
+    oracle = LinearReadoutPolicy(make_policy("oracle_state", 16, torch.Generator().manual_seed(21)))
+    oracle.w.data.normal_(0, 0.05)
+    with torch.no_grad():
+        a = rollout(oracle, mkt, batch, mkt.premium, record=True)
+        b = rollout(oracle, mkt, flipped, mkt.premium, record=True)
+    assert not torch.allclose(a["rec"]["phi"], b["rec"]["phi"])   # the oracle, by design, does see z

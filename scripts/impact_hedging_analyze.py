@@ -23,6 +23,7 @@ PAL = {"blue": "#2a78d6", "orange": "#eb6834", "aqua": "#1baf7a", "yellow": "#ed
 
 LABEL = {
     "static_tanh": "Static tanh (memoryless)",
+    "static_lag1": "Static tanh + one lag (dS_k, q_{k-1})",
     "ewma_linear": "EWMA bank, linear readout",
     "ewma_tanh": "EWMA bank + tanh head",
     "cross_tanh": "Hand-crafted propagator stats + tanh",
@@ -33,11 +34,11 @@ LABEL = {
     "gru": "GRU trained end-to-end (same budget)",
 }
 SHORT = {
-    "static_tanh": "Static tanh\n(no memory)", "ewma_linear": "EWMA bank\nlinear readout", "ewma_tanh": "EWMA bank\n+ tanh head",
+    "static_tanh": "Static tanh\n(no memory)", "static_lag1": "Static tanh\n+ one lag", "ewma_linear": "EWMA bank\nlinear readout", "ewma_tanh": "EWMA bank\n+ tanh head",
     "cross_tanh": "Hand-crafted\npropagator stats", "reservoir_norec": "Reservoir\nno recurrence", "reservoir": "Reservoir\n(Petar's readout)",
     "reservoir_tanh": "Reservoir\n+ tanh head", "gru": "GRU\n(same budget)", "oracle_state": "Oracle\n(F, impact, regime)",
 }
-ORDER = ["static_tanh", "ewma_linear", "ewma_tanh", "cross_tanh", "reservoir_norec", "reservoir", "reservoir_tanh", "gru", "oracle_state"]
+ORDER = ["static_tanh", "static_lag1", "ewma_linear", "ewma_tanh", "cross_tanh", "reservoir_norec", "reservoir", "reservoir_tanh", "gru", "oracle_state"]
 
 
 def load(outdir, tag):
@@ -173,6 +174,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--outdir", default=str(ROOT / "reports" / "impact_hedging" / "results")); ap.add_argument("--tag", default="main")
     ap.add_argument("--sens", action="store_true", help="also build the regime-separation sensitivity table")
+    ap.add_argument("--compare", default="", help="another tag to put side by side (e.g. the original 400-iteration run)")
     args = ap.parse_args()
     rows = load(args.outdir, args.tag)
     md, summary, names, seeds = table(rows, args.outdir, args.tag)
@@ -186,3 +188,17 @@ if __name__ == "__main__":
     fig_history(rows, names, args.outdir, args.tag)
     if args.sens:
         print(sensitivity_table(args.outdir))
+    if args.compare:
+        other = load(args.outdir, args.compare)
+        _, other_summary, _, other_seeds = table(other, args.outdir, args.compare)
+        lines = [f"| hedger | {args.compare} (seeds {other_seeds}) | {args.tag} (seeds {seeds}) | change |", "|---|---:|---:|---:|"]
+        for n in ORDER:
+            if n in summary and n in other_summary:
+                a, b = other_summary[n]["rmse_mean"], summary[n]["rmse_mean"]
+                lines.append(f"| {LABEL[n]} | {a:.3f} ± {other_summary[n]['rmse_sd']:.3f} | {b:.3f} ± {summary[n]['rmse_sd']:.3f} | {100*(b/a-1):+.1f}% |")
+            elif n in summary:
+                lines.append(f"| {LABEL[n]} | — | {summary[n]['rmse_mean']:.3f} ± {summary[n]['rmse_sd']:.3f} | new |")
+        md2 = "\n".join(lines)
+        print(md2)
+        with open(f"{args.outdir}/{args.tag}_vs_{args.compare}.md", "w") as f:
+            f.write(md2 + "\n")
