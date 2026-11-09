@@ -19,3 +19,8 @@ data/
 !/results/cas_memory/
 /results/cas_memory/*
 !/results/cas_memory/REPORT.md
+!/results/volterra_check/
+/results/volterra_check/*
+!/results/volterra_check/SUMMARY.md
+!/results/volterra_check/volterra_seeds.json
+!/results/volterra_check/volterra_markov_seeds.json
